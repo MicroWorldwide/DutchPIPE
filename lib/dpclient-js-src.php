@@ -2,7 +2,13 @@
 /**
  * Client side Javascript for DutchPIPE
  *
- * DutchPIPE version 0.3; PHP version 5
+ * This is the source of public/dpclient-js.php, which is packed JavaScript.
+ * This is the unpacked version, with the exception of jQuery, of which a packed
+ * version is included. See http://jquery.com/ for a full version. This file is
+ * not used directly, but changes should go in here after which a new packed
+ * version can be produced.
+ *
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -10,16 +16,20 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * jQuery 1.1.3.1 is included in this source file and is not subject to the
- * DutchPIPE license. It has its own license and copyright statement. See below.
+ * DutchPIPE license. It has its own license and copyright statement. See
+ * LICENSE-3RDPARTY.
  *
  * @package    DutchPIPE
  * @subpackage public
- * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006, 2007 Lennert Stock
+ * @author     Lennert Stock <ls@dutchpipe.org> (DutchPIPE part)
+ * @author     John Resig <http://jquery.com/> (jQuery part)
+ * @copyright  2006, 2007 Lennert Stock (DutchPIPE part)
+ * @copyright  2006, 2007 John Resig (jQuery part)
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpclient-js-src.php 253 2007-08-03 10:58:33Z ls $
+ * @license    http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt
+ * @version    Subversion: $Id: dpclient-js-src.php 288 2007-08-21 19:29:16Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
- * @see        dpclient.php
+ * @see        dpclient-js.php dpclient.php
  */
 
 /**
@@ -29,16 +39,17 @@ require_once(realpath(dirname($_SERVER['SCRIPT_FILENAME']) . '/..')
     . '/config/dpserver-ini.php');
 
 error_reporting(DPSERVER_ERROR_REPORTING);
+header("Cache-Control: max-age=86400, must-revalidate");
 ?>
 var php = [
-    '<?php echo dptext('You must have (session) cookies enabled in order to view this site'); ?>',
-    '<?php echo dptext('Invalid event count'); ?>',
-    '<?php echo dptext('Invalid event time'); ?>',
-    '<?php echo dptext('Invalid DutchPIPE XML (2), tagname:'); ?>',
+    '<?php echo dp_text('You must have (session) cookies enabled in order to view this site'); ?>',
+    '<?php echo dp_text('Invalid event count'); ?>',
+    '<?php echo dp_text('Invalid event time'); ?>',
+    '<?php echo dp_text('Invalid DutchPIPE XML (2), tagname:'); ?>',
     '<?php echo DPSERVER_CLIENT_DIR; ?>',
-    '<?php echo dptext('Invalid DutchPIPE XML (1), tagname:'); ?>',
-    '<?php echo dptext('inventory'); ?>',
-    '<?php echo dptext('close'); ?>',
+    '<?php echo dp_text('Invalid DutchPIPE XML (1), tagname:'); ?>',
+    '<?php echo dp_text('inventory'); ?>',
+    '<?php echo dp_text('close'); ?>',
     '<?php echo DPSERVER_HOST_URL . DPSERVER_CLIENT_DIR; ?>',
     '<?php echo DPSERVER_CLIENT_FILENAME; ?>'
 ];
@@ -61,54 +72,63 @@ eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a
  */
 ?>
 
-var loc = '';
-var cur_loc = null;
-var event_count;
-var event_time;
-var has_started = false;
-var scriptid;
-var getstr = '';
-var standalone = false;
-var warned_nocookies = false;
-var seq = 0;
-
-// Action menu vars
-var am_mouse_x;
-var am_mouse_y;
-var am_level;
-var am_levels;
-var am_checksum = 0;
-var am_start = 0;
-var am_no_close = false;
-var am_target_over = null;
-var am_target_out = null;
-var am_y_mod = 0;
-
-var action_history;
-var remote_history = 0;
-var action_index = null;
-var action_cur = null;
-var action_count = 0;
-var cur_menu_item = null;
-var has_formfocus = 0;
-var options_open;
-var sb_width = 0;
+var loc = '',
+cur_loc = null,
+event_count,
+event_time,
+has_started = false,
+scriptid,
+getstr = '',
+standalone = false,
+warned_nocookies = false,
+seq = 0,
+am_mouse_x,
+am_mouse_y,
+am_level,
+am_levels,
+am_checksum = 0,
+am_start = 0,
+am_no_close = false,
+am_target_over = null,
+am_target_out = null,
+am_y_mod = 0,
+action_history,
+remote_history = 0,
+action_index = null,
+action_cur = null,
+action_count = 0,
+cur_menu_item = null,
+has_formfocus = 0,
+options_open,
+sb_width = 0,
+alive_err = 0;
 
 function send_alive2server(firstcall, calltime, getdivs)
 {
     jQuery.ajax({
-        data: 'location=' + escape(loc + getstr) + '&scriptid='
+        data: 'location=' + encodeURIComponent(loc + getstr) + '&scriptid='
             + (firstcall || (new Date().getTime() - calltime > 2300) ? 0
             : scriptid)
-            + (getdivs && getdivs != '' ? '&getdivs=' + escape(getdivs) : '')
+            + (getdivs && getdivs != '' ? '&getdivs='
+            + encodeURIComponent(getdivs) : '')
             + (standalone ? '&standalone=true' + (firstcall ? '&title='
-            + escape(jQuery('title').html()) : '')  : '') + '&seq=' + seq
-            + _arnd(),
+            + encodeURIComponent(jQuery('title').html()) : '')  : '') + '&seq='
+            + seq + _arnd(),
         success: function(msg) {
+            alive_err = 0;
             if (handle_response(msg)) {
                 seq++;
                 setTimeout('send_alive2server(false, ' + (new Date().getTime())
                 + ', "")', 2000);
+            }
+        },
+        error: function(requestOb,msg) {
+            //dpdebug(alive_err + ';' + seq + ';' + msg);
+            // no error handling for first call yet
+            if (seq && alive_err < 3) {
+                seq++;
+                alive_err++;
+                send_alive2server(false, (new Date().getTime()), '');
             }
         }
     });
@@ -120,8 +140,8 @@ function send_action2server(dpaction, cmdline)
         data: 'location=' + loc + getstr + '&scriptid='
             + scriptid + (standalone ? '&standalone=true' : '')
             + '&seq=' + seq + _arnd()
-            + '&dpaction=' + escape(dpaction) + (!cmdline ? '&menuaction=1'
-            : '&cmdline=1')
+            + '&dpaction=' + encodeURIComponent(dpaction)
+            + (!cmdline ? '&menuaction=1' : '&cmdline=1')
     });
 }
 
@@ -158,7 +178,7 @@ function get_actions(id, event)
 
     _get_actions_init(event);
     jQuery.ajax({
-        data: 'call_object=' + escape(id) + '&method=getActionsMenu'
+        data: 'call_object=' + encodeURIComponent(id) + '&method=getActionsMenu'
             + _arnd() + lvls + '&checksum=' + am_checksum
     });
 }
@@ -172,15 +192,15 @@ function get_map_area_actions(map_name, map_area_id, id, event)
     am_levels = new Array(am_level);
 
     for (i = 1; i <= am_level; i++) {
-        lvls += '&l' + i + '=' + escape(arguments[i + 3]);
-        am_levels[i - 1] = escape(arguments[i + 3]);
+        lvls += '&l' + i + '=' + encodeURIComponent(arguments[i + 3]);
+        am_levels[i - 1] = encodeURIComponent(arguments[i + 3]);
     }
 
     _get_actions_init(event);
     jQuery.ajax({
-        data: 'call_object=' + escape(id)
-            + '&method=getActionsMenu&map_name=' + escape(map_name)
-            + '&map_area_id=' + escape(map_area_id) +_arnd()
+        data: 'call_object=' + encodeURIComponent(id)
+            + '&method=getActionsMenu&map_name=' + encodeURIComponent(map_name)
+            + '&map_area_id=' + encodeURIComponent(map_area_id) +_arnd()
             + lvls + '&checksum=' + am_checksum
     });
 }
@@ -244,7 +264,7 @@ function handle_response(response)
                 + '/' + seq + "\n";
 
         }
-        alert(response);
+        //alert(response);
         return false;
     }
 
@@ -264,7 +284,7 @@ function handle_response(response)
     }
 
     for (var i = 0; i < response2.childNodes.length ; i++) {
-        if (jQuery(response2.childNodes[i]).text() != '')
+        //if (jQuery(response2.childNodes[i]).text() != '')
             handle_dp_element(response2.childNodes[i]);
     }
     if (window.init_drag)
@@ -344,6 +364,8 @@ function handle_dp_event(el)
             if (!isNaN(zindex))
                 newdiv.css('z-index', zindex);
         }
+        if ('dpinput_wrap' == id && jQuery('#dpinput[input]').length)
+            gototop(null,true);
         break;
     case 'message':
         var message;
@@ -373,9 +395,8 @@ function handle_dp_event(el)
         break;
     case 'script':
         if (jQuery(el).attr('src')) {
-
             jQuery.getScript(jQuery(el).attr('src'));
-            return;
+            break;
         }
 
         var tag = document.createElement("script");
@@ -387,6 +408,11 @@ function handle_dp_event(el)
             tag.text = el.text;
 
         document.getElementsByTagName('head')[0].appendChild(tag);
+        break;
+    case 'stylesheet':
+        jQuery(document.createElement('link')).attr({ type: 'text/css', rel:
+            'stylesheet', href: jQuery(el).attr('href'), media: 'screen' }).
+            appendTo(jQuery('head'));
         break;
     case 'removeDpElement':
         jQuery('#' + id).remove();
@@ -403,8 +429,8 @@ function handle_dp_event(el)
         break;
     case 'changeDpElement':
         var t = 'div[@id=' + id + ']';
-        jQuery(t + '[@class^=title_img],' + t + '[@class^=dpobject]').
-            html(jQuery(el).text());
+        jQuery('dppage_body' == id ? t : t + '[@class^=title_img],' + t
+            + '[@class^=dpobject]').html(jQuery(el).text());
         break;
     case 'moveDpElement':
         jQuery('#' + id).removeClass().remove().clone().attr('id', id).
@@ -412,8 +438,15 @@ function handle_dp_event(el)
             attr('where')));
         break;
     case 'window':
-        make_dpwindow(jQuery(el).text(), jQuery(el).attr('autoclose'),
-            jQuery(el).attr('styleclass'), jQuery(el).attr('name'));
+        var delay = jQuery(el).attr('delay');
+        if (!delay)
+            make_dpwindow(jQuery(el).text(), jQuery(el).attr('autoclose'),
+                jQuery(el).attr('styleclass'), jQuery(el).attr('name'));
+        else
+            setTimeout('make_dpwindow(' + check_val(jQuery(el).text()) + ', '
+                + check_val(jQuery(el).attr('autoclose')) + ', '
+                + check_val(jQuery(el).attr('styleclass')) + ', '
+                + check_val(jQuery(el).attr('name')) + ')', parseInt(delay));
         break;
     case 'refreshDpWindow':
         if (jQuery('div[@name=' + jQuery(el).attr('name') + ']').length)
@@ -441,6 +474,12 @@ function handle_dp_event(el)
             alert(php[5] + el.tagName);
         */
     }
+}
+
+function check_val(val)
+{
+    return undefined == val || null == val ? val
+        : "'" + val.replace(/\'/g,'\\\'') + "'";
 }
 
 function update_dpinv()
@@ -528,8 +567,6 @@ function make_amenu(el)
     var w = amenu.get(0).clientWidth;
 
     var highlight = 'first';
-    //dpdebug('tp='+tp+"; jQuery('.am', amenu).length="+jQuery('.am', amenu).length+'; scrtop()='+scrtop()+'; wheight()='+wheight());
-    //dpdebug(self.innerHeight + ' / ' + jQuery.boxModel + ' / ' + document.documentElement.clientHeight + '/' + document.body.clientHeight);
     if (tp + (6 + 16 * jQuery('.am', amenu).length) - scrtop() > wheight()) {
         tp = tp - (6 + 16 * jQuery('.am', amenu).length) + 22 + am_y_mod;
         am_y_mod = 0;
@@ -595,8 +632,8 @@ function open_options(ob,e)
         + (jQuery.browser.msie || jQuery.browser.safari ? 1 : 0);
     if (am_mouse_y + 44 - scrtop() > wheight())
         am_y_mod = -35;
-    jQuery.ajax({ data: 'call_object='
-        + escape(jQuery('div[@id=dpinventory] div[@class=dpinventory2]').
+    jQuery.ajax({ data: 'call_object=' + encodeURIComponent(
+        jQuery('div[@id=dpinventory] div[@class=dpinventory2]').
         attr('id')) + '&method=getInputAreaOptions' + _arnd() + '&checksum='
         + am_checksum });
 }
@@ -675,23 +712,19 @@ function init_drag(id, event)
 function stopdrag(x)
 {
     jQuery.ajax({
-        data: 'call_object=' + escape(jQuery(x).attr('id'))
+        data: 'call_object=' + encodeURIComponent(jQuery(x).attr('id'))
             + '&method=reportMove&x=' + x.style.left + '&y=' + x.style.top
             + _arnd()
     });
 }
 
-function gototop(jump)
+function gototop(jump,no_focus_delay)
 {
     var top = 0;
     if (jump)
         top = gettop(jQuery('a[@name=' + jump + ']').get()[0], true);
-
-    focus_input();
-    if (jQuery.browser.msie)
-        setTimeout('scroll(0, ' + top + ')', 10);
-    else
-        scroll(0, top);
+    focus_input(no_focus_delay,'self.scrollTo(0, ' + top + '); '
+        + 'jQuery("#dpaction").unbind("focus")');
 }
 
 function dpdebug(str)
@@ -743,21 +776,21 @@ function action_dutchpipe()
     return false;
 }
 
-function insert_history(element)
+function insert_history(el)
 {
     if (action_history == null) {
-        if (jQuery(element).text())
-            action_history = jQuery(element).text().split('@SEP@');
+        if (jQuery(el).text())
+            action_history = jQuery(el).text().split('@SEP@');
     } else if (action_history.length >= 20)
         return;
     else {
-        var insert_history = jQuery(element).text().split('@SEP@');
-        var insert_length = insert_history.length - action_count;
-        if (insert_length <= 0)
+        var ins_history = jQuery(el).text().split('@SEP@');
+        var ins_length = ins_history.length - action_count;
+        if (ins_length <= 0)
             return;
-        while (action_history.length < 20 && insert_length) {
-            action_history.unshift(insert_history[insert_length - 1]);
-            insert_length--;
+        while (action_history.length < 20 && ins_length) {
+            action_history.unshift(ins_history[ins_length - 1]);
+            ins_length--;
         }
 
     }
@@ -774,7 +807,7 @@ function bindKeyDown(e)
 
     if (38 != keynum && 40 != keynum)
         return true;
-    if (!remote_history == 0) {
+    if (remote_history == 0) {
         remote_history = 1;
         jQuery.ajax({
             data: 'location=' + loc + getstr + '&scriptid=' + scriptid
@@ -819,13 +852,26 @@ function gbody()
         ? document.documentElement : document.body;
 }
 
-function focus_input()
+function focus_input(no_delay,gototop)
 {
     if (!jQuery('input:not(#dpaction)').length)
         has_formfocus = 0;
-    if (!has_formfocus && jQuery('#dpinput[input]').length)
-        setTimeout("if (!has_formfocus && jQuery('#dpinput[input]').length) { "
-            + "gbody().focus();\ jQuery('#dpaction')[0].focus() }", 100);
+    if (!has_formfocus && jQuery('#dpinput[input]').length) {
+        if (gototop)
+            jQuery('#dpaction').bind('focus', {src: gototop},
+                function(event){setTimeout(event.data.src,
+                jQuery.browser.msie ? 175 : 0 )});
+        var src = "if (!has_formfocus && jQuery('#dpinput[input]').length) { "
+            + "gbody().focus();\ jQuery('#dpaction')[0].focus() }";
+        if (no_delay) {
+            if (jQuery.browser.msie)
+                setTimeout(src, 10);
+            else
+                eval(src);
+        }
+        else
+            setTimeout(src, 100);
+    }
 }
 
 function show_input(act)
@@ -848,8 +894,9 @@ function show_input(act)
         _gel('dpaction').value = act;
     jQuery.ajax({
         data: 'call_object='
-            + escape(jQuery('div[@id=dpinventory] div[@class=dpinventory2]').
-            attr('id')) + '&method=openInputArea' + _arnd()
+            + encodeURIComponent(jQuery(
+            'div[@id=dpinventory] div[@class=dpinventory2]').attr('id'))
+            + '&method=openInputArea' + _arnd()
     });
     return false;
 }
@@ -858,8 +905,9 @@ function close_input()
 {
     jQuery.ajax({
         data: 'call_object='
-            + escape(jQuery('div[@id=dpinventory] div[@class=dpinventory2]').
-            attr('id')) + '&method=closeInputArea' + _arnd()
+            + encodeURIComponent(jQuery(
+            'div[@id=dpinventory] div[@class=dpinventory2]').attr('id'))
+            + '&method=closeInputArea' + _arnd()
     });
     var tmp = jQuery('#dpinput').html();
     jQuery('#dpinput').html(jQuery('#dpinput_say').html());
@@ -974,11 +1022,12 @@ jQuery(function() {
     else {
         if (standalone)
             send_alive2server(true, curtime, '');
-        else
+        else {
             setTimeout('send_alive2server(true, '+curtime+', "")',
             (!has_started ? 10 : 2000));
+        }
         if (jQuery('#dpinput[input]').length)
-            gototop(jump);
+            gototop(jump,true);
         has_started = true;
     }
     if (typeof history.navigationMode != 'undefined')

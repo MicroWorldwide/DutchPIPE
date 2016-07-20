@@ -2,7 +2,7 @@
 /**
  * Common functions available to all objects in the universe
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpfunctions.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: dpfunctions.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php, dptemplates.php
  */
@@ -106,14 +106,14 @@ function inherit($path)
 {
     /* PHP 5.1.5 kludge symlink bug fix */
     $files = get_included_files();
-    $pos = strrpos($path, '/');
-    if (FALSE !== $pos && $pos != strlen($path) -1) {
-        $file = substr($path, $pos + 1);
+    $pos = dp_strrpos($path, '/');
+    if (FALSE !== $pos && $pos != dp_strlen($path) -1) {
+        $file = dp_substr($path, $pos + 1);
     }
     foreach ($files as $f) {
-        $pos = strrpos($f, '/');
-        if (FALSE !== $pos && $pos != strlen($f) -1) {
-            if ($file === substr($f, $pos + 1)) {
+        $pos = dp_strrpos($f, '/');
+        if (FALSE !== $pos && $pos != dp_strlen($f) -1) {
+            if ($file === dp_substr($f, $pos + 1)) {
                 return;
             }
         }
@@ -199,7 +199,6 @@ function dp_file_get_contents($path)
 function make_random_id()
 {
     return md5(uniqid(rand(), true));
-
 }
 
 /**
@@ -212,7 +211,7 @@ function is_whole_number($var)
 {
    $var = (string)$var;
 
-   for ($i = 0, $len = strlen($var); $i < $len; $i++) {
+   for ($i = 0, $len = dp_strlen($var); $i < $len; $i++) {
        if (($ascii_code = ord($var[$i])) < 48 || $ascii_code > 57) {
            return FALSE;
        }
@@ -237,30 +236,30 @@ function get_age2string($age)
     $rval = array();
     if ($age >= 31536000) {
         $tmp = floor($age / 31536000);
-        $rval[] = 1 === $tmp ? dptext('1 year') : dptext('%d years', $tmp);
+        $rval[] = 1 === $tmp ? dp_text('1 year') : dp_text('%d years', $tmp);
         $rest_age = $age % 31536000;
     }
     if ($rest_age >= 86400) {
         $tmp = floor($rest_age / 86400);
-        $rval[] = 1 === $tmp ? dptext('1 day') : dptext('%d days', $tmp);
+        $rval[] = 1 === $tmp ? dp_text('1 day') : dp_text('%d days', $tmp);
         $rest_age = $rest_age % 86400;
     }
     if ($rest_age >= 3600) {
         $tmp = floor($rest_age / 3600);
-        $rval[] = 1 === $tmp ? dptext('1 hour') : dptext('%d hours', $tmp);
+        $rval[] = 1 === $tmp ? dp_text('1 hour') : dp_text('%d hours', $tmp);
         $rest_age = $rest_age % 3600;
     }
 
     if ($age < 31536000) {
         if ($rest_age >= 60) {
             $tmp = floor($rest_age / 60);
-            $rval[] = 1 === $tmp ? dptext('1 minute')
-                : dptext('%d minutes', $tmp);
+            $rval[] = 1 === $tmp ? dp_text('1 minute')
+                : dp_text('%d minutes', $tmp);
             $rest_age = $rest_age % 60;
         }
         if ($age < 86400) {
-            $rval[] = 1 === $rest_age ? dptext('1 second')
-                : dptext('%d seconds', $rest_age);
+            $rval[] = 1 === $rest_age ? dp_text('1 second')
+                : dp_text('%d seconds', $rest_age);
         }
     }
 
@@ -271,6 +270,6 @@ function get_age2string($age)
     $last = $rval[$sz - 1];
     $rval = array_slice($rval, 0, -1);
 
-    return implode(', ', $rval) . ' ' . dptext('and') . ' ' . $last;
+    return implode(', ', $rval) . ' ' . dp_text('and') . ' ' . $last;
 }
 ?>

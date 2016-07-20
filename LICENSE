@@ -1,19 +1,113 @@
-Copyright (c) 2006, 2007 Lennert Stock
+CONTENTS
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
+    Introduction
+    The DutchPIPE Licence
+    3rd Party Software
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+INTRODUCTION
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    The DutchPIPE distribution as a whole and all files not listed under "3rd
+    Party Software" are covered by the DutchPIPE licence, see the "The DutchPIPE
+    Licence" below. However, the DutchPIPE distribution includes 3rd party
+    software and images which have their own licence or terms, see "3rd Party
+    Software" below.
 
+    DutchPIPE uses the permissive Open Source MIT License, included 3rd party
+    software was either released in the Public Domain, or also uses the MIT
+    License.
+
+    You can also view the DutchPIPE licence here:
+
+    http://dutchpipe.org/license/1_0.txt
+
+THE DUTCHPIPE LICENCE
+
+    Copyright (c) 2006, 2007 Lennert Stock
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to
+    deal in the Software without restriction, including without limitation the
+    rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+    sell copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+    IN THE SOFTWARE.
+
+3RD PARTY SOFTWARE
+
+    1. Avatar images by Juliane Krug
+
+       Files: public/images/avatar/*
+       Licence: Public Domain
+       See: http://creativecommons.org/licenses/publicdomain/
+
+       Released in the Public Domain in 2005.
+
+    2. CAPTCHA creation script by Julien Crouzet
+
+       Files: script/make_captcha.php
+       Licence: Public Domain
+       See: http://creativecommons.org/licenses/publicdomain/
+
+       Released in the Public Domain in 2006.
+
+    3. jQuery 1.1.3.1
+
+       Files: lib/dpclient-js-src.php public/dpclient-js.php
+       Licence: MIT
+
+       Copyright (c) 2007 John Resig, http://jquery.com/
+
+       Permission is hereby granted, free of charge, to any person obtaining a
+       copy of this software and associated documentation files (the
+       "Software"), to deal in the Software without restriction, including
+       without limitation the rights to use, copy, modify, merge, publish,
+       distribute, sublicense, and/or sell copies of the Software, and to permit
+       persons to whom the Software is furnished to do so, subject to the
+       following conditions:
+
+       The above copyright notice and this permission notice shall be included
+       in all copies or substantial portions of the Software.
+
+       THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+       OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+       MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+       NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+       DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+       OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+       USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+    4. SortTable version 2
+
+       Files: lib/sorttable-src.js public/sorttable.js
+       Licence: MIT
+
+       Copyright (c) 2007 Stuart Langridge
+
+       Permission is hereby granted, free of charge, to any person obtaining a
+       copy of this software and associated documentation files (the
+       "Software"), to deal in the Software without restriction, including
+       without limitation the rights to use, copy, modify, merge, publish,
+       distribute, sublicense, and/or sell copies of the Software, and to permit
+       persons to whom the Software is furnished to do so, subject to the
+       following conditions:
+
+       The above copyright notice and this permission notice shall be included
+       in all copies or substantial portions of the Software.
+
+       THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+       OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+       MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+       NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+       DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+       OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+       USE OR OTHER DEALINGS IN THE SOFTWARE.

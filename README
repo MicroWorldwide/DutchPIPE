@@ -1,6 +1,6 @@
 CONTENTS
 
-    Welcome to DutchPIPE
+    Introduction
     Warning
     Installation
     Directory Layout
@@ -13,15 +13,16 @@ CONTENTS
     Roadmap
     Contributing
 
-WELCOME TO DUTCHPIPE
+INTRODUCTION
 
-    With open source DutchPIPE software, web developers can make virtual
-    multi-user environments. Each web page becomes an abstracted environment or
-    location where visitors and other items on the page are visualized. This
-    status is retained as visitors move around. A lot of real-time interaction
-    is possible. The result: Persistent Interactive Page Environments. DutchPIPE
-    uses AJAX and the DOM for the browser - it works without Java, Flash,
-    plug-in or firewall adjustments. On the server, PHP 5 is used.
+    Welcome to DutchPIPE! With open source DutchPIPE software, web developers
+    can make virtual multi-user environments. Each web page becomes an
+    abstracted environment or location where visitors and other items on the
+    page are visualized. This status is retained as visitors move around. A lot
+    of real-time interaction is possible. The result: Persistent Interactive
+    Page Environments. DutchPIPE uses AJAX and the DOM for the browser - it
+    works without Java, Flash, plug-in or firewall adjustments. On the server,
+    PHP 5 is used.
 
 WARNING
 
@@ -58,7 +59,7 @@ DIRECTORY LAYOUT
         DutchPIPE server startup script
 
     template/
-        Templates for building XHTML pages
+        Templates for building web pages
 
 TROUBLESHOOTING/GETTING HELP/GIVING FEEDBACK
 
@@ -143,7 +144,7 @@ ROADMAP
 
     For all open tickets see:
 
-    http://dev.dutchpipe.org/trac/report/3
+    http://dutchpipe.org/trac/report/3
 
 CONTRIBUTING
 
@@ -152,4 +153,3 @@ CONTRIBUTING
     taking. This will be a free project in any sense, if you shine at some
     particular skill or knowledge, you'll be able to pretty much give it shape
     any way you please.
-

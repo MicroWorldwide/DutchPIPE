@@ -4,7 +4,7 @@
  *
  * When instances of these objects get the same environment, they will merge.
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -16,7 +16,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpHeap.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: DpHeap.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -70,8 +70,8 @@ class DpHeap extends DpObject
     {
         $this->amount = new_dp_property(1);
         $this->isHeap = new_dp_property(TRUE);
-        $this->heapTitleSingular = new_dp_property(dptext('1 unit'));
-        $this->heapTitlePlural = new_dp_property(dptext('%d units'));
+        $this->heapTitleSingular = new_dp_property(dp_text('1 unit'));
+        $this->heapTitlePlural = new_dp_property(dp_text('%d units'));
         $this->heapWeightModifier = new_dp_property(1);
         $this->heapVolumeModifier = new_dp_property(1);
         $this->heapValueModifier = new_dp_property(0);
@@ -185,8 +185,11 @@ class DpHeap extends DpObject
         if (DpObject::isId($id)) {
             return TRUE;
         }
-        return strlen($id)
-            && preg_match(dptext("/^(\d+) (.+)$/"), $id, $matches)
+        return dp_strlen($id)
+            && ((!DPSERVER_ENABLE_MBSTRING
+            && preg_match(dp_text('/^(\d+) (.+)$/'), $id, $matches))
+            || (DPSERVER_ENABLE_MBSTRING
+            && mb_ereg(dp_text('^([0-9]+) (.+)$'), $id, $matches)))
             && DpObject::isId($matches[2]) && $matches[1] > 0
             && $matches[1] <= $this->amount;
     }

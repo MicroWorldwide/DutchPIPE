@@ -2,7 +2,7 @@
 /**
  * The DutchPIPE property and coinherit system which all objects extend on
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpProperties.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: DpProperties.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  */
 
@@ -122,7 +122,7 @@ class DpProperties
             return;
         }
 
-        if (!is_null($this->mCoinherits)) {
+        if (isset($this->mCoinherits) && !is_null($this->mCoinherits)) {
                 foreach ($this->mCoinherits as $coinherit) {
                     if (isset($coinherit->{$nm})) {
                     $coinherit->{$nm} = $val;
@@ -131,7 +131,7 @@ class DpProperties
             }
         }
 
-        // echo dptext("Invalid __set, %s not defined.\n", $nm);
+        // echo dp_text("Invalid __set, %s not defined.\n", $nm);
         // Should throw error in future.
     }
 
@@ -185,7 +185,7 @@ class DpProperties
             }
         }
 
-        // echo dptext("Invalid __get, %s not defined.\n", $nm);
+        // echo dp_text("Invalid __get, %s not defined.\n", $nm);
         // Should throw error in future.
         return NULL;
     }
@@ -260,32 +260,32 @@ class DpProperties
     {
         //echo "__call($name, $params) called\n";
         //echo "params:\n"; print_r($params);
-        if (strlen($name) > 3) {
-            $part1 = substr($name, 0, 3);
-            $part2 = strtolower(substr($name, 3, 1))
-                . (strlen($name) == 4 ? '' : substr($name, 4));
+        if (dp_strlen($name) > 3) {
+            $part1 = dp_substr($name, 0, 3);
+            $part2 = dp_strtolower(dp_substr($name, 3, 1))
+                . (dp_strlen($name) == 4 ? '' : dp_substr($name, 4));
 
                 //echo $part1 . '---' . $part2 . "\n";
 
             if (isset($this->mProperties[$part2])) {
                 if ('set' === $part1) {
                     if (count($params) <= 1) {
-                        return $this->__set(strtolower(substr($name, 3, 1))
-                            . substr($name, 4), array_pop($params));
+                        return $this->__set(dp_strtolower(dp_substr($name, 3,
+                            1)) . dp_substr($name, 4), array_pop($params));
                     }
                     call_user_func_array(array(&$this, '__set'),
-                        array_merge(array(strtolower(substr($name, 3, 1))
-                        . substr($name, 4)), $params));
+                        array_merge(array(dp_strtolower(dp_substr($name, 3, 1))
+                        . dp_substr($name, 4)), $params));
                     return;
                 }
                 if ('get' === $part1) {
                     if (empty($params)) {
-                        return $this->__get(strtolower(substr($name, 3, 1))
-                            . substr($name, 4));
+                        return $this->__get(dp_strtolower(dp_substr($name, 3,
+                            1)) . dp_substr($name, 4));
                     }
                     return call_user_func_array(array(&$this, '__get'),
-                        array_merge(array(strtolower(substr($name, 3, 1))
-                        . substr($name, 4)), $params));
+                        array_merge(array(dp_strtolower(dp_substr($name, 3, 1))
+                        . dp_substr($name, 4)), $params));
                 }
             }
         }
@@ -302,7 +302,7 @@ class DpProperties
             }
         }
 
-        //echo dptext("Invalid __call, method %s does not exist.\n", $name);
+        //echo dp_text("Invalid __call, method %s does not exist.\n", $name);
         return NULL;
     }
 
@@ -373,8 +373,8 @@ class DpProperties
         }
         require_once(DPUNIVERSE_PREFIX_PATH . $pathname);
         $classname =  explode("/", $pathname);
-        $classname = ucfirst(!strlen($classname[sizeof($classname) - 1])
-            ? 'index' : substr($classname[sizeof($classname) - 1], 0, -4));
+        $classname = ucfirst(!dp_strlen($classname[sizeof($classname) - 1])
+            ? 'index' : dp_substr($classname[sizeof($classname) - 1], 0, -4));
         $object = new $classname($this);
 
         $this->mCoinherits[$pathname] =& $object;

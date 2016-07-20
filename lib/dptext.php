@@ -2,7 +2,7 @@
 /**
  * Replacements for gettext and _ if gettext is not enabled in PHP
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dptext.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: dptext.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php
  */
@@ -41,7 +41,7 @@ if (!DPSERVER_GETTEXT_ENABLED || !function_exists('gettext')) {
      * @param      mixed     $args,...   the integer or string to check
      * @return     string    string produced according to format and language
      */
-    function dptext($message)
+    function dp_text($message)
     {
         if (1 === func_num_args()) {
             return $message;
@@ -66,7 +66,7 @@ if (!DPSERVER_GETTEXT_ENABLED || !function_exists('gettext')) {
     /**
      * @ignore
      */
-    function dptext($message)
+    function dp_text($message)
     {
         if (1 === func_num_args()) {
             return gettext($message);

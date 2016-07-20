@@ -101,6 +101,7 @@ a.col2:link, a.col2:visited { color: #666666; text-decoration: none }
 .dpwindow_tell { left: 88px; top: 105px; width: 450px; background-color: #99ff99 }
 .dpwindow_shout { left: 100px; top: 115px; width: 450px; background-color: #00ccff }
 .dpwindow_emote { left: 60px; top: 135px; width: 450px; background-color: #ff9900 }
+.dpwindow_oblist { left: 20px; top: 20px }
 .dpinactive { opacity: 0.60; -moz-opacity: 0.60; filter: alpha(opacity=60) }
 .dpinactive_txt { color: #6666A3 }
 .dpcomm { width: 375px }

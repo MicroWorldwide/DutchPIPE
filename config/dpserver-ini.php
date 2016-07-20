@@ -8,7 +8,7 @@
  * and the user's browser. See {@link dpuniverse-ini.php} for settings dealing
  * with the "universe".
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -20,7 +20,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpserver-ini.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: dpserver-ini.php 292 2007-08-23 08:13:56Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver.php, dpclient.php, dpuniverse-ini.php
  */
@@ -254,7 +254,8 @@ define('DPSERVER_TEMPLATE_DOWN_FILE', 'dpdown.tpl');
  * so this can be fixed.
  *
  * @see        DPSERVER_GETTEXT_LOCALE_PATH, DPSERVER_GETTEXT_DOMAIN,
- *             DPSERVER_GETTEXT_ENCODING, DPSERVER_LOCALE, DPSERVER_LOCALE_FULL
+ *             DPSERVER_GETTEXT_ENCODING, DPSERVER_LOCALE, DPSERVER_LOCALE_FULL,
+ *             DPSERVER_ENABLE_MBSTRING
  */
 define('DPSERVER_GETTEXT_ENABLED', FALSE);
 
@@ -264,7 +265,8 @@ define('DPSERVER_GETTEXT_ENABLED', FALSE);
  * Used when gettext is enabled.
  *
  * @see        DPSERVER_GETTEXT_ENABLED, DPSERVER_GETTEXT_DOMAIN,
- *             DPSERVER_GETTEXT_ENCODING, DPSERVER_LOCALE, DPSERVER_LOCALE_FULL
+ *             DPSERVER_GETTEXT_ENCODING, DPSERVER_LOCALE, DPSERVER_LOCALE_FULL,
+ *             DPSERVER_ENABLE_MBSTRING
  */
 define('DPSERVER_GETTEXT_LOCALE_PATH', DPSERVER_ROOT_PATH . 'locale/');
 
@@ -274,7 +276,8 @@ define('DPSERVER_GETTEXT_LOCALE_PATH', DPSERVER_ROOT_PATH . 'locale/');
  * Used when gettext is enabled.
  *
  * @see        DPSERVER_GETTEXT_ENABLED, DPSERVER_GETTEXT_LOCALE_PATH,
- *             DPSERVER_GETTEXT_ENCODING, DPSERVER_LOCALE, DPSERVER_LOCALE_FULL
+ *             DPSERVER_GETTEXT_ENCODING, DPSERVER_LOCALE, DPSERVER_LOCALE_FULL,
+ *             DPSERVER_ENABLE_MBSTRING
  */
 define('DPSERVER_GETTEXT_DOMAIN', 'messages');
 
@@ -285,7 +288,8 @@ define('DPSERVER_GETTEXT_DOMAIN', 'messages');
  * DutchPIPE uses UTF-8 but I'm not sure how this works for other languages
  *
  * @see        DPSERVER_GETTEXT_ENABLED, DPSERVER_GETTEXT_LOCALE_PATH,
- *             DPSERVER_GETTEXT_DOMAIN, DPSERVER_LOCALE, DPSERVER_LOCALE_FULL
+ *             DPSERVER_GETTEXT_DOMAIN, DPSERVER_LOCALE, DPSERVER_LOCALE_FULL,
+ *             DPSERVER_ENABLE_MBSTRING
  */
 define('DPSERVER_GETTEXT_ENCODING', 'UTF-8');
 
@@ -304,10 +308,27 @@ define('DPSERVER_GETTEXT_ENCODING', 'UTF-8');
  *
  * @see        DPSERVER_GETTEXT_ENABLED, DPSERVER_GETTEXT_LOCALE_PATH,
  *             DPSERVER_GETTEXT_DOMAIN, DPSERVER_GETTEXT_ENCODING,
- *             DPSERVER_LOCALE_FULL
+ *             DPSERVER_LOCALE_FULL, DPSERVER_ENABLE_MBSTRING
  */
 define('DPSERVER_LOCALE', '0');
 //define('DPSERVER_LOCALE', 'nl_NL');
+
+/**
+ * Multibyte string handling enabled?
+ *
+ * Enables your site to handle all UTF-8 chars, so people can communicate for
+ * example in East Asian languages. PHP must have the multibyte extension
+ * enabled if set to TRUE, otherwise this setting is ignored. Set to FALSE to
+ * disable.
+ *
+ * See also: http://www.php.net/manual/en/ref.mbstring.php
+ *
+ * @see        DPSERVER_GETTEXT_ENABLED, DPSERVER_GETTEXT_LOCALE_PATH,
+ *             DPSERVER_GETTEXT_DOMAIN, DPSERVER_GETTEXT_ENCODING,
+ *             DPSERVER_LOCALE_FULL, DPSERVER_LOCALE
+ * @since      DutchPIPE 0.4.0
+ */
+define('DPSERVER_ENABLE_MBSTRING', TRUE);
 
 /**
  * You probably don't need to touch this
@@ -340,7 +361,7 @@ define('DPSERVER_MAXUPTIME', 0);
  *             DPSERVER_SOCKET_ADDRESS, DPSERVER_SOCKET_PORT,
  *             DPSERVER_MAX_SOCKET_BACKLOG
  */
-define('DPSERVER_SOCKERR_MSG', dptext('The DutchPIPE server is down'));
+define('DPSERVER_SOCKERR_MSG', dp_text('The DutchPIPE server is down'));
 
 /**
  * Error reporting level
@@ -455,4 +476,18 @@ define('DPSERVER_SERVER_CHUNK', 2048);
  * See also: http://www.php.net/manual/en/ini.core.php#ini.memory-limit
  */
 define('DPSERVER_MEMORY_LIMIT', '32M');
+
+/**
+ * Apache minimal deflate/gzip size
+ *
+ * If you are using Apache's mod_deflate (or mod_gzip), even small Ajax requests
+ * are compressed, which is not effective. You can set a minimal size in bytes
+ * here the content of the request should have (200 is a good size). The
+ * DutchPIPE client will use the following PHP function call for small requests:
+ *    apache_setenv('no-gzip', '1');
+ * Set to FALSE if you're not running Apache with output compression or if you
+ * don't want to use this feature.
+ */
+define('DPSERVER_APACHE_GZIP_MIN', FALSE);
+//define('DPSERVER_APACHE_GZIP_MIN', 200);
 ?>

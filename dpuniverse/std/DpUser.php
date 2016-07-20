@@ -2,7 +2,7 @@
 /**
  * A user object, the object representing a real user
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpUser.php 254 2007-08-03 12:48:24Z ls $
+ * @version    Subversion: $Id: DpUser.php 286 2007-08-21 11:24:10Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpLiving
  */
@@ -149,7 +149,7 @@ class DpUser extends DpLiving
      */
     function createDpLiving()
     {
-        $this->addId(dptext('user'));
+        $this->addId(dp_text('user'));
         $this->isUser = new_dp_property(TRUE);
         $this->isRegistered = new_dp_property(FALSE);
         $this->isAdmin = new_dp_property(FALSE);
@@ -165,34 +165,38 @@ class DpUser extends DpLiving
 
         $avatar_nr = $this->_getRandAvatarNr();
         $this->avatarNr = new_dp_property($avatar_nr);
-        $this->setTitle(dptext('User'));
+        $this->setTitle(dp_text('User'));
         $this->titleType = DPUNIVERSE_TITLE_TYPE_NAME;
         $this->titleImg = DPUNIVERSE_AVATAR_URL . 'user' . $avatar_nr . '.gif';
         $this->status = new_dp_property(FALSE, NULL, 'getStatus');
         $this->setBody('<img src="' . DPUNIVERSE_AVATAR_URL . 'user'
             . $avatar_nr . '_body.gif" border="0" alt="" align="left" '
-            . 'style="margin-right: 15px" />' . dptext('A user.') . '<br />');
+            . 'style="margin-right: 15px" />' . dp_text('A user.') . '<br />');
 
         /* Actions for everybody */
-        $this->addAction(dptext("who's here?"), dptext('who'), 'actionWho', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('tools'), dptext('avatar & other settings')), explode('#', dptext('settings#config')), 'actionSettings', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('tools'), dptext('my home')), dptext('myhome'), 'actionMyhome', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_REGISTERED, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('tools'), dptext('set my home')), dptext('myhome set'), 'actionMyhome', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_REGISTERED, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('tools'), dptext('login/register')), dptext('login'), 'actionLoginOut', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_GUEST, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('tools'), dptext('logout')), dptext('logout'), 'actionLoginOut', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_REGISTERED, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('tools'), dptext('advanced'), array($this, 'getModeChecked')), dptext('mode'), 'actionMode', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('tools'), dptext('advanced'), dptext('show page links')), dptext('links'), 'actionLinks', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('tools'), dptext('advanced'), dptext('show source')), dptext('source'), 'actionSource', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(dp_text("who's here?"), dp_text('who'), 'actionWho', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dp_text('tools'), dp_text('avatar & other settings')), explode('#', dp_text('settings#config')), 'actionSettings', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dp_text('tools'), dp_text('my home')), dp_text('myhome'), 'actionMyhome', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_REGISTERED, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dp_text('tools'), dp_text('set my home')), dp_text('myhome set'), 'actionMyhome', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_REGISTERED, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dp_text('tools'), dp_text('login/register')), dp_text('login'), 'actionLoginOut', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_GUEST, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dp_text('tools'), dp_text('logout')), dp_text('logout'), 'actionLoginOut', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_REGISTERED, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dp_text('tools'), dp_text('advanced'), array($this, 'getModeChecked')), dp_text('mode'), 'actionMode', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dp_text('tools'), dp_text('advanced'), dp_text('show page links')), dp_text('links'), 'actionLinks', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dp_text('tools'), dp_text('advanced'), dp_text('show source')), dp_text('source'), 'actionSource', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
 
         /* Actions for admin only */
-        $this->addAction(array(dptext('admin'), dptext('goto...')), dptext('goto'), 'actionGoto', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('admin'), dptext('reset')), dptext('reset'), 'actionReset', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('admin'), dptext('svars')), dptext('svars'), 'actionSvars', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF | DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('admin'), dptext('force...')), dptext('force'), 'actionForce', array($this, 'actionMoveOperant'), DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('admin'), dptext('move...')), dptext('move'), 'actionMove', array($this, 'actionMoveOperant'), DP_ACTION_TARGET_SELF | DP_ACTION_TARGET_LIVING | DP_ACTION_TARGET_OBJINV | DP_ACTION_TARGET_OBJENV, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dp_text('admin'), dp_text('goto...')), dp_text('goto'), 'actionGoto', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dp_text('admin'), dp_text('reset')), dp_text('reset'), 'actionReset', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dp_text('admin'), dp_text('svars')), dp_text('svars'), 'actionSvars', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF | DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dp_text('admin'), dp_text('force...')), dp_text('force'), 'actionForce', array($this, 'actionMoveOperant'), DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dp_text('admin'), dp_text('move...')), dp_text('move'), 'actionMove', array($this, 'actionMoveOperant'), DP_ACTION_TARGET_SELF | DP_ACTION_TARGET_LIVING | DP_ACTION_TARGET_OBJINV | DP_ACTION_TARGET_OBJENV, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dp_text('admin'), dp_text('destroy')), dp_text('destroy'), 'actionDestroy', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_LIVING | DP_ACTION_TARGET_OBJINV | DP_ACTION_TARGET_OBJENV, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dp_text('admin'), dp_text('object list')), dp_text('oblist'), 'actionOblist', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
 
         /* Last action in menu */
-        $this->addAction(dptext('help'), dptext('help'), 'actionHelp', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(dp_text('help'), dp_text('help'), 'actionHelp', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+
+        $this->addValidClientCall('setSettings');
     }
 
     /**
@@ -228,12 +232,14 @@ class DpUser extends DpLiving
             return FALSE;
         }
 
-        $result = mysql_query("SELECT userAge FROM Users WHERE "
-            . "userUsernameLower='" . addslashes(strtolower($this->getTitle()))
-             . "'");
+        $result = dp_db_query('SELECT userAge FROM Users WHERE '
+            . 'userUsernameLower='
+            . dp_db_quote(dp_strtolower($this->getTitle()), 'text'));
 
-        $age = !$result || !mysql_num_rows($result)
-            ? 0 : mysql_result($result, 0, 0);
+        $age = !$result || !dp_db_num_rows($result)
+            ? 0 : dp_db_fetch_one($result, 0, 0);
+
+        dp_db_free($result);
 
         return get_age2string($age + (time() - $this->creationTime));
 
@@ -290,7 +296,7 @@ class DpUser extends DpLiving
     function getStatus()
     {
         if ($this->isInactive) {
-            return dptext('away');
+            return dp_text('away');
         }
 
         return FALSE;
@@ -371,7 +377,7 @@ class DpUser extends DpLiving
      */
     function tell($data, &$binded_env = NULL)
     {
-        if ((FALSE === is_string($data) || 0 === strlen($data)) &&
+        if ((FALSE === is_string($data) || 0 === dp_strlen($data)) &&
                 (FALSE === is_array($data)) || 0 === count($data)) {
             return;
         }
@@ -379,7 +385,7 @@ class DpUser extends DpLiving
         if (FALSE === is_null($binded_env)
                 && (FALSE === ($env = $this->getEnvironment())
                 || $env !== $binded_env)) {
-            echo dptext("Message skipped, no longer in page\n");
+            echo dp_text("Message skipped, no longer in page\n");
             return;
         }
 
@@ -388,8 +394,8 @@ class DpUser extends DpLiving
         // a HTTP request from the user.
         if (TRUE === get_current_dpuniverse()->isNoDirectTell()
                 || $this !== get_current_dpuser()) {
-            //echo sprintf(dptext("Storing %s: %s\n"), $this->getTitle(),
-            //    (strlen($data) > 512 ? substr($data, 0, 512) : $data));
+            //echo sprintf(dp_text("Storing %s: %s\n"), $this->getTitle(),
+            //    (dp_strlen($data) > 512 ? dp_substr($data, 0, 512) : $data));
             get_current_dpuniverse()->storeTell($this, $data, $binded_env);
             return;
         }
@@ -407,14 +413,14 @@ class DpUser extends DpLiving
 
     private function _tellParseTag($data)
     {
-         if (strlen($data) >=3 && substr($data, 0, 1) == '<'
-                && FALSE !== ($pos = strpos($data, '>'))) {
-            $mtype_start = substr($data, 1, $pos - 1);
-            $endpos = strrpos($data, '<');
-            $mtype_end = substr($data, $endpos + 2, -1);
+         if (dp_strlen($data) >=3 && dp_substr($data, 0, 1) == '<'
+                && FALSE !== ($pos = dp_strpos($data, '>'))) {
+            $mtype_start = dp_substr($data, 1, $pos - 1);
+            $endpos = dp_strrpos($data, '<');
+            $mtype_end = dp_substr($data, $endpos + 2, -1);
 
-            $data = "<![CDATA[" . substr($data, strlen($mtype_start) + 2,
-                $endpos - strlen($mtype_start) - 2) . ']]>';
+            $data = "<![CDATA[" . dp_substr($data, dp_strlen($mtype_start) + 2,
+                $endpos - dp_strlen($mtype_start) - 2) . ']]>';
         } else {
             $mtype_start = $mtype_end = 'message';
             $data = "<![CDATA[$data]]>";
@@ -439,8 +445,9 @@ class DpUser extends DpLiving
             }
             /*
             if ($data !== '1') {
-                echo sprintf(dptext("Telling %s: %s\n"), $this->getTitle(),
-                    (strlen($data) > 236 ? substr($data, 0, 236) : $data));
+                echo sprintf(dp_text("Telling %s: %s\n"), $this->getTitle(),
+                    (dp_strlen($data) > 236 ? dp_substr($data, 0, 236)
+                    : $data));
             }
             */
             if ($mtype_end === '' || $mtype_end === 'header'
@@ -470,17 +477,17 @@ class DpUser extends DpLiving
             return;
         }
 
-        $result = mysql_query("SELECT userAge FROM Users WHERE "
-            . "userUsernameLower='" . addslashes(strtolower($this->getTitle()))
-            . "'");
-
-        $age = !$result || !mysql_num_rows($result)
-            ? 0 : mysql_result($result, 0, 0);
+        $result = dp_db_query('SELECT userAge FROM Users WHERE '
+            . 'userUsernameLower='
+            . dp_db_quote(dp_strtolower($this->getTitle()), 'text'));
+        $age = !$result || !dp_db_num_rows($result) ? 0
+            : dp_db_fetch_one($result, 0, 0);
+        dp_db_free($result);
 
         $new_age = $age + (time() - $this->creationTime);
-        mysql_query($query = "UPDATE Users set userAge='{$new_age}' WHERE "
-            . "userUsernameLower='" . addslashes(strtolower($this->getTitle()))
-            . "'");
+        dp_db_exec('UPDATE Users set userAge=' . dp_db_quote($new_age)
+            . ' WHERE userUsernameLower='
+            . dp_db_quote(dp_strtolower($this->getTitle()), 'text'));
     }
 
     /**
@@ -513,11 +520,11 @@ class DpUser extends DpLiving
     {
         $action = $orig_action = trim($action);
         if (!isset($this->_GET['menuaction']) && 'say' === $this->inputMode
-                && strlen($action)) {
-            if (strlen($action) && '/' === substr($action, 0, 1)) {
-                $action = $orig_action = substr($action, 1);
+                && dp_strlen($action)) {
+            if (dp_strlen($action) && '/' === dp_substr($action, 0, 1)) {
+                $action = $orig_action = dp_substr($action, 1);
             } else {
-                $action = sprintf(dptext('say %s'), $action);
+                $action = sprintf(dp_text('say %s'), $action);
             }
         }
         $rval = DpLiving::performAction($action);
@@ -560,13 +567,13 @@ class DpUser extends DpLiving
      */
     function actionSource($verb, $noun)
     {
-        if (!strlen($noun)) {
+        if (!dp_strlen($noun)) {
             $what = $this->getEnvironment();
         } else {
             if (FALSE === ($what = $this->isPresent($noun))
                     && FALSE === ($what =
                     $this->getEnvironment()->isPresent($noun))) {
-                $this->tell(sprintf(dptext("Can't find: %s<br />"), $noun));
+                $this->tell(sprintf(dp_text("Can't find: %s<br />"), $noun));
                 return TRUE;
             }
         }
@@ -577,7 +584,7 @@ class DpUser extends DpLiving
         /* Without the \n and &nbsp; to &#160 conversion, highlight_file gave
          invalid XHTML */
         $this->tell("<window styleclass=\"dpwindow_src\">\n"
-            . str_replace('&nbsp;', '&#160;', highlight_file(DPUNIVERSE_PATH
+            . str_replace('&nbsp;', '&#160;', @highlight_file(DPUNIVERSE_PATH
             . $what->location, TRUE) . "\n</window>"));
         return TRUE;
     }
@@ -591,31 +598,31 @@ class DpUser extends DpLiving
      */
     function actionLinks($verb, $noun)
     {
-        if (!strlen($noun)) {
+        if (!dp_strlen($noun)) {
             $what = $this->getEnvironment();
         } else {
             if (FALSE === ($what = $this->isPresent($noun))
                     && FALSE === ($what =
                     $this->getEnvironment()->isPresent($noun))) {
-                $this->tell(sprintf(dptext("Can't find: %s<br />"), $noun));
+                $this->tell(sprintf(dp_text("Can't find: %s<br />"), $noun));
                 return TRUE;
             }
         }
 
         if (FALSE === method_exists($what, 'getExits')
                 || 0 === count($links = $what->getExits())) {
-            $tell = '<b>' . sprintf(dptext('No links found in %s'),
+            $tell = '<b>' . sprintf(dp_text('No links found in %s'),
                 $what->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))
                 . '</b><br />';
         } else {
-            $tell = '<b>' . sprintf(dptext('Links found in: %s'),
+            $tell = '<b>' . sprintf(dp_text('Links found in: %s'),
                 $what->getTitle()) . '</b><br /><br />';
             foreach ($links as $linktitle => $linkdata) {
                 if ($linktitle === DPUNIVERSE_NAVLOGO) {
-                    $linkcommand = dptext('home');
+                    $linkcommand = dp_text('home');
                 } else {
                     $linkcommand = explode(' ', $linktitle);
-                    $linkcommand = strtolower($linktitle);
+                    $linkcommand = dp_strtolower($linktitle);
                 }
                 $tell .= "<a href=\"" . DPSERVER_CLIENT_URL
                 . "?location={$linkdata[0]}\">$linkcommand</a><br />";
@@ -636,18 +643,19 @@ class DpUser extends DpLiving
     {
         $users = get_current_dpuniverse()->getUsers();
         if (0 === count($users)) {
-           $this->tell('<window><b>' . dptext('No one is on this site.')
+           $this->tell('<window><b>' . dp_text('No one is on this site.')
             . '</b></window>');
             return TRUE;
         }
 
-        $tell = '<b>' . dptext('People currently on this site:') . '</b><br />';
+        $tell = '<b>' . dp_text('People currently on this site:')
+            . '</b><br />';
         $tell .= '<table cellpadding="0" cellspacing="0" border="0" style="'
             . 'margin-top: 5px">';
         foreach ($users as &$user) {
             $env = $user->getEnvironment();
             $loc = $env->location;
-            if (0 !== strpos($loc, 'http://')) {
+            if (0 !== dp_strpos($loc, 'http://')) {
                 $loc = DPSERVER_CLIENT_URL . '?location=' . $loc;
             }
             $env = FALSE === $env ? '-' : '<a href="' . $loc . '">'
@@ -715,16 +723,17 @@ function send_settings()
                 . "&#160; ";
         }
 
-        $this->tell('<window>' . dptext('Choose your avatar:') . '<br />'
+        $this->tell('<window>' . dp_text('Choose your avatar:') . '<br />'
 . $avatar_settings . '<br /><br />'
-. dptext('People and items on the page are displayed in:') . '<br />
-<input type="radio" id="display_mode1" name="display_mode" value="graphical"' . ($this->displayMode == 'graphical' ? ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dptext('Graphical mode') . '<br />
-<input type="radio" id="display_mode2" name="display_mode" value="abstract"' . ($this->displayMode == 'abstract' ? ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dptext('Abstract mode') . '<br /><br />'
-. dptext('Alert me of the following events:') . '<br />
-<input type="checkbox" id="people_entering" name="people_entering" value="1"' . (isset($this->mAlertEvents['people_entering']) ? ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dptext('People entering this site') . '<br />
-<input type="checkbox" id="people_leaving" name="people_leaving" value="1"' . (isset($this->mAlertEvents['people_leaving']) ? ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dptext('People leaving this site') . '<br />
-<input type="checkbox" id="bots_entering" name="bots_entering" value="1"' . (isset($this->mAlertEvents['bots_entering']) ?  ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dptext('Search engines indexing pages') . '<br /><br />'
-. '<div id="box"><a href="http://www.messdudes.com/" target="_blank"><b>Mess Dudes</b></a> has kindly allowed DutchPIPE to use a number of avatars.</div>
+. dp_text('People and items on the page are displayed in:') . '<br />
+<input type="radio" id="display_mode1" name="display_mode" value="graphical"' . ($this->displayMode == 'graphical' ? ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dp_text('Graphical mode') . '<br />
+<input type="radio" id="display_mode2" name="display_mode" value="abstract"' . ($this->displayMode == 'abstract' ? ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dp_text('Abstract mode') . '<br /><br />'
+. dp_text('Alert me of the following events:') . '<br />
+<input type="checkbox" id="people_entering" name="people_entering" value="1"' . (isset($this->mAlertEvents['people_entering']) ? ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dp_text('People entering this site') . '<br />
+<input type="checkbox" id="people_leaving" name="people_leaving" value="1"' . (isset($this->mAlertEvents['people_leaving']) ? ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dp_text('People leaving this site') . '<br />
+<input type="checkbox" id="bots_entering" name="bots_entering" value="1"' . (isset($this->mAlertEvents['bots_entering']) ?  ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dp_text('Search engines indexing pages') . '<br />'
+            . ('http://dutchpipe.org' !== DPSERVER_HOST_URL ? '' : '<br />'
+. '<div id="box"><a href="http://www.messdudes.com/" target="_blank"><b>Mess Dudes</b></a> has kindly allowed DutchPIPE to use a number of avatars.</div>') . '
 </window>');
 
         return TRUE;
@@ -738,15 +747,15 @@ function send_settings()
      * settings, based on the DpUser::_GET variable in this living object.
      *
      * @see     actionSettings
-     * @todo    save settings for registered users in the database
      */
     function setSettings()
     {
         if (!isset($this->_GET['avatar_nr'])
-                || 0 === strlen($avatar_nr = $this->_GET['avatar_nr'])
+                || 0 === dp_strlen($avatar_nr = $this->_GET['avatar_nr'])
                 || !isset($this->_GET['display_mode'])
-                || 0 === strlen($display_mode = $this->_GET['display_mode'])) {
-            $this->tell(dptext('Error receiving settings.<br />'));
+                || 0 === dp_strlen($display_mode
+                = $this->_GET['display_mode'])) {
+            $this->tell(dp_text('Error receiving settings.<br />'));
         }
 
         $this->avatarNr = $avatar_nr;
@@ -754,7 +763,7 @@ function send_settings()
             . '.gif');
         $this->setBody('<img src="' . DPUNIVERSE_AVATAR_URL . 'user'
             . $avatar_nr . '_body.gif" border="0" alt="" align="left" '
-            . 'style="margin-right: 15px" />' . dptext('A user.') . '<br />');
+            . 'style="margin-right: 15px" />' . dp_text('A user.') . '<br />');
 
         $this->displayMode = $display_mode;
 
@@ -783,7 +792,7 @@ function send_settings()
         }
 
         if ($this->isRegistered) {
-            mysql_query($query = "UPDATE Users set "
+            dp_db_exec("UPDATE Users set "
                 . "userAvatarNr='" . addslashes($avatar_nr)
                 . "',userDisplayMode='" . addslashes($display_mode)
                 . "',userEventPeopleEntering='"
@@ -793,7 +802,7 @@ function send_settings()
                 . "',userEventBotsEntering='"
                 . (!isset($this->mAlertEvents['bots_entering']) ? '0' : '1')
                 . "' WHERE userUsernameLower='"
-                . addslashes(strtolower($this->getTitle())) . "'");
+                . addslashes(dp_strtolower($this->getTitle())) . "'");
         }
 
         if (FALSE !== ($body = $this->getEnvironment()->
@@ -819,7 +828,7 @@ function send_settings()
      */
     function actionSvars($verb, $noun)
     {
-        if (!strlen($noun)) {
+        if (!dp_strlen($noun)) {
             $ob =& $this;
         } else {
             if (FALSE === ($env = $this->getEnvironment())) {
@@ -830,19 +839,80 @@ function send_settings()
                     if (FALSE ===
                             ($ob = get_current_dpuniverse()->findUser($noun))) {
                         $this->setActionFailure(sprintf(
-                            dptext('Target %s not found.<br />'), $noun));
+                            dp_text('Target %s not found.<br />'), $noun));
                         return FALSE;
                     }
                 }
             }
         }
-        $this->tell('<window><b>' . sprintf(dptext('Server variables of %s:'),
+        $this->tell('<window><b>' . sprintf(dp_text('Server variables of %s:'),
             $ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))
             . '</b><br /><pre>' . print_r($ob->_SERVER, TRUE) . '</pre>'
-            . '<b>' . sprintf(dptext('Properties of %s:'),
+            . '<b>' . sprintf(dp_text('Properties of %s:'),
             $ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))
             . '</b><pre>' . htmlentities(print_r($ob->getProperties(), TRUE))
             . '</pre></window>');
+        return TRUE;
+    }
+
+    /**
+     * Destroys an object
+     *
+     * @param   string  $verb       the action, "destroy"
+     * @param   string  $noun       the object to destroy, for example "rose"
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     * @since   DutchPIPE 0.4.0
+     */
+    function actionDestroy($verb, $noun)
+    {
+        if (FALSE === ($env = $this->getEnvironment()) ||
+                ($noun && !($dest_ob = $env->isPresent($noun)))) {
+            $this->setActionFailure(sprintf(dp_text("Couldn't find: %s<br />"),
+                $noun));
+            return FALSE;
+        }
+        if (!isset($dest_ob)) {
+            $this->setActionFailure(dp_text('Destroy what?<br />'));
+            return FALSE;
+        }
+        $this->tell(sprintf(
+            dp_text('You destroy %s.<br />'),
+            $dest_ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
+        $env->tell(ucfirst(sprintf(
+            dp_text('%s destroys %s.<br />'),
+            $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
+            $dest_ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))),
+            $this, $dest_ob);
+        $dest_ob->tell(ucfirst(sprintf(
+            dp_text('%s destroys you.<br />'),
+            $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))));
+        $dest_ob->removeDpObject();
+
+        return TRUE;
+    }
+
+    /**
+     * Shows a list of all objects in this DutchPIPE universe in a window
+     *
+     * @param   string  $verb       the action, "oblist"
+     * @param   string  $noun       empty string
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     * @see     DpUniverse::gteObjectList()
+     * @since   DutchPIPE 0.4.0
+     */
+    function actionOblist($verb, $noun)
+    {
+        $this->tell('<stylesheet href="' . DPUNIVERSE_WWW_URL
+            . 'oblist.css"></stylesheet>');
+        $this->tell('<window styleclass="dpwindow_oblist" delay="100">'
+            . '<div class="dpoblist_div">'
+            . get_current_dpuniverse()->getObjectList()
+            . '</div><a href="javascript:send_action2server(\'oblist\')">Reload'
+            . '</a></window>');
+        $this->tell('<script type="text/javascript" ' .
+            'src="' . DPUNIVERSE_WWW_URL . 'sorttable.js"></script>');
+        $this->tell("<script>\nsetTimeout('sorttable.init()', 200);\n"
+            . "</script>");
         return TRUE;
     }
 
@@ -855,8 +925,8 @@ function send_settings()
      */
     function actionGoto($verb, $noun)
     {
-        if (!strlen($noun)) {
-            $this->setActionFailure(dptext('Goto where?<br />'));
+        if (!dp_strlen($noun)) {
+            $this->setActionFailure(dp_text('Goto where?<br />'));
             return FALSE;
         }
 
@@ -873,25 +943,25 @@ function send_settings()
      */
     function actionForce($verb, $noun)
     {
-        if (!strlen($noun = trim($noun))
-                || FALSE === ($pos = strpos($noun, ' '))) {
+        if (!dp_strlen($noun = trim($noun))
+                || FALSE === ($pos = dp_strpos($noun, ' '))) {
             $this->setActionFailure(
-                dptext('Syntax: force <i>who what</i>.<br />'));
+                dp_text('Syntax: force <i>who what</i>.<br />'));
             return FALSE;
         }
 
         $noun = str_replace('&quot;', '"', $noun);
 
-        if (substr($noun, 0, 1) == '"') {
-            $noun = trim(substr($noun, 1));
-            if (FALSE !== ($pos2 = strpos($noun, '"'))) {
-                $who = substr($noun, 0, $pos2);
-                $what = substr($noun, $pos2 + 1);
+        if (dp_substr($noun, 0, 1) == '"') {
+            $noun = trim(dp_substr($noun, 1));
+            if (FALSE !== ($pos2 = dp_strpos($noun, '"'))) {
+                $who = dp_substr($noun, 0, $pos2);
+                $what = dp_substr($noun, $pos2 + 1);
             }
         }
         if (!isset($who)) {
-            $who = substr($noun, 0, $pos);
-            $what = substr($noun, $pos + 1);
+            $who = dp_substr($noun, 0, $pos);
+            $what = dp_substr($noun, $pos + 1);
         }
 
         if (FALSE === ($who_ob = $this->isPresent($who))) {
@@ -901,20 +971,20 @@ function send_settings()
         }
         if (FALSE === $who_ob) {
             $this->setActionFailure(sprintf(
-                dptext('Target %s not found.<br />'), $who));
+                dp_text('Target %s not found.<br />'), $who));
             return FALSE;
         }
 
         $this->tell(sprintf(
-            dptext('You give %s the old "Jedi mind-trick" stink eye.<br />'),
+            dp_text('You give %s the old "Jedi mind-trick" stink eye.<br />'),
             $who_ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
         $env->tell(ucfirst(sprintf(
-            dptext('%s gives %s the old "Jedi mind-trick" stink eye.<br />'),
+            dp_text('%s gives %s the old "Jedi mind-trick" stink eye.<br />'),
             $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
             $who_ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))),
             $this, $who_ob);
         $who_ob->tell(ucfirst(sprintf(
-            dptext('%s gives you the old "Jedi mind-trick" stink eye.<br />'),
+            dp_text('%s gives you the old "Jedi mind-trick" stink eye.<br />'),
             $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))));
 
         $who_ob->performAction($what);
@@ -930,9 +1000,9 @@ function send_settings()
      */
     function actionMoveOperant($verb, &$menuobj)
     {
-        $title = strtolower($menuobj->getTitle());
+        $title = dp_strtolower($menuobj->getTitle());
 
-        return (FALSE === strpos($title, ' ') ? $title : '"' . $title . '"')
+        return (FALSE === dp_strpos($title, ' ') ? $title : '"' . $title . '"')
             . ' ';
     }
 
@@ -945,23 +1015,23 @@ function send_settings()
      */
     function actionMove($verb, $noun)
     {
-        if (!strlen($noun = trim($noun))
-                || FALSE === ($pos = strpos($noun, ' '))) {
+        if (!dp_strlen($noun = trim($noun))
+                || FALSE === ($pos = dp_strpos($noun, ' '))) {
             $this->setActionFailure(
-                dptext('Syntax: move <i>what where</i>.<br />'));
+                dp_text('Syntax: move <i>what where</i>.<br />'));
             return FALSE;
         }
 
         $noun = str_replace('&quot;', '"', $noun);
 
-        if (substr($noun, 0, 1) == '"') {
-            $noun = trim(substr($noun, 1));
-            if (FALSE !== ($pos2 = strpos($noun, '"'))) {
-                $what = substr($noun, 0, $pos2);
+        if (dp_substr($noun, 0, 1) == '"') {
+            $noun = trim(dp_substr($noun, 1));
+            if (FALSE !== ($pos2 = dp_strpos($noun, '"'))) {
+                $what = dp_substr($noun, 0, $pos2);
             }
         }
         if (!isset($what)) {
-            $what = substr($noun, 0, $pos);
+            $what = dp_substr($noun, 0, $pos);
         }
 
         if (FALSE === ($what_ob = $this->isPresent($what))) {
@@ -974,23 +1044,23 @@ function send_settings()
         }
         if (FALSE === $what_ob) {
             $this->setActionFailure(sprintf(
-                dptext('Object to move %s not found.<br />'), $what));
+                dp_text('Object to move %s not found.<br />'), $what));
             return FALSE;
         }
 
         $pos = !isset($pos2) ? $pos + 1 : $pos2 + 2;
-        if (strlen($where = trim(substr($noun, $pos))))  {
-            if (substr($where, 0, 1) == '"') {
-                $where = trim(substr($where, 1));
-                if ($pos = strpos($where, '"')) {
-                    $where = substr($where, 0, $pos);
+        if (dp_strlen($where = trim(dp_substr($noun, $pos))))  {
+            if (dp_substr($where, 0, 1) == '"') {
+                $where = trim(dp_substr($where, 1));
+                if ($pos = dp_strpos($where, '"')) {
+                    $where = dp_substr($where, 0, $pos);
                 }
             }
         }
 
-        if (!strlen($where))  {
+        if (!dp_strlen($where))  {
             $this->setActionFailure(
-                dptext('Syntax: move <i>what where</i>.<br />'));
+                dp_text('Syntax: move <i>what where</i>.<br />'));
             return FALSE;
         }
 
@@ -999,7 +1069,7 @@ function send_settings()
             $where_ob = $this->getEnvironment();
             if (FALSE === $where_ob) {
                 $this->setActionFailure(sprintf(
-                    dptext("Can't move object %s to this location: you have no environment.<br />"),
+                    dp_text("Can't move object %s to this location: you have no environment.<br />"),
                     $what));
             }
         }
@@ -1016,28 +1086,28 @@ function send_settings()
         }
         if (FALSE === $where_ob) {
             $this->setActionFailure(sprintf(
-                dptext('Target %s not found.<br />'), $where));
+                dp_text('Target %s not found.<br />'), $where));
             return FALSE;
         }
 
         if ($this === $what_ob && $this === $where_ob) {
             $this->setActionFailure(
-                dptext('You cannot move yourself into yourself.<br />'));
+                dp_text('You cannot move yourself into yourself.<br />'));
             return FALSE;
         }
 
         $this->tell(sprintf(
-            dptext('You give %s the old "Jedi mind-trick" stink eye.<br />'),
+            dp_text('You give %s the old "Jedi mind-trick" stink eye.<br />'),
             $what_ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
         if (FALSE !== $env) {
             $env->tell(ucfirst(sprintf(
-                dptext('%s gives %s the old "Jedi mind-trick" stink eye.<br />'),
+                dp_text('%s gives %s the old "Jedi mind-trick" stink eye.<br />'),
                 $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
                 $what_ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))),
                 $this, $what_ob);
             }
         $what_ob->tell(ucfirst(sprintf(
-            dptext('%s gives you the old "Jedi mind-trick" stink eye.<br />'),
+            dp_text('%s gives you the old "Jedi mind-trick" stink eye.<br />'),
             $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))));
 
         $what_ob->moveDpObject($where_ob);
@@ -1079,46 +1149,49 @@ function send_settings()
     function actionMyhome($verb, $noun)
     {
         if (is_null($noun)) {
-            $result = mysql_query("
+            $result = dp_db_query('
                 SELECT
                     userHomeLocation,userHomeSublocation
                 FROM
                     Users
                 WHERE
-                    userUsernameLower='"
-                    . addslashes(strtolower($this->getTitle())) . "'
-                ");
+                    userUsernameLower='
+                    . dp_db_quote(dp_strtolower($this->getTitle()), 'text'));
 
-            if (empty($result) || !($row = mysql_fetch_array($result))) {
+            if (empty($result) || !($row = dp_db_fetch_row($result))) {
+                dp_db_free($result);
                 return FALSE;
             }
 
             if (is_null($row[0])) {
-                $this->tell(dptext('You have no home location set. Set your home location first.<br />'));
+                $this->tell(dp_text('You have no home location set. Set your home location first.<br />'));
+                dp_db_free($result);
                 return TRUE;
             }
 
+            dp_db_free($result);
             $this->tell('<location>' . $row[0] . (is_null($row[1]) ? ''
                 : '&sublocation=' . $row[1]) . '</location>');
             return TRUE;
         }
 
-        if (dptext("set") === $noun) {
+        if (dp_text("set") === $noun) {
             $env = $this->getEnvironment();
-            if (!$env || !strlen($loc = $env->location)) {
+            if (!$env || !dp_strlen($loc = $env->location)) {
                 return FALSE;
             }
             $subloc = $env->sublocation;
 
-            mysql_query($query = "UPDATE Users set userHomeLocation='{$loc}',"
-                . "userHomeSublocation=" . (is_null($subloc) || !strlen($subloc) ?
-                'NULL' : "'{$subloc}'") . " WHERE userUsernameLower='"
-                . addslashes(strtolower($this->getTitle())) . "'");
-            $this->tell(dptext('Your home location has been set to the current page.<br />'));
+            dp_db_exec('UPDATE Users set userHomeLocation='
+                . dp_db_quote($loc, 'text') . ',userHomeSublocation='
+                . (is_null($subloc) || !dp_strlen($subloc) ? 'NULL'
+                : dp_db_quote($subloc, 'text')) . ' WHERE userUsernameLower='
+                . dp_db_quote(dp_strtolower($this->getTitle()), 'text'));
+            $this->tell(dp_text('Your home location has been set to the current page.<br />'));
             return TRUE;
         }
 
-        $this->actionFailure = dptext('Syntax: myhome [set]<br />');
+        $this->actionFailure = dp_text('Syntax: myhome [set]<br />');
         return FALSE;
     }
 
@@ -1137,39 +1210,41 @@ function send_settings()
     {
         if (is_null($noun)) {
             $this->inputMode = 'cmd' !== $this->inputMode ? 'cmd' : 'say';
-        } elseif (in_array($noun, explode('#', dptext('cmd#command')))) {
+        } elseif (in_array($noun, explode('#', dp_text('cmd#command')))) {
             $this->inputMode = 'cmd';
-        } elseif (in_array($noun, explode('#', dptext('say')))) {
+        } elseif (in_array($noun, explode('#', dp_text('say')))) {
             $this->inputMode = 'say';
-        } elseif (in_array($noun, explode('#', dptext('once')))) {
+        } elseif (in_array($noun, explode('#', dp_text('once')))) {
             $ip = 'once';
-        } elseif (in_array($noun, explode('#', dptext('page')))) {
+        } elseif (in_array($noun, explode('#', dp_text('page')))) {
             $ip = 'page';
-        } elseif (in_array($noun, explode('#', dptext('always')))) {
+        } elseif (in_array($noun, explode('#', dp_text('always')))) {
             $ip = 'always';
         } else {
-            $this->actionFailure = dptext('Invalid action mode (valid modes are: say and cmd).<br />');
+            $this->actionFailure = dp_text('Invalid action mode (valid modes are: say and cmd).<br />');
             return FALSE;
         }
 
         if (isset($ip)) {
             $this->inputPersistent = $ip;
             if ($this->isRegistered) {
-                mysql_query($query = "UPDATE Users set "
-                    . "userInputPersistent='{$ip}' WHERE userUsernameLower='"
-                    . addslashes(strtolower($this->getTitle())) . "'");
+                dp_db_exec('UPDATE Users SET '
+                    . 'userInputPersistent=' . dp_db_quote($ip, 'text')
+                    . ' WHERE userUsernameLower='
+                    . dp_db_quote(dp_strtolower($this->getTitle()), 'text'));
             }
             return TRUE;
         }
 
         if ($this->isRegistered) {
-            mysql_query("UPDATE Users set userInputMode='{$this->inputMode}' "
-                . "WHERE userUsernameLower='"
-                . addslashes(strtolower($this->getTitle())) . "'");
+            dp_db_exec('UPDATE Users set userInputMode='
+                . dp_db_quote($this->inputMode, 'text')
+                . ' WHERE userUsernameLower='
+                . dp_db_quote(dp_strtolower($this->getTitle()), 'text'));
         }
         $this->tell('cmd' === $this->inputMode
-            ? dptext('The input field is now in command mode. Enter <tt>help</tt> for more information.<br />')
-            : dptext('The input field is now in page chat mode. Enter <tt>/help</tt> for more information.<br />'));
+            ? dp_text('The input field is now in command mode. Enter <tt>help</tt> for more information.<br />')
+            : dp_text('The input field is now in page chat mode. Enter <tt>/help</tt> for more information.<br />'));
         return TRUE;
     }
 
@@ -1179,7 +1254,7 @@ function send_settings()
             . DPUNIVERSE_IMAGE_URL . 'checked.gif" width="7" '
             . 'height="7" border="0" alt="" title="" />#'
             . DPUNIVERSE_IMAGE_URL . 'checked_over.gif#')
-            . dptext('command mode');
+            . dp_text('command mode');
     }
 
     /**
@@ -1191,12 +1266,12 @@ function send_settings()
      */
     function actionTell($verb, $noun)
     {
-        if (FALSE === ($pos = strpos($noun, ' '))) {
+        if (FALSE === ($pos = dp_strpos($noun, ' '))) {
             $this->tell('<script>
 setTimeout("bind_input(); _gel(\'dptell\').focus();", 50);
 </script>');
             $this->tell('<window styleclass="dpwindow_tell">
-<b>' . sprintf(dptext('Private message to %s:'), $noun) . '</b><br /><br />
+<b>' . sprintf(dp_text('Private message to %s:'), $noun) . '</b><br /><br />
 <form onSubmit="send_action2server(\''
                 . addslashes($verb) . ' ' . addslashes($noun)
                 . ' \' + jQuery(\'#dptell\').val()); close_dpwindow(); '
@@ -1224,7 +1299,7 @@ class="dpcomm" /> <input type="submit" value=" &gt; " /></form>
 setTimeout("bind_input(); _gel(\'dpshout\').focus();", 50);
 </script>');
             $this->tell('<window styleclass="dpwindow_shout">
-<b>' . dptext('Message to everybody on this site:') . '</b><br /><br />
+<b>' . dp_text('Message to everybody on this site:') . '</b><br /><br />
 <form onSubmit="send_action2server(\''
                 . addslashes($verb)
                 . ' \' + jQuery(\'#dpshout\').val()); close_dpwindow(); '
@@ -1252,7 +1327,7 @@ class="dpcomm" /> <input type="submit" value=" &gt; " /></form>
 setTimeout("bind_input(); _gel(\'dpemote\').focus();", 50);
 </script>');
             $this->tell('<window styleclass="dpwindow_emote">
-<b>' . dptext('Emotion to everybody on this page:') . '</b><br /><br />'
+<b>' . dp_text('Emotion to everybody on this page:') . '</b><br /><br />'
                 . $this->title . ' <form onSubmit="send_action2server(\''
                 . addslashes($verb)
                 . ' \' + jQuery(\'#dpemote\').val()); close_dpwindow(); '
@@ -1265,5 +1340,7 @@ class="dpemote" /> <input type="submit" value=" &gt; " /></form>
 
         return DpLiving::actionEmote($verb, $noun);
     }
+
+
 }
 ?>

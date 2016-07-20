@@ -2,7 +2,7 @@
 /**
  * Handles the current HTTP page or AJAX request by the user
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpcurrentrequest.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: dpcurrentrequest.php 281 2007-08-20 21:45:53Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php
  */
@@ -302,7 +302,7 @@ class DpCurrentRequest
              * which comes first.
              */
             $this->mCookieId = FALSE;
-            //echo dptext("NO COOKIE\n");
+            //echo dp_text("NO COOKIE\n");
             return FALSE;
         }
         /*
@@ -335,15 +335,15 @@ class DpCurrentRequest
     {
         if (isset($this->__COOKIE)
                 && isset($this->__COOKIE[DPSERVER_COOKIE_NAME])
-                && strlen($this->__COOKIE[DPSERVER_COOKIE_NAME])
-                && strlen($cookie_data =
+                && dp_strlen($this->__COOKIE[DPSERVER_COOKIE_NAME])
+                && dp_strlen($cookie_data =
                     trim($this->__COOKIE[DPSERVER_COOKIE_NAME], ';'))
                 && sizeof($cookie_data = explode(';', $cookie_data))
                 && 2 === sizeof($cookie_data)) {
             $this->mCookieId = $cookie_data[0];
             $this->mCookiePass = $cookie_data[1];
 
-            return strlen($this->mCookieId) && strlen($this->mCookiePass);
+            return dp_strlen($this->mCookieId) && dp_strlen($this->mCookiePass);
         }
         return FALSE;
     }
@@ -387,7 +387,7 @@ class DpCurrentRequest
             return FALSE;
         }
 
-        $result = mysql_query("
+        $result = dp_db_query('
             SELECT
                 userUsername,userAvatarNr,userDisplayMode,
                 userEventPeopleEntering,userEventPeopleLeaving,
@@ -396,15 +396,15 @@ class DpCurrentRequest
             FROM
                 Users
             WHERE
-                userCookieId='" . addslashes($cookieId) . "'
+                userCookieId=' . dp_db_quote($cookieId, 'text') . '
             AND
-                userCookiePassword='" . addslashes($cookiePass) . "'
-            ");
+                userCookiePassword=' . dp_db_quote($cookiePass, 'text'));
 
-        if (empty($result) || !($row = mysql_fetch_array($result))) {
+        if (empty($result) || !($row = dp_db_fetch_row($result))) {
+            dp_db_free($result);
             return FALSE;
         }
-
+        dp_db_free($result);
         $this->mUsername = $row[0];
         $this->mUserAvatarNr = $row[1];
         $this->mUserDisplayMode = $row[2];
@@ -451,7 +451,7 @@ class DpCurrentRequest
         }
 
         if (FALSE === $this->mIsKnownBot) {
-            $this->mUsername = sprintf(dptext('Guest#%d'),
+            $this->mUsername = sprintf(dp_text('Guest#%d'),
                 $this->mrDpUniverse->getGuestCnt());
         } else {
             $this->mUsername = $this->mIsKnownBot;
@@ -483,11 +483,11 @@ class DpCurrentRequest
     {
         /* Gets the browser name of the user, a.k.a. the user agent */
         $this->mUserAgent = !isset($this->__SERVER['HTTP_USER_AGENT'])
-                || 0 === strlen($this->__SERVER['HTTP_USER_AGENT'])
+                || 0 === dp_strlen($this->__SERVER['HTTP_USER_AGENT'])
             ? FALSE : $this->__SERVER['HTTP_USER_AGENT'];
 
         if (FALSE === $this->mUserAgent) {
-            //echo dptext("No agent\n");
+            //echo dp_text("No agent\n");
             return FALSE;
         }
 
@@ -495,11 +495,14 @@ class DpCurrentRequest
          * Give special guest names to some well known search bots.
          * Otherwise the name will be Guest#<number>.
          */
-        $result = mysql_query("SELECT userAgentTitle FROM UserAgentTitles "
-            . "WHERE userAgentString='{$this->mUserAgent}'");
+        $result = dp_db_query('SELECT userAgentTitle FROM UserAgentTitles '
+            . 'WHERE userAgentString='
+            . dp_db_quote($this->mUserAgent, 'text'));
 
-        return $this->mIsKnownBot = (FALSE === $result
-            || !($row = mysql_fetch_array($result)) ? FALSE : $row[0]);
+        $rval = $this->mIsKnownBot = (FALSE === $result
+            || !($row = dp_db_fetch_row($result)) ? FALSE : $row[0]);
+        dp_db_free($result);
+        return $rval;
     }
 
     /**
@@ -551,7 +554,7 @@ class DpCurrentRequest
 
         $this->mrDpUniverse->addDpUser($this->mrUser, $this->mUsername,
             $this->mCookieId, $this->mCookiePass, $this->mIsRegistered);
-        echo sprintf(dptext("User %s created\n"), $this->mUsername);
+        echo sprintf(dp_text("User %s created\n"), $this->mUsername);
     }
 
     /**
@@ -576,7 +579,7 @@ class DpCurrentRequest
             $this->mrUser->setBody('<img src="' . DPUNIVERSE_AVATAR_URL
                 . 'user' . $this->mUserAvatarNr . '_body.gif" border="0" '
                 . 'alt="" align="left" style="margin-right: 15px" />'
-                . dptext('A user.') . '<br />');
+                . dp_text('A user.') . '<br />');
         }
 
         if (FALSE !== $this->mUserDisplayMode) {
@@ -605,7 +608,7 @@ class DpCurrentRequest
             $this->mrUser->setBody('<img src="' . DPUNIVERSE_IMAGE_URL
                 . 'bot.gif" border="0" alt="" align="left" '
                 . 'style="margin-right: 15px" />'
-                . dptext('This is a search engine indexing this site.<br />'));
+                . dp_text('This is a search engine indexing this site.<br />'));
             $this->mrUser->isKnownBot = TRUE;
         }
 
@@ -634,7 +637,7 @@ class DpCurrentRequest
         $this->_getLocation();
         //echo "_handleLocation()... " . $this->__GET['location']  . "\n";
 
-        //echo sprintf(dptext("Getting location %s given by client for %s\n"),
+        //echo sprintf(dp_text("Getting location %s given by client for %s\n"),
         //    $this->__GET['location'], $this->mUsername);
 
         $sublocation = !isset($this->__GET['sublocation']) ? FALSE
@@ -711,10 +714,10 @@ class DpCurrentRequest
      */
     private function _isValidLocation()
     {
-        //echo dptext("_isValidLocation: checking location \"%s\"\n",
+        //echo dp_text("_isValidLocation: checking location \"%s\"\n",
         //    !isset($this->__GET['location']) ? '' : $this->__GET['location']);
         if (isset($this->__GET['location'])
-                && !strlen($this->__GET['location'])) {
+                && !dp_strlen($this->__GET['location'])) {
             return TRUE;
         }
 
@@ -722,28 +725,29 @@ class DpCurrentRequest
             return isset($this->__GET['getdivs']);
         }
 
-        if (FALSE !== strpos($this->__GET['location'], '..')) {
+        if (FALSE !== dp_strpos($this->__GET['location'], '..')) {
             return FALSE;
         }
 
-        if (FALSE !== ($pos = strpos($this->__GET['location'], '?'))) {
+        if (FALSE !== ($pos = dp_strpos($this->__GET['location'], '?'))) {
             $this->__GET['location'] =
-                substr($this->__GET['location'], 0, $pos);
+                dp_substr($this->__GET['location'], 0, $pos);
         }
 
-        if (FALSE !== ($pos = strpos($this->__GET['location'], '#'))) {
+        if (FALSE !== ($pos = dp_strpos($this->__GET['location'], '#'))) {
             $this->__GET['location'] =
-                substr($this->__GET['location'], 0, $pos);
+                dp_substr($this->__GET['location'], 0, $pos);
         }
 
         /* Experimental */
         if (isset($this->__GET['proxy'])
-                || 0 === strpos($this->__GET['location'], '/mailman2/')) {
+                || 0 === dp_strpos($this->__GET['location'], '/mailman2/')) {
             return TRUE;
         }
 
-        if (($len = strlen(DPSERVER_HOST_URL)) < strlen($this->__GET['location'])
-                && DPSERVER_HOST_URL === substr($this->__GET['location'], 0,
+        if (($len = dp_strlen(DPSERVER_HOST_URL))
+                < dp_strlen($this->__GET['location'])
+                && DPSERVER_HOST_URL === dp_substr($this->__GET['location'], 0,
                 $len)) {
             return TRUE;
         }
@@ -761,7 +765,7 @@ class DpCurrentRequest
     private function _handleNewEnvironment($from_env)
     {
         if (!$from_env) {
-            $arrive_msg = sprintf(dptext("%s enters the site.<br />"),
+            $arrive_msg = sprintf(dp_text("%s enters the site.<br />"),
                 ucfirst($this->mrUser->getTitle(
                 DPUNIVERSE_TITLE_TYPE_DEFINITE)));
             $remote_address = isset($this->__SERVER['REMOTE_ADDR'])
@@ -769,46 +773,46 @@ class DpCurrentRequest
                 $this->__SERVER['REMOTE_ADDR'] . '" target="_blank" '
                 . 'class="col2">'
                 . gethostbyaddr($this->__SERVER['REMOTE_ADDR']) . '</a>'
-                : '<em>' . dptext('unknown remote address') . '</em>';
-            $time = strftime(dptext('%H:%M'));
+                : '<em>' . dp_text('unknown remote address') . '</em>';
+            $time = strftime(dp_text('%H:%M'));
             $admin_msg = ' ' . sprintf(
-                dptext("<span class=\"col2\">%s</span> %s <span class=\"col2\">(%s)</span> enters the site from <span class=\"col2\">%s</span> using <span class=\"col2\">%s</span>.<br />"),
+                dp_text("<span class=\"col2\">%s</span> %s <span class=\"col2\">(%s)</span> enters the site from <span class=\"col2\">%s</span> using <span class=\"col2\">%s</span>.<br />"),
                 $time,
                 ucfirst($this->mrUser->getTitle(
                 DPUNIVERSE_TITLE_TYPE_DEFINITE)),
                 $remote_address,
                 (!isset($this->__SERVER['HTTP_REFERER'])
-                || !strlen($this->__SERVER['HTTP_REFERER']) ? '-'
+                || !dp_strlen($this->__SERVER['HTTP_REFERER']) ? '-'
                 : '<a href="' . $this->__SERVER['HTTP_REFERER']
                 . '" target="_blank" class="col2">'
                 . $this->__SERVER['HTTP_REFERER'] . '</a>'),
                 (!isset($this->__SERVER['HTTP_USER_AGENT'])
-                || !strlen($this->__SERVER['HTTP_USER_AGENT']) ? '-'
+                || !dp_strlen($this->__SERVER['HTTP_USER_AGENT']) ? '-'
                 : $this->__SERVER['HTTP_USER_AGENT']));
             if (!$this->mIsKnownBot) {
                 $listeners = get_current_dpuniverse()->getAlertEvent(
                     'people_entering');
                 if (is_array($listeners)) {
                     $listener_msg = ' ' . sprintf(
-                        dptext("<span class=\"col2\">%s</span> %s enters the site at %s.<br />"),
+                        dp_text("<span class=\"col2\">%s</span> %s enters the site at %s.<br />"),
                         $time,
                         ucfirst($this->mrUser->getTitle(
                         DPUNIVERSE_TITLE_TYPE_DEFINITE)),
                         $this->mrEnvironment->title);
                     $listener_admin_msg = ' ' . sprintf(
-                        dptext("<span class=\"col2\">%s</span> %s <span class=\"col2\">(%s)</span> enters the site at %s from <span class=\"col2\">%s</span> using <span class=\"col2\">%s</span>.<br />"),
+                        dp_text("<span class=\"col2\">%s</span> %s <span class=\"col2\">(%s)</span> enters the site at %s from <span class=\"col2\">%s</span> using <span class=\"col2\">%s</span>.<br />"),
                         $time,
                         ucfirst($this->mrUser->getTitle(
                         DPUNIVERSE_TITLE_TYPE_DEFINITE)),
                         $remote_address,
                         $this->mrEnvironment->title,
                         (!isset($this->__SERVER['HTTP_REFERER'])
-                        || !strlen($this->__SERVER['HTTP_REFERER']) ? '-'
+                        || !dp_strlen($this->__SERVER['HTTP_REFERER']) ? '-'
                         : '<a href="' . $this->__SERVER['HTTP_REFERER']
                         . '" target="_blank" class="col2">'
                         . $this->__SERVER['HTTP_REFERER'] . '</a>'),
                         (!isset($this->__SERVER['HTTP_USER_AGENT'])
-                        || !strlen($this->__SERVER['HTTP_USER_AGENT']) ? '-'
+                        || !dp_strlen($this->__SERVER['HTTP_USER_AGENT']) ? '-'
                         : $this->__SERVER['HTTP_USER_AGENT']));
 
                     foreach ($listeners as &$listener) {
@@ -825,13 +829,13 @@ class DpCurrentRequest
                     'bots_entering');
                 if (is_array($listeners)) {
                     $listener_msg = ' ' . sprintf(
-                        dptext("<span class=\"col2\">%s</span> %s indexes %s.<br />"),
+                        dp_text("<span class=\"col2\">%s</span> %s indexes %s.<br />"),
                         $time,
                         ucfirst($this->mrUser->getTitle(
                         DPUNIVERSE_TITLE_TYPE_DEFINITE)),
                         $this->mrEnvironment->title);
                     $listener_admin_msg = ' ' . sprintf(
-                        dptext("<span class=\"col2\">%s</span> %s <span class=\"col2\">(%s)</span> indexes %s.<br />"),
+                        dp_text("<span class=\"col2\">%s</span> %s <span class=\"col2\">(%s)</span> indexes %s.<br />"),
                         $time,
                         ucfirst($this->mrUser->getTitle(
                         DPUNIVERSE_TITLE_TYPE_DEFINITE)),
@@ -848,12 +852,12 @@ class DpCurrentRequest
                 }
             }
         } else {
-            $from_env->tell(sprintf(dptext("%s leaves to %s.<br />"),
+            $from_env->tell(sprintf(dp_text("%s leaves to %s.<br />"),
                 ucfirst($this->mrUser->getTitle(
                 DPUNIVERSE_TITLE_TYPE_DEFINITE)),
                 $this->mrEnvironment->getTitle()), $this->mrUser);
             $arrive_msg = $admin_msg = sprintf(
-                dptext("%s arrives from %s.<br />"),
+                dp_text("%s arrives from %s.<br />"),
                 ucfirst($this->mrUser->getTitle(
                 DPUNIVERSE_TITLE_TYPE_DEFINITE)), $from_env->getTitle());
         }
@@ -921,7 +925,7 @@ function init_drag() {
     private function _handleMethodCall()
     {
         if (!isset($this->__GET['call_object'])
-                || !strlen($call_object = $this->__GET['call_object'])) {
+                || !dp_strlen($call_object = $this->__GET['call_object'])) {
             if (!isset($this->__GET['param'])) {
                 $this->mrEnvironment->{$this->__GET['method']}();
             } else {
@@ -932,11 +936,15 @@ function init_drag() {
         else {
             if (FALSE !== ($call_object =
                     $this->mrDpUniverse->findDpObject($call_object))) {
-                if (!isset($this->__GET['param'])) {
-                    $call_object->{$this->__GET['method']}();
-                } else {
-                    $call_object->{$this->__GET['method']}
-                        ($this->__GET['param']);
+                if (isset($this->__GET['method'])
+                        && dp_strlen($method = $this->__GET['method'])
+                        && $call_object->isValidClientCall($method)) {
+                    if (!isset($this->__GET['param'])) {
+                        $call_object->{$this->__GET['method']}();
+                    } else {
+                        $call_object->{$this->__GET['method']}
+                            ($this->__GET['param']);
+                    }
                 }
             }
         }
@@ -994,7 +1002,7 @@ function init_drag() {
                     . '<div id="dpinput_say"><div id="dpinput_inner">'
                     . $dpinput_say . '</div></div></div>');
                 $this->mrUser->tell("<script>jQuery('#dpaction').bind("
-                    . "'keydown', bindKeyDown); focus_input(); "
+                    . "'keydown', bindKeyDown);"
                     . "if (!jQuery('#dpinput[input]').length) jQuery(document)."
                     . "bind('keypress', show_input); else jQuery(document)."
                     . "unbind('keypress', show_input)</script>");
@@ -1003,15 +1011,15 @@ function init_drag() {
                     TRUE !== $this->mrUser->isRegistered
                     ? '<a href="' . DPSERVER_CLIENT_URL . '?location='
                     . DPUNIVERSE_PAGE_PATH. 'login.php" style='
-                    . '"padding-left: 4px">' . dptext('Login/register')
+                    . '"padding-left: 4px">' . dp_text('Login/register')
                     . '</a>'
                     : '<a href="' . DPSERVER_CLIENT_URL . '?location='
                     . DPUNIVERSE_PAGE_PATH . 'login.php&amp;act=logout" '
-                    . 'style="padding-left: 4px">' . dptext('Logout')
+                    . 'style="padding-left: 4px">' . dp_text('Logout')
                     . '</a>';
-                $bottom = dptext('Go to Bottom');
+                $bottom = dp_text('Go to Bottom');
                 $this->mrUser->tell('<div id="dploginout">' . sprintf(
-                        dptext('Welcome %s'), '<span id="username">'
+                        dp_text('Welcome %s'), '<span id="username">'
                         . $this->mrUser->getTitle() . '</span>')
                         . ' <span id="loginlink">'
                         . $login_link . '</span>&#160;&#160;&#160;&#160;'

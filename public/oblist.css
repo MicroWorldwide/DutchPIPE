@@ -1,0 +1,6 @@
+table.dpoblist, table.dpoblist th, table.dpoblist td { font-family: verdana,arial,helvetica; text-align: left }
+table.dpoblist th { font-size: 10px; white-space: nowrap; font-weight: normal; cursor: pointer }
+table.dpoblist td { background-color: #eee; font-size: 10px; white-space: nowrap; overflow: hidden }
+table.dpoblist th.align_c, table.dpoblist td.align_c { text-align: center }
+.dpwindow_oblist { display: block; position: absolute; cursor: move; text-align: left; z-index: 5; border: solid 1px black; padding: 15px; opacity: 0.95; -moz-opacity: 0.95; left: 20px; top: 20px; background-color: #CFD5E0; opacity: 0.97; -moz-opacity: 0.97 }
+.dpoblist_div { height: 500px; overflow: auto; cursor: default }

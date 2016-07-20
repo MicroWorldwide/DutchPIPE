@@ -13,9 +13,10 @@
  *     >Image Magick http://www.imagemagick.org/script/index.php
  *
  * For additional details, see:
- * http://blog.theoconcept.com/index.php/2006/01/27/3-un-peu-tordu-comme-idee
+ * http://web.archive.org/web/20060721212525/http://blog.theoconcept.com/index.
+ * php/2006/01/27/3-un-peu-tordu-comme-idee
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -28,7 +29,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Julien CROUZET
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: make_captcha.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: make_captcha.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver.php, /www/captcha.php
  */
@@ -54,10 +55,10 @@ error_reporting(E_ALL | E_STRICT);
 
 mysql_pconnect(DPUNIVERSE_MYSQL_HOST, DPUNIVERSE_MYSQL_USER,
     DPUNIVERSE_MYSQL_PASSWORD)
-    || die(dptext("Could not connect: %s\n", mysql_error()));
+    || die(dp_text("Could not connect: %s\n", mysql_error()));
 
 mysql_select_db(DPUNIVERSE_MYSQL_DB)
-    || die(dptext("Failed to select database: %s\n", DPUNIVERSE_MYSQL_DB));
+    || die(dp_text("Failed to select database: %s\n", DPUNIVERSE_MYSQL_DB));
 
 /**
  * Get a string width and height with given parameters
@@ -104,7 +105,7 @@ function distortion_string($String, $Font, $FontSize, $BGColor='#FFFFFF',
     // First, we create the source image with GD Image
     $ImageRessource = imagecreatetruecolor($Width, $Height);
     if (empty($ImageRessource)) {
-        die(dptext("Cannot Initialize new GD image stream"));
+        die(dp_text("Cannot Initialize new GD image stream"));
     }
 
 
@@ -202,7 +203,7 @@ $fp = fopen(DPUNIVERSE_CAPTCHA_IMAGES_PATH . $file, 'w');
 fwrite($fp, $str);
 fclose($fp);
 // chown(DPUNIVERSE_CAPTCHA_IMAGES_PATH . $file, DPUNIVERSE_FILE_OWNER);
-echo sprintf(dptext("Created %s.gif\n"), $code);
+echo sprintf(dp_text("Created %s.gif\n"), $code);
 
 $oldest_time = time() + 3600; /* Future */
 $oldest_file = FALSE;

@@ -2,7 +2,7 @@
 /**
  * A small note that users can read
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: note.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: note.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -43,16 +43,16 @@ final class Note extends DpObject
      */
     public function createDpObject()
     {
-        $this->title = dptext('small note');
-        $this->titleDefinite = dptext('the small note');
-        $this->titleIndefinite = dptext('a small note');
+        $this->title = dp_text('small note');
+        $this->titleDefinite = dp_text('the small note');
+        $this->titleIndefinite = dp_text('a small note');
         $this->titleImg = DPUNIVERSE_IMAGE_URL . 'smallnote.gif';
         $this->addId(explode('#',
-            dptext('note#paper note#small note#small paper note#small, paper note#a small note')));
+            dp_text('note#paper note#small note#small paper note#small, paper note#a small note')));
         $this->body = '<img src="' . DPUNIVERSE_IMAGE_URL
             . 'smallnote_body.gif" width="35" height="46" border="0" alt="" '
             . 'align="left" style="margin-right: 15px" /><br />'
-            . dptext('This is a small paper note. You can read it.<br />');
+            . dp_text('This is a small paper note. You can read it.<br />');
 
         $this->value = 0.99;
 
@@ -77,7 +77,7 @@ final class Note extends DpObject
             }
         }
 
-        $this->addAction(dptext('read me!'), dptext('read'), 'actionRead');
+        $this->addAction(dp_text('read me!'), dp_text('read'), 'actionRead');
     }
 
     /**
@@ -90,20 +90,21 @@ final class Note extends DpObject
     public function actionRead($verb, $noun)
     {
         /* Replies to object entering "read" */
-        if (!strlen($noun)) {
+        if (!dp_strlen($noun)) {
             get_current_dpobject()->setActionFailure(
-                dptext('What do you want to read?<br />'));
+                dp_text('What do you want to read?<br />'));
             return FALSE;
         }
 
         /* Replies to object entering "read noet" (typo) */
         if (FALSE === $this->isId($noun)) {
-            get_current_dpobject()->setActionFailure(dptext('Read WHAT?<br />'));
+            get_current_dpobject()->setActionFailure(
+                dp_text('Read WHAT?<br />'));
             return FALSE;
         }
 
         /* Shows a nice window with content */
-        get_current_dpobject()->tell('<window>' . dptext('Hello world.')
+        get_current_dpobject()->tell('<window>' . dp_text('Hello world.')
             . '</window>');
         return TRUE;
     }

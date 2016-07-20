@@ -2,7 +2,7 @@
 /**
  * A dark alley
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: alley2.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: alley2.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -44,23 +44,24 @@ final class Alley2 extends DpPage
     public function createDpPage()
     {
         // Standard setup calls:
-        $this->title = dptext('A dark alley');
+        $this->title = dp_text('A dark alley');
         $this->body = '<img src="' . DPUNIVERSE_IMAGE_URL . 'alley2.jpg"
 width="450" height="339" border="0" usemap="#alley2_map" alt=""
 style="border: solid 1px black; margin-right: 10px" title="" alt=""
 align="left" />
 <div style="width: 220px; float: left">
 <br /><b>'
-            . dptext('A Dark Alley') . '</b><br />'
-            . sprintf(dptext('<p align="justify">You are in a dark alley.
+            . dp_text('A Dark Alley') . '</b><br />'
+            . sprintf(dp_text('<p align="justify">You are in a dark alley.
 Better get out of here quick.</p><p align="justify">To the
 <a href="%s">southeast</a> you see a square.</p>'),
             DPSERVER_CLIENT_URL . '?location=/page/square.php')
             . '</div><br clear="all" />';
         $this->setNavigationTrail(
             array(DPUNIVERSE_NAVLOGO, ''),
-            array(dptext('Showcases'), DPUNIVERSE_PAGE_PATH . 'showcases.php'));
-        $this->addExit(array(dptext('se'), dptext('square')),
+            array(dp_text('Showcases'), DPUNIVERSE_PAGE_PATH
+            . 'showcases.php'));
+        $this->addExit(array(dp_text('se'), dp_text('square')),
             DPUNIVERSE_PAGE_PATH . 'square.php', NULL,
             array('alley2_map', 'square_area', 'rect', '165,303,450,339'));
     }

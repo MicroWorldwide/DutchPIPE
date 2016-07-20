@@ -4,7 +4,7 @@
  *
  * Defines DpObjects, users, pages, etc. (our 'rules of nature')
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -16,7 +16,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpuniverse.php 255 2007-08-03 13:15:59Z ls $
+ * @version    Subversion: $Id: dpuniverse.php 291 2007-08-22 20:42:12Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        currentdpuserrequest.php, dpserver.php, dpfunctions.php
  */
@@ -147,12 +147,20 @@ final class DpUniverse
     private $mLastNewUserErrors = array();
 
     /**
+     * UNIX timestamp when next reset in an object will occur
+     *
+     * @var         integer
+     * @access      private
+     */
+    private $mNextResetTime;
+
+    /**
      * UNIX time stamp when cleanup mechanism was last called
      *
      * @var         array
      * @access      private
      */
-    private $mLastCleanupTime = 0;
+    private $mLastCleanUpTime = 0;
 
     /**
      * Lists of objects listening to certain events
@@ -173,22 +181,23 @@ final class DpUniverse
         require_once($iniFile);
 
         $this->mGuestCnt = mt_rand(25, 75);
-        $this->mLastCleanupTime = time();
+        $this->mLastCleanUpTime = time();
 
-        require_once(DPSERVER_LIB_PATH . 'dpcurrentrequest.php');
+        require_once(DPUNIVERSE_LIB_PATH . 'dpcurrentrequest.php');
 
         /* These functions will be available for all objects */
-        require_once(DPSERVER_LIB_PATH . 'dptext.php');
+        require_once(DPUNIVERSE_LIB_PATH . 'dptext.php');
         require_once(DPUNIVERSE_LIB_PATH . 'dpfunctions.php');
         require_once(DPUNIVERSE_LIB_PATH . 'dptemplates.php');
+        require_once(DPUNIVERSE_LIB_PATH . 'dpmbstring_'
+            . (!DPSERVER_ENABLE_MBSTRING || !function_exists('mb_strlen')
+            ? 'disabled' : 'enabled') . '.php');
 
-        mysql_pconnect(DPUNIVERSE_MYSQL_HOST, DPUNIVERSE_MYSQL_USER,
-            DPUNIVERSE_MYSQL_PASSWORD)
-            || die(sprintf(dptext("Could not connect: %s\n"), mysql_error()));
-
-        mysql_select_db(DPUNIVERSE_MYSQL_DB)
-            || die(sprintf(dptext("Failed to select database: %s\n"),
-            DPUNIVERSE_MYSQL_DB));
+        if (!DPUNIVERSE_MDB2_ENABLED) {
+            require_once(DPUNIVERSE_LIB_PATH . 'dpdb_mysql.php');
+        } else {
+            require_once(DPUNIVERSE_LIB_PATH . 'dpdb_mdb2.php');
+        }
     }
 
     /**
@@ -231,7 +240,9 @@ final class DpUniverse
          * user requests are used to handle some generic cyclic calls
          */
         $this->handleLinkdead();
-        $this->handleReset();
+        if (isset($this->mNextResetTime) && $this->mNextResetTime <= time()) {
+            $this->handleReset();
+        }
 
         $this->mrCurrentDpUserRequest = new DpCurrentRequest($this,
             $rServerVars, $rSessionVars, $rCookieVars, $rGetVars, $rPostVars,
@@ -243,7 +254,7 @@ final class DpUniverse
             if (!isset($rGetVars['ajax'])) {
                 $this->tellCurrentDpUserRequest('<event><div id="dppage">'
                     . '<![CDATA['
-                    . dptext('Your browser did not report a User Agent string to the server. This is required.<br />')
+                    . dp_text('Your browser did not report a User Agent string to the server. This is required.<br />')
                     . ']]></div></event>');
             }
             unset($this->mrCurrentDpUserRequest);
@@ -300,9 +311,9 @@ final class DpUniverse
         unset($this->mrCurrentDpUserRequest);
         unset($this->mCurrentDpUserKey);
 
-        if ($this->mLastCleanupTime < time() - DPUNIVERSE_RESET_CYCLE * 2) {
-            $this->handleCleanups();
-            $this->mLastCleanupTime = time();
+        if ($this->mLastCleanUpTime < time() - DPUNIVERSE_RESET_CYCLE * 2) {
+            $this->handleCleanUps();
+            $this->mLastCleanUpTime = time();
         }
     }
 
@@ -444,10 +455,10 @@ final class DpUniverse
                             || (!$ajax_capable
                             && $lastrequest_time > $showbot_time)) {
                         /* Drop stuff, tell people on the page the user left */
-                        $u[_DPUSER_OBJECT]->actionDrop(dptext('drop'),
-                            dptext('all'));
+                        $u[_DPUSER_OBJECT]->actionDrop(dp_text('drop'),
+                            dp_text('all'));
                         $env->tell($left_msg = sprintf(
-                            dptext('%s left the site.<br />'),
+                            dp_text('%s left the site.<br />'),
                             ucfirst($u[_DPUSER_OBJECT]->getTitle(
                             DPUNIVERSE_TITLE_TYPE_DEFINITE))),
                             $u[_DPUSER_OBJECT]);
@@ -456,8 +467,8 @@ final class DpUniverse
                                 getAlertEvent('people_leaving');
                             if (is_array($listeners)) {
                                 $listener_msg = ' ' . sprintf(
-                                    dptext("<span class=\"col2\">%s</span> %s left the site at %s.<br />"),
-                                    strftime(dptext('%H:%M')),
+                                    dp_text("<span class=\"col2\">%s</span> %s left the site at %s.<br />"),
+                                    strftime(dp_text('%H:%M')),
                                     ucfirst($u[_DPUSER_OBJECT]->getTitle(
                                     DPUNIVERSE_TITLE_TYPE_DEFINITE)),
                                     $env->title);
@@ -470,8 +481,8 @@ final class DpUniverse
                         }
                     } else {
                         /* Drop all silently */
-                        $u[_DPUSER_OBJECT]->actionDrop(dptext('drop'),
-                            dptext('all'), TRUE);
+                        $u[_DPUSER_OBJECT]->actionDrop(dp_text('drop'),
+                            dp_text('all'), TRUE);
                     }
                 }
 
@@ -495,25 +506,24 @@ final class DpUniverse
     {
         /* Perform a limited number of resets per cycle */
         $max_resets = DPUNIVERSE_MAX_RESETS;
+        $max_loop = 100;
 
+        reset($this->mDpObjectResets);
         /* Pick up where we were in the reset array */
-        while (($ob = current($this->mDpObjectResets)) && $max_resets--) {
+        while (($ob = current($this->mDpObjectResets)) && $max_resets--
+                 && $max_loop--) {
             /* Checks if the current object ready to reset */
             if ($ob->resetTime > time()) {
-                /* No need to go on, check next http request cycle */
+                $this->mNextResetTime = $ob->resetTime;
                 return;
             }
-
             /* Resets the object, sets next reset time */
             $ob->__reset();
             $ob->resetTime = time() + DPUNIVERSE_RESET_CYCLE;
-
-            if (FALSE === next($this->mDpObjectResets)) {
-                reset($this->mDpObjectResets);
-            }
-
-            /* Check the next object */
-            continue;
+            $this->mDpObjectResets[] = $ob;
+            array_splice($this->mDpObjectResets, 0, 1);
+            reset($this->mDpObjectResets);
+            $this->mNextResetTime = current($this->mDpObjectResets)->resetTime;
         }
     }
 
@@ -535,7 +545,7 @@ final class DpUniverse
                     : DPUNIVERSE_PAGE_PATH . 'index.php';
                 $this->mrUser->tell('<location>' . $__GET['location']
                     . '</location>');
-                $this->mMoveError = dptext('You notice a disruptance.<br />');
+                $this->mMoveError = dp_text('You notice a disruptance.<br />');
             }
         }
     }
@@ -574,12 +584,14 @@ final class DpUniverse
      *
      * @access     private
      */
-    private function handleCleanups()
+    private function handleCleanUps()
     {
+        echo "HandleCleanUps called\n";
         foreach ($this->mDpObjects as $i => &$ob) {
             if (!$ob->getEnvironment()
                     && $ob->lastEventTime < time() - DPUNIVERSE_RESET_CYCLE) {
-                $ob->handleCleanup();
+                echo "calling handleCleanUp in {$ob->title}\n";
+                $ob->handleCleanUp();
             }
         }
     }
@@ -595,32 +607,41 @@ final class DpUniverse
     private function saveUserAgent(&$user)
     {
         $agent = !isset($user->_SERVER['HTTP_USER_AGENT'])
-            || 0 === strlen($user->_SERVER['HTTP_USER_AGENT'])
+            || 0 === dp_strlen($user->_SERVER['HTTP_USER_AGENT'])
             ? '[Undefined]'
-            : addslashes($user->_SERVER['HTTP_USER_AGENT']);
+            : $user->_SERVER['HTTP_USER_AGENT'];
 
         if (isset($user->isAjaxCapable) && TRUE === $user->isAjaxCapable) {
-            $result = mysql_query($query = "SELECT userAgentId from UserAgents "
-                . "WHERE userAgentString='$agent'");
-            if (FALSE === $result
-                    || !($num_rows = mysql_num_rows($result))) {
-                mysql_query($query = "INSERT INTO UserAgents (userAgentString) "
-                    . "VALUES ('$agent')");
+            $result = dp_db_query('SELECT userAgentId from UserAgents '
+                . 'WHERE userAgentString=' . dp_db_quote($agent, 'text'));
+            if (FALSE === $result || !dp_db_num_rows($result)) {
+                if ($next_id = dp_db_next_id('UserAgents', 'userAgentId')) {
+                    dp_db_exec('INSERT INTO UserAgents '
+                        . '(userAgentId,userAgentString) VALUES ('
+                        . dp_db_quote($next_id, 'integer') . ','
+                        . dp_db_quote($agent, 'text') . ')');
+                }
             }
+            dp_db_free($result);
         } else {
             $remote_address = !isset($user->_SERVER['REMOTE_ADDR'])
-                || 0 === strlen($user->_SERVER['REMOTE_ADDR'])
+                || 0 === dp_strlen($user->_SERVER['REMOTE_ADDR'])
                 ? '[Undefined]'
-                : addslashes($user->_SERVER['REMOTE_ADDR']);
-            $result = mysql_query($query = "SELECT userAgentId from UserAgents "
-                . "WHERE userAgentString='$agent' and userAgentRemoteAddress="
-                . "'$remote_address'");
-            if (FALSE === $result
-                    || !($num_rows = mysql_num_rows($result))) {
-                mysql_query($query = "INSERT INTO UserAgents (userAgentString, "
-                    . "userAgentRemoteAddress) VALUES ('$agent', "
-                    . "'$remote_address')");
+                : $user->_SERVER['REMOTE_ADDR'];
+            $result = dp_db_query('SELECT userAgentId from UserAgents '
+                . 'WHERE userAgentString=' . dp_db_quote($agent, 'text')
+                . ' AND userAgentRemoteAddress='
+                . dp_db_quote($remote_address, 'text'));
+            if (FALSE === $result || !dp_db_num_rows($result)) {
+                if ($next_id = dp_db_next_id('UserAgents', 'userAgentId')) {
+                    dp_db_exec('INSERT INTO UserAgents '
+                        . '(userAgentId,userAgentString,userAgentRemoteAddress)'
+                        . ' VALUES (' . dp_db_quote($next_id, 'integer') . ','
+                        . dp_db_quote($agent, 'text') . ','
+                        . dp_db_quote($remote_address, 'text') . ')');
+                }
             }
+            dp_db_free($result);
         }
     }
 
@@ -678,13 +699,15 @@ final class DpUniverse
      */
     function getRandCaptcha()
     {
-        $result = mysql_query("SELECT captchaId FROM Captcha");
+        $result = dp_db_query('SELECT captchaId FROM Captcha');
 
-        if (FALSE === $result || !($num_rows = mysql_num_rows($result))) {
+        if (FALSE === $result || !($num_rows = dp_db_num_rows($result))) {
             return FALSE;
         }
 
-        return mysql_result($result, mt_rand(0, $num_rows - 1), 0);
+        $rval = dp_db_fetch_one($result, mt_rand(0, $num_rows - 1), 0);
+        dp_db_free($result);
+        return $rval;
     }
 
     /**
@@ -715,10 +738,11 @@ final class DpUniverse
 
         echo "Making: $pathname, $sublocation\n";
 
-        if (strlen($pathname) >= 7 && substr($pathname, 0, 7) == 'http://') {
-            if (($len = strlen(DPSERVER_HOST_URL)) >= strlen($pathname)
-                    || DPSERVER_HOST_URL !== substr($pathname, 0, $len)) {
-                echo dptext("Illegal object requested!\n");
+        if (dp_strlen($pathname) >= 7 && dp_substr($pathname, 0, 7)
+                == 'http://') {
+            if (($len = dp_strlen(DPSERVER_HOST_URL)) >= dp_strlen($pathname)
+                    || DPSERVER_HOST_URL !== dp_substr($pathname, 0, $len)) {
+                echo dp_text("Illegal object requested!\n");
                 $rval = FALSE;
                 return $rval;
             }
@@ -727,28 +751,30 @@ final class DpUniverse
         $unique_id = $this->mUniqueDpObjectCnt;
         $this->mUniqueDpObjectCnt++;
 
-        if ($pathname && (substr($pathname, 0, 1) != '/'
-                || ((FALSE === strpos($pathname, '://'))
-                && (strlen($pathname) < 4
-                || substr($pathname, - 4) != '.php')))) {
+        if ($pathname && (dp_substr($pathname, 0, 1) != '/'
+                || ((FALSE === dp_strpos($pathname, '://'))
+                && (dp_strlen($pathname) < 4
+                || dp_substr($pathname, - 4) != '.php')))) {
             require_once(DPUNIVERSE_PREFIX_PATH . DPUNIVERSE_STD_PATH
                 . 'DpPage.php');
-            $object = new DpPage($unique_id, time() + DPUNIVERSE_RESET_CYCLE,
+            $ob = new DpPage($unique_id, time() + DPUNIVERSE_RESET_CYCLE,
                 $pathname, FALSE);
-            $object->setTitle($pathname);
-            if (FALSE === strpos($pathname, '://')) {
-                $object->setBody($pathname, 'file');
-                $object->setNavigationTrail(array(DPUNIVERSE_NAVLOGO, '/'));
+            $ob->setTitle($pathname);
+            $ob->isStandalone = new_dp_property(TRUE);
+            if (FALSE === dp_strpos($pathname, '://')) {
+                $ob->setBody($pathname, 'file');
+                $ob->setNavigationTrail(array(DPUNIVERSE_NAVLOGO, '/'));
             }
         } else {
             require_once(DPUNIVERSE_PREFIX_PATH . $pathname);
             $classname =  explode("/", $pathname);
-            $classname = ucfirst(!strlen($classname[sizeof($classname) - 1]) ?
-                'index' : substr($classname[sizeof($classname) - 1], 0, -4));
-            $object = new $classname($unique_id,
-                time() + DPUNIVERSE_RESET_CYCLE, $pathname, $sublocation);
+            $classname = ucfirst(!dp_strlen($classname[sizeof($classname) - 1])
+                ? 'index'
+                : dp_substr($classname[sizeof($classname) - 1], 0, -4));
+            $ob = new $classname($unique_id, time() + DPUNIVERSE_RESET_CYCLE,
+                $pathname, $sublocation);
         }
-        if (empty($object)) {
+        if (empty($ob)) {
             $rval = FALSE;
             return $rval;
         }
@@ -758,14 +784,17 @@ final class DpUniverse
             $this->__GET['sublocation'] = $sublocation;
         }
 
-        $this->mDpObjects[] =& $object;
-        $this->mDpObjectResets[] =& $object;
+        $this->mDpObjects[] =& $ob;
+        $this->mDpObjectResets[] =& $ob;
+        if (!isset($this->mNextResetTime)) {
+            $this->mNextResetTime = $ob->resetTime;
+        }
 
-        $object->__construct2();
+        $ob->__construct2();
 
-        echo sprintf(dptext("Made new object %s\n"), $pathname);
+        echo sprintf(dp_text("Made new object %s\n"), $pathname);
 
-        return $object;
+        return $ob;
     }
 
     /**
@@ -935,7 +964,7 @@ final class DpUniverse
         if (FALSE === $sublocation) {
             foreach ($this->mDpObjects as $i => &$ob) {
                 if ($pathname === $ob->location) {
-                    //echo dptext("getDpObject(): returning existing object with location %s, no sublocation\n",
+                    //echo dp_text("getDpObject(): returning existing object with location %s, no sublocation\n",
                     //    $pathname);
                     return $ob;
                 }
@@ -944,7 +973,7 @@ final class DpUniverse
             foreach ($this->mDpObjects as $i => &$ob) {
                 if ($pathname === $ob->location
                         && $sublocation === $ob->sublocation) {
-                    //echo dptext("getDpObject(): returning existing object with location %s, sublocation %s\n",
+                    //echo dp_text("getDpObject(): returning existing object with location %s, sublocation %s\n",
                     //    $pathname, $sublocation);
                     return $ob;
                 }
@@ -952,9 +981,9 @@ final class DpUniverse
         }
 
         echo FALSE == $sublocation
-            ? dptext("getDpObject(): returning new object for location %s, no sublocation\n",
+            ? dp_text("getDpObject(): returning new object for location %s, no sublocation\n",
                 $pathname)
-            : dptext("getDpObject(): returning new object for location %s, sublocation %s\n",
+            : dp_text("getDpObject(): returning new object for location %s, sublocation %s\n",
                 $pathname, $sublocation);
         return $this->newDpObject($pathname, $sublocation);
     }
@@ -1028,17 +1057,17 @@ final class DpUniverse
         $inv = $this->getInventory($where);
         $rval = FALSE;
         if (sizeof($inv)) {
-            if (is_string($what) && strlen($what = trim($what))) {
-                $what = strtolower($what);
+            if (is_string($what) && dp_strlen($what = trim($what))) {
+                $what = dp_strtolower($what);
                 $nr = 1;
-                if (FALSE !== ($pos = strrpos($what, ' '))) {
-                    $nr = substr($what, $pos + 1);
+                if (FALSE !== ($pos = dp_strrpos($what, ' '))) {
+                    $nr = dp_substr($what, $pos + 1);
                     if (FALSE === is_whole_number($nr)) {
                         $nr = 1;
                     }
                     else {
                         $nr = (int)$nr;
-                        $what = trim(substr($what, 0, $pos));
+                        $what = trim(dp_substr($what, 0, $pos));
                     }
                 }
                 foreach ($inv as &$ob) {
@@ -1196,39 +1225,40 @@ final class DpUniverse
     {
         $this->mLastNewUserErrors = array();
         if (!isset($user->_GET['username'])
-                || 0 === strlen($user->_GET['username'])) {
+                || 0 === dp_strlen($user->_GET['username'])) {
             $this->mLastNewUserErrors[] = '<li>'
-                . dptext('No username was given') . '</li>';
+                . dp_text('No username was given') . '</li>';
         }
         if (0 === sizeof($this->mLastNewUserErrors)
                 && $user->_GET['username'] === $user->getTitle()) {
             $this->mLastNewUserErrors[] = '<li>'
-                . sprintf(dptext('You are already logged in as %s'),
+                . sprintf(dp_text('You are already logged in as %s'),
                 $user->getTitle()) . '</li>';
         } elseif (!isset($user->_GET['password'])
-                || 0 === strlen($user->_GET['password'])) {
+                || 0 === dp_strlen($user->_GET['password'])) {
             $this->mLastNewUserErrors[] = '<li>'
-                . dptext('No password was given') . '</li>';
+                . dp_text('No password was given') . '</li>';
         }
         if (0 === sizeof($this->mLastNewUserErrors)) {
-            $username = addslashes($user->_GET['username']);
-            $result = mysql_query("SELECT userUsername, userPassword, "
-                . "userCookieId, userCookiePassword FROM Users WHERE "
-                . "userUsernameLower='" . strtolower($username) . "'");
-            if (empty($result) || !($row = mysql_fetch_array($result))) {
+            $username = dp_strtolower($user->_GET['username']);
+            $result = dp_db_query('SELECT userUsername, userPassword, '
+                . 'userCookieId, userCookiePassword FROM Users WHERE '
+                . 'userUsernameLower=' . dp_db_quote($username, 'text'));
+            if (FALSE === $result || !($row = dp_db_fetch_row($result))) {
                 $this->mLastNewUserErrors[] =
-                    '<li>' . dptext('That username doesn\'t exist') . '</li>';
+                    '<li>' . dp_text('That username doesn\'t exist') . '</li>';
             } else {
                 if ($row[1] !== $user->_GET['password']) {
                     $this->mLastNewUserErrors[] = '<li>'
-                        . dptext('Invalid password') . '</li>';
+                        . dp_text('Invalid password') . '</li>';
                 }
             }
+            dp_db_free($result);
         }
 
         if (sizeof($this->mLastNewUserErrors)) {
             $user->tell('<window styleclass="dpwindow_error"><h1>'
-                . dptext('Invalid login') . '</h1><br /><ul>'
+                . dp_text('Invalid login') . '</h1><br /><ul>'
                 . implode('', $this->mLastNewUserErrors) . '</ul></window>');
             return FALSE;
         }
@@ -1242,7 +1272,7 @@ final class DpUniverse
             . '</cookie>');
         $user->_GET['username'] = $username;
         $user->addId($user->_GET['username']);
-        $user->addId(strtolower($user->_GET['username']));
+        $user->addId(dp_strtolower($user->_GET['username']));
         $user->setTitle(ucfirst($user->_GET['username']));
         $user->isRegistered = TRUE;
         if ($user === get_current_dpuser()) {
@@ -1277,7 +1307,7 @@ final class DpUniverse
         $user->tell('<changeDpElement id="loginlink"><a href="'
             . DPSERVER_CLIENT_URL . '?location=' . DPUNIVERSE_PAGE_PATH
             . 'login.php&amp;act=logout" style="padding-left: 4px">'
-            . dptext('Logout') . '</a></changeDpElement>');
+            . dp_text('Logout') . '</a></changeDpElement>');
         $user->getEnvironment()->tell(array(
             'abstract' => '<changeDpElement id="' . $user->getUniqueId() . '">'
             . $user->getAppearance(1, FALSE) . '</changeDpElement>',
@@ -1285,8 +1315,8 @@ final class DpUniverse
             . $user->getUniqueId() . '">'
             . $user->getAppearance(1, FALSE, $user, 'graphical')
             . '</changeDpElement>'), $user);
-        $user->tell('<window><h1>' . dptext('Welcome back') . '</h1><br />'
-            . sprintf(dptext('You are now logged in as: <b>%s</b>'),
+        $user->tell('<window><h1>' . dp_text('Welcome back') . '</h1><br />'
+            . sprintf(dp_text('You are now logged in as: <b>%s</b>'),
             $user->getTitle()) . '</window>');
 
         return TRUE;
@@ -1299,7 +1329,7 @@ final class DpUniverse
      */
     function logoutUser(&$user)
     {
-        $username = sprintf(dptext('Guest#%d'), $this->getGuestCnt());
+        $username = sprintf(dp_text('Guest#%d'), $this->getGuestCnt());
         $cookie_id = make_random_id();
         $cookie_pass = make_random_id();
         $oldtitle = $user->getTitle();
@@ -1327,9 +1357,9 @@ final class DpUniverse
         }
         $this->mrCurrentDpUserRequest->setHasMoved();
         $this->mNoDirectTell = TRUE;
-        $user->tell('<window><h1>' . sprintf(dptext('Logged out %s'),
-            $oldtitle) . '</h1><br />' . dptext('See you later!') . '<br />'
-            . dptext('You are now: <b>%s</b>', $user->getTitle())
+        $user->tell('<window><h1>' . sprintf(dp_text('Logged out %s'),
+            $oldtitle) . '</h1><br />' . dp_text('See you later!') . '<br />'
+            . dp_text('You are now: <b>%s</b>', $user->getTitle())
             . '</b></window>');
         $this->mNoDirectTell = FALSE;
         $user->tell('<location>' . DPUNIVERSE_PAGE_PATH
@@ -1355,8 +1385,8 @@ final class DpUniverse
         if (FALSE === $this->validLoginInfo($user->_GET['username'],
                 $user->_GET['password'], $user->_GET['password2'])) {
             $user->tell('<window styleclass="dpwindow_error"><h1>'
-                . dptext('Invalid registration') . '</h1><br />'
-                . dptext('Please correct the following errors:') . '<ul>'
+                . dp_text('Invalid registration') . '</h1><br />'
+                . dp_text('Please correct the following errors:') . '<ul>'
                 . implode('', $this->mLastNewUserErrors) . '</ul></window>');
             return FALSE;
         } else {
@@ -1371,14 +1401,14 @@ final class DpUniverse
                     . 'dpcaptcha.php?captcha_id='
                     . $captcha_id . '" border="0" alt="" /></div>'
                     . '<br clear="all" />'
-                    . dptext('To complete registration, please enter the code you see above:')
+                    . dp_text('To complete registration, please enter the code you see above:')
                     . '<br /><br /><div align="center" '
                     . 'style="margin-bottom: 5px"><input id="givencode" '
                     . 'type="text" size="6" maxlength="6" value="" /> '
                     . '<input type="submit" value="'
-                    . dptext('OK') . '" /></div><br />'
-                    . dptext('This system is used to filter software robots from
-registrations submitted by individuals. If you are unable to validate the
+                    . dp_text('OK') . '" /></div><br />'
+                    . dp_text('This system is used to filter software robots
+from registrations submitted by individuals. If you are unable to validate the
 above code, please <a href="mailto:registration@dutchpipe.org">mail us</a>
 to complete registration.') . '</form></window>');
                 return FALSE;
@@ -1409,75 +1439,84 @@ to complete registration.') . '</form></window>');
             }
             unset($user->captchaAttempts);
             $user->tell('<window styleclass="dpwindow_error"><h1>'
-                . dptext('Failure validating code') . '</h1><br />'
-                . dptext('Please try again.') . '</window>');
+                . dp_text('Failure validating code') . '</h1><br />'
+                . dp_text('Please try again.') . '</window>');
             return;
         }
+        if ($next_id = dp_db_next_id('Users', 'userId')) {
+            $username = $user->_GET['username'];
+            $keys = $vals = array();
+            $keys[] = 'userId';
+            $vals[] = dp_db_quote($next_id);
+            $keys[] = 'userUsername';
+            $vals[] = dp_db_quote($user->_GET['username']);
+            $keys[] = 'userUsernameLower';
+            $vals[] = dp_db_quote(dp_strtolower($user->_GET['username']));
+            $keys[] = 'userPassword';
+            $vals[] = dp_db_quote($user->_GET['password']);
+            $keys[] = 'userCookieId';
+            $vals[] = dp_db_quote($cookie_id = make_random_id());
+            $keys[] = 'userCookiePassword';
+            $vals[] = dp_db_quote($cookie_pass = make_random_id());
+            $keys = implode(',', $keys);
+            $vals = implode(',', $vals);
 
-        $username = $user->_GET['username'];
+            if (FALSE !==
+                    dp_db_exec("INSERT INTO Users ($keys) VALUES ($vals)")) {
+                $user->tell('<cookie>removeguest</cookie>');
+                $user->_COOKIE[DPSERVER_COOKIE_NAME] =
+                    "$cookie_id;$cookie_pass";
+                $user->tell('<cookie>' . $user->_COOKIE[DPSERVER_COOKIE_NAME]
+                    . '</cookie>');
+                $user->addId($username);
+                $user->setTitle(ucfirst($username));
+                $user->isRegistered = TRUE;
+                $user->isAdmin = FALSE;
+                if ($user === get_current_dpuser()) {
+                    $this->mrCurrentDpUserRequest->findAndInitRegisteredDpUser(
+                        $cookie_id, $cookie_pass);
+                }
 
-        $keys = $vals = array();
-        $keys[] = 'userUsername';
-        $vals[] = "'" . addslashes($user->_GET['username']) . "'";
-        $keys[] = 'userUsernameLower';
-        $vals[] = "'" . addslashes(strtolower($user->_GET['username']))
-            . "'";
-        $keys[] = 'userPassword';
-        $vals[] = "'" . addslashes($user->_GET['password']) . "'";
-        $keys[] = 'userCookieId';
-        $vals[] = "'" . ($cookie_id = make_random_id()) . "'";
-        $keys[] = 'userCookiePassword';
-        $vals[] = "'" . ($cookie_pass = make_random_id()) . "'";
-        $keys = implode(',', $keys);
-        $vals = implode(',', $vals);
-        mysql_query("INSERT INTO Users ($keys) VALUES ($vals)");
-        $user->tell('<cookie>removeguest</cookie>');
-        $user->_COOKIE[DPSERVER_COOKIE_NAME] = "$cookie_id;$cookie_pass";
-        $user->tell('<cookie>' . $user->_COOKIE[DPSERVER_COOKIE_NAME]
-            . '</cookie>');
-        $user->addId($username);
-        $user->setTitle(ucfirst($username));
-        $user->isRegistered = TRUE;
-        $user->isAdmin = FALSE;
-        if ($user === get_current_dpuser()) {
-            $this->mrCurrentDpUserRequest->findAndInitRegisteredDpUser(
-                $cookie_id, $cookie_pass);
-        }
-
-        foreach ($this->mDpUsers as $user_nr => &$u) {
-            if ($u[0] === $user) {
-                $this->mDpUsers[$user_nr][2] = $username;
-                $this->mDpUsers[$user_nr][3] = $cookie_id;
-                $this->mDpUsers[$user_nr][4] = $cookie_pass;
-                $this->mDpUsers[$user_nr][5] = 1;
+                foreach ($this->mDpUsers as $user_nr => &$u) {
+                    if ($u[0] === $user) {
+                        $this->mDpUsers[$user_nr][2] = $username;
+                        $this->mDpUsers[$user_nr][3] = $cookie_id;
+                        $this->mDpUsers[$user_nr][4] = $cookie_pass;
+                        $this->mDpUsers[$user_nr][5] = 1;
+                    }
+                }
+                $user->tell('<changeDpElement id="username">' . $username
+                    . '</changeDpElement>');
+                $user->tell(array('abstract' => '<changeDpElement id="'
+                    . $user->getUniqueId() . '"><b>'
+                    . $user->getAppearance(1, FALSE) . '</b></changeDpElement>',
+                    'graphical' => '<changeDpElement id="'
+                    . $user->getUniqueId() . '"><b>'
+                    . $user->getAppearance(1, FALSE, $user, 'graphical')
+                    . '</b></changeDpElement>'));
+                $user->tell('<changeDpElement id="loginlink"><a href="'
+                    . DPSERVER_CLIENT_URL . '?location=' . DPUNIVERSE_PAGE_PATH
+                    . 'login.php&amp;act=logout" style="padding-left: 4px">'
+                    . dp_text('Logout') . '</a></changeDpElement>');
+                if ($env = $user->getEnvironment()) {
+                    $env->tell(array('abstract' => '<changeDpElement id="'
+                        . $user->getUniqueId() . '">'
+                        . $user->getAppearance(1, FALSE) . '</changeDpElement>',
+                        'graphical' => '<changeDpElement id="'
+                        . $user->getUniqueId() . '">'
+                        . $user->getAppearance(1, FALSE, $user, 'graphical')
+                        . '</changeDpElement>'), $user);
+                }
+                $user->tell('<window><h1>'
+                    . dp_text('Thank you for registering and welcome to DutchPIPE!')
+                    . '</h1><br />' . sprintf(
+                    dp_text('You are now logged in as: <b>%s</b>'), $username)
+                    . '</window>');
+                return;
             }
         }
-        $user->tell('<changeDpElement id="username">' . $username
-            . '</changeDpElement>');
-        $user->tell(array('abstract' => '<changeDpElement id="'
-            . $user->getUniqueId() . '"><b>'
-            . $user->getAppearance(1, FALSE) . '</b></changeDpElement>',
-            'graphical' => '<changeDpElement id="'
-            . $user->getUniqueId() . '"><b>'
-            . $user->getAppearance(1, FALSE, $user, 'graphical')
-            . '</b></changeDpElement>'));
-        $user->tell('<changeDpElement id="loginlink"><a href="'
-            . DPSERVER_CLIENT_URL . '?location=' . DPUNIVERSE_PAGE_PATH
-            . 'login.php&amp;act=logout" style="padding-left: 4px">'
-            . dptext('Logout') . '</a></changeDpElement>');
-        if ($env = $user->getEnvironment()) {
-            $env->tell(array('abstract' => '<changeDpElement id="'
-                . $user->getUniqueId() . '">'
-                . $user->getAppearance(1, FALSE) . '</changeDpElement>',
-                'graphical' => '<changeDpElement id="'
-                . $user->getUniqueId() . '">'
-                . $user->getAppearance(1, FALSE, $user, 'graphical')
-                . '</changeDpElement>'), $user);
-        }
-        $user->tell('<window><h1>'
-            . dptext('Thank you for registering and welcome to DutchPIPE!')
-            . '</h1><br />'
-            . sprintf(dptext('You are now logged in as: <b>%s</b>'), $username)
+        $user->tell('<window>' .
+            dp_text('There was a problem registering your new user. Registration failed.')
             . '</window>');
     }
 
@@ -1493,10 +1532,13 @@ to complete registration.') . '</form></window>');
         $captchaId = addslashes($captchaId);
         $captchaGivenCode = addslashes($captchaGivenCode);
 
-        $result = mysql_query("SELECT captchaId FROM Captcha WHERE "
-            . "captchaId='$captchaId' AND captchaFile='$captchaGivenCode.gif'");
+        $result = dp_db_query('SELECT captchaId FROM Captcha WHERE '
+            . 'captchaId=' . dp_db_quote($captchaId, 'integer')
+            . ' AND captchaFile=' . dp_db_quote($captchaGivenCode . '.gif'));
 
-        return $result && mysql_num_rows($result);
+        $rval = $result && dp_db_num_rows($result);
+        dp_db_free($result);
+        return $rval;
     }
 
     /**
@@ -1514,37 +1556,37 @@ to complete registration.') . '</form></window>');
     {
         $this->mLastNewUserErrors = array();
 
-        $len = strlen($userName);
+        $len = dp_strlen($userName);
         if (0 === $len) {
             $this->mLastNewUserErrors[] = '<li>'
-                . dptext('No username was given') . '</li>';
+                . dp_text('No username was given') . '</li>';
         } else {
             if ($len < DPUNIVERSE_MIN_USERNAME_LEN) {
                 $this->mLastNewUserErrors[] = '<li>' . sprintf(
-                    dptext('The username must be at least %d characters long'),
+                    dp_text('The username must be at least %d characters long'),
                     DPUNIVERSE_MIN_USERNAME_LEN) . '</li>';
             } elseif ($len > DPUNIVERSE_MAX_USERNAME_LEN) {
                 $this->mLastNewUserErrors[] = '<li>' . sprintf(
-                    dptext('The username must be at most %d characters long'),
+                    dp_text('The username must be at most %d characters long'),
                     DPUNIVERSE_MAX_USERNAME_LEN) . '</li>';
             }
 
             /*if (FALSE !== ($words = file(DUTCHPIPE_FORBIDDEN_USERNAMES_FILE))
                     && count($words)) {
                 foreach ($words as $word) {
-                    if (FALSE !== strpos($userName, $word)) {
+                    if (FALSE !== dp_strpos($userName, $word)) {
                         $this->lastUsernameError[] = '<li>' .
-                        dptext('This username is not allowed, please try again.')
+                        dp_text('This username is not allowed, please try again.')
                         . '</li>';
                         break;
                     }
                 }
             }*/
 
-            $lower_user_name = strtolower($userName);
+            $lower_user_name = dp_strtolower($userName);
             if ($lower_user_name{0} < 'a' || $lower_user_name{0} > 'z') {
                 $this->mLastNewUserErrors[] = '<li>'
-                     . dptext('Illegal character in username at position 1 (usernames must start with a letter, digits or other characters are not allowed)')
+                     . dp_text('Illegal character in username at position 1 (usernames must start with a letter, digits or other characters are not allowed)')
                      . '</li>';
             }
             for ($i = 1; $i < $len; $i++) {
@@ -1552,40 +1594,41 @@ to complete registration.') . '</form></window>');
                         && ($lower_user_name{$i} < '0'
                         || $lower_user_name{$i} > '9')) {
                     $this->mLastNewUserErrors[] = '<li>' . sprintf(
-                        dptext('Illegal character in username at position %d (you can only use a-z and 0-9)'),
+                        dp_text('Illegal character in username at position %d (you can only use a-z and 0-9)'),
                         ($i + 1)) . '</li>';
                     break;
                 }
             }
 
-            $result = mysql_query("SELECT userId FROM Users WHERE "
-                . "userUsernameLower='" . strtolower($userName) . "'");
-            if ($result && mysql_num_rows($result)) {
+            $result = dp_db_query('SELECT userId FROM Users WHERE '
+                . 'userUsernameLower=' . dp_db_quote(dp_strtolower($userName)));
+            if ($result && dp_db_num_rows($result)) {
                 $this->mLastNewUserErrors[] = '<li>'
-                    . dptext('That username is already in use') . '</li>';
+                    . dp_text('That username is already in use') . '</li>';
             }
+            dp_db_free($result);
         }
 
-        if (!isset($password) || !strlen($password)) {
+        if (!isset($password) || !dp_strlen($password)) {
             $this->mLastNewUserErrors[] = '<li>'
-                . dptext('No password was given') . '</li>';
+                . dp_text('No password was given') . '</li>';
         }
 
         if (0 === sizeof($this->mLastNewUserErrors)) {
-            if (strlen($password) < 6) {
+            if (dp_strlen($password) < 6) {
                 $this->mLastNewUserErrors[] = '<li>'
-                    . dptext('Your password must be at least 6 characters long')
+                    . dp_text('Your password must be at least 6 characters long')
                     . '</li>';
-            } elseif (strlen($password) > 32) {
+            } elseif (dp_strlen($password) > 32) {
                 $this->mLastNewUserErrors[] = '<li>'
-                    . dptext('Your password must be at most 32 characters long')
+                    . dp_text('Your password must be at most 32 characters long')
                     . '</li>';
-            } elseif (!strlen($password2)) {
+            } elseif (!dp_strlen($password2)) {
                 $this->mLastNewUserErrors[] = '<li>'
-                    . dptext('You didn\'t repeat your password') . '</li>';
+                    . dp_text('You didn\'t repeat your password') . '</li>';
             } elseif ($password !== $password2) {
                 $this->mLastNewUserErrors[] = '<li>'
-                    . dptext('The repeated password was different') . '</li>';
+                    . dp_text('The repeated password was different') . '</li>';
             }
         }
 
@@ -1693,13 +1736,85 @@ to complete registration.') . '</form></window>');
 
         $info = $this->getUniverseInfo();
 
-        printf("Memory: %dKB KB  #Objects: %d  #Users: %d  #Environments: %d  "
+        printf("Memory: %dKB  #Objects: %d  #Users: %d  #Environments: %d  "
             . "#Timeouts: %d\n",
             round($info['memory_usage'] / 1024),
             $info['nr_of_objects'],
             $info['nr_of_users'],
             $info['nr_of_environments'],
             $info['nr_of_timeouts']);
+    }
+
+    /**
+     * Gets a list of all objects in this DutchPIPE universe
+     *
+     * @return     array     A list of all objects in this DutchPIPE universe
+     * @see        DpUser::actionOblist()
+     * @since      DutchPIPE 0.4.0
+     */
+    function getObjectList()
+    {
+        $rval = '<table border="0" cellspacing="2" cellpadding="2" '
+            . 'class="dpoblist sortable"><thead><tr>'
+            . '<th nowrap="nowrap" style="white-space: nowrap">'
+                . '<div style="float: left">' . dp_text('Unique Id')
+            . '</div></th>'
+            . '<th>' . dp_text('Title') . '</th>'
+            . '<th>' . dp_text('Location') . '</th>'
+            . '<th>' . dp_text('Environment') . '</th>'
+            . '<th class="align_c">' . dp_text('User') . '</th>'
+            . '<th class="align_c">' . dp_text('Adm') . '</th>'
+            . '<th class="align_c">' . dp_text('NPC') . '</th>'
+            . '<th class="align_c">' . dp_text('Page') . '</th>'
+            . '<th>' . dp_text('Created') . '</th>'
+            . '<th>' . dp_text('Reset') . '</th>'
+            . '</tr></thead><tbody>';
+        $checked = '<img src="' . DPUNIVERSE_IMAGE_URL . 'checked.gif'
+            . '" width="7" height="7" border="0" alt="*" title="*" />';
+
+        $ob_nr = 1;
+        $ob_sz = count($this->mDpObjects);
+        foreach ($this->mDpObjects as &$ob) {
+            $rval .= '<tr>'
+                . '<td sorttable_customkey="' . $ob_nr . '">'
+                    . $ob->uniqueId
+                . '</td>'
+                . '<td><div>' . ucfirst($ob->title) . '</div></td>'
+                . '<td><div>' . $ob->location . '</div></td>'
+                . '<td><div>'
+                    . (!($env = $ob->getEnvironment()) ? '&nbsp;'
+                    : '<a href="' . (!$env->isStandalone ? DPSERVER_CLIENT_URL
+                    . '?location=' : '') . $env->location . '">'
+                    . ucfirst($env->title)
+                    . '</a>')
+                . '</div></td>'
+                . '<td class="align_c"' . (!$ob->isUser
+                    ? ' sorttable_customkey="' . $ob_sz . '">&nbsp;'
+                    : '">' . $checked)
+                . '</td>'
+                . '<td class="align_c"' . (!$ob->isAdmin
+                    ? ' sorttable_customkey="' . $ob_sz . '">&nbsp;'
+                    : '">' . $checked)
+                . '</td>'
+                . '<td class="align_c"' . (!$ob->isNpc
+                    ? ' sorttable_customkey="' . $ob_sz . '">&nbsp;'
+                    : '">' . $checked)
+                . '</td>'
+                . '<td class="align_c"' . (!$ob->isPage
+                    ? ' sorttable_customkey="' . $ob_sz . '">&nbsp;'
+                    : '">' . $checked)
+                . '</td>'
+                . '<td><div>'
+                    . strftime('%d %b %H:%M', $ob->creationTime)
+                . '</div></td>'
+                . '<td><div>'
+                    . strftime('%H:%M', $ob->resetTime)
+                . '</div></td>'
+                . '</tr>';
+            $ob_nr++;
+        }
+
+        return $rval . '</tbody></table>';
     }
 }
 ?>

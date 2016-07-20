@@ -2,7 +2,7 @@
 /**
  * In Front Of A House
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: alley.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: alley.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -44,15 +44,16 @@ final class Alley extends DpPage
     public function createDpPage()
     {
         // Standard setup calls:
-        $this->title = dptext('In Front Of A House');
-        $this->addItem(explode('#', dptext('door#simple door')),
-            dptext('A simple door. It is %s.'), 'getDoorStatusStr',
+        $this->title = dp_text('In Front Of A House');
+        $this->addItem(explode('#', dp_text('door#simple door')),
+            dp_text('A simple door. It is %s.'), 'getDoorStatusStr',
             'door_area');
         $this->setNavigationTrail(
             array(DPUNIVERSE_NAVLOGO, ''),
-            array(dptext('Showcases'), DPUNIVERSE_PAGE_PATH . 'showcases.php'));
+            array(dp_text('Showcases'), DPUNIVERSE_PAGE_PATH
+            . 'showcases.php'));
         $this->setMapArea('alley_map', 'door_area', 'rect', '142,223,196,274');
-        $this->addExit(explode('#', dptext('sw#square')),
+        $this->addExit(explode('#', dp_text('sw#square')),
             DPUNIVERSE_PAGE_PATH . 'square.php', NULL,
             array('alley_map', 'square_area', 'rect', '25,311,400,336'));
 
@@ -76,7 +77,7 @@ final class Alley extends DpPage
         if (!$this->isDoorUnlocked) {
             $user = get_current_dpobject();
 
-            $user->tell(dptext("The door of the house is locked.<br />"));
+            $user->tell(dp_text("The door of the house is locked.<br />"));
             return FALSE;
         }
 
@@ -100,45 +101,45 @@ final class Alley extends DpPage
             . 'alley.jpg" width="450" height="336" border="0"
 usemap="#alley_map" style="border: solid 1px black; margin-right: 10px""
 title="" alt="" align="left" /><div style="width: 220px; float: left"><br /><b>'
-            . dptext('In Front Of A House') . '</b><br /><p align="justify">'
+            . dp_text('In Front Of A House') . '</b><br /><p align="justify">'
             . (!$isDoorUnlocked
-? sprintf(dptext('The stone paved alley ends here in front of a large brick
+? sprintf(dp_text('The stone paved alley ends here in front of a large brick
 house.</p><p align="justify">To the <a href="%s">southwest</a> you see a
 square.'), DPSERVER_CLIENT_URL . '?location=/page/square.php')
-: sprintf(dptext('The stone paved alley ends here in front of a large brick
+: sprintf(dp_text('The stone paved alley ends here in front of a large brick
 house.</p><p align="justify">A door leads <a href="%s">inside</a>. To the
 <a href="%s">southwest</a> you see a square.'),
             DPSERVER_CLIENT_URL . '?location=/page/house.php',
             DPSERVER_CLIENT_URL . '?location=/page/square.php'))
             . '</p></div><br clear="all" />';
 
-        $this->removeAction(dptext('unlock'), 'door_area');
-        $this->removeAction(dptext('lock'), 'door_area');
-        $this->removeExit(dptext('n'));
+        $this->removeAction(dp_text('unlock'), 'door_area');
+        $this->removeAction(dp_text('lock'), 'door_area');
+        $this->removeExit(dp_text('n'));
 
         if (!$isDoorUnlocked) {
-            $this->addAction(dptext('unlock door'), dptext('unlock'), 'actionUnlock',
-                DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
+            $this->addAction(dp_text('unlock door'), dp_text('unlock'),
+                'actionUnlock', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
                 DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY,
-                'door_area', dptext('unlock door'));
-            $this->addAction(dptext('lock'), dptext('lock'), 'actionLock',
+                'door_area', dp_text('unlock door'));
+            $this->addAction(dp_text('lock'), dp_text('lock'), 'actionLock',
                 DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
                 DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY);
             $this->addExit(explode('#',
-                dptext('n#house#enter house#inside#door#enter door')),
+                dp_text('n#house#enter house#inside#door#enter door')),
                 DPUNIVERSE_PAGE_PATH . 'house.php', 'isExitOpened');
         } else {
-            $this->addAction(dptext('unlock'), dptext('unlock'), 'actionUnlock',
-                DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
+            $this->addAction(dp_text('unlock'), dp_text('unlock'),
+                'actionUnlock', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
                 DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY);
-            $this->addAction(dptext('lock door'), dptext('lock'), 'actionLock',
-                DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
+            $this->addAction(dp_text('lock door'), dp_text('lock'),
+                'actionLock', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
                 DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY,
-                'door_area', dptext('lock door'));
+                'door_area', dp_text('lock door'));
             $this->addExit(explode('#',
-                dptext('n#house#enter house#inside#door#enter door')),
+                dp_text('n#house#enter house#inside#door#enter door')),
                 DPUNIVERSE_PAGE_PATH . 'house.php',
-                'isExitOpened', 'door_area', dptext('enter house'));
+                'isExitOpened', 'door_area', dp_text('enter house'));
         }
 
         $this->tell('<changeDpElement id="dppage_body">' . $this->getBody()
@@ -147,30 +148,28 @@ house.</p><p align="justify">A door leads <a href="%s">inside</a>. To the
 
     public function actionUnlock($verb, $noun)
     {
-        echo "verb: $verb\nnoun: $noun\n";
-        if (dptext('door') != $noun && dptext('door with key') != $noun
-                && dptext('door with silver key') != $noun) {
-            $this->setActionFailure(dptext('Unlock what?'));
+        if (dp_text('door') != $noun && dp_text('door with key') != $noun
+                && dp_text('door with silver key') != $noun) {
+            $this->setActionFailure(dp_text('Unlock what?'));
             return FALSE;
         }
         $user = get_current_dpuser();
 
-        if (!($key = $user->isPresent(dptext('silver key')))) {
-            $user->tell(
-                dptext("You don't have the right key to unlock the door.<br />"));
+        if (!($key = $user->isPresent(dp_text('silver key')))) {
+            $user->tell(dp_text("You don't have the right key to unlock the door.<br />"));
             return TRUE;
         }
 
         if ($this->isDoorUnlocked) {
-            $user->tell(dptext('The door is already unlocked.<br />'));
+            $user->tell(dp_text('The door is already unlocked.<br />'));
             return TRUE;
         }
 
         $user->tell(sprintf(
-            dptext('You unlock the door with %s. You can now enter the building.<br />'),
+            dp_text('You unlock the door with %s. You can now enter the building.<br />'),
             $key->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
         $this->tell(ucfirst(sprintf(
-            dptext('%s unlocks the door.<br />'),
+            dp_text('%s unlocks the door.<br />'),
             $user->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))),
             $user);
         $this->isDoorUnlocked = TRUE;
@@ -180,29 +179,28 @@ house.</p><p align="justify">A door leads <a href="%s">inside</a>. To the
 
     public function actionLock($verb, $noun)
     {
-        if (dptext('door') != $noun && dptext('door with key') != $noun
-                && dptext('door with silver key') != $noun) {
-            $this->setActionFailure(dptext('Lock what?'));
+        if (dp_text('door') != $noun && dp_text('door with key') != $noun
+                && dp_text('door with silver key') != $noun) {
+            $this->setActionFailure(dp_text('Lock what?'));
             return FALSE;
         }
 
         $user = get_current_dpuser();
 
-        if (!($key = $user->isPresent(dptext('silver key')))) {
-            $user->tell(
-                dptext("You don't have the right key to lock the door.<br />"));
+        if (!($key = $user->isPresent(dp_text('silver key')))) {
+            $user->tell(dp_text("You don't have the right key to lock the door.<br />"));
             return TRUE;
         }
 
         if (!$this->isDoorUnlocked) {
-            $user->tell(dptext('The door is already locked.<br />'));
+            $user->tell(dp_text('The door is already locked.<br />'));
             return TRUE;
         }
 
-        $user->tell(sprintf(dptext('You lock the door with %s.<br />'),
+        $user->tell(sprintf(dp_text('You lock the door with %s.<br />'),
             $key->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
         $this->tell(ucfirst(sprintf(
-            dptext('%s locks the door.<br />'),
+            dp_text('%s locks the door.<br />'),
             $user->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))),
             $user);
         $this->isDoorUnlocked = FALSE;
@@ -212,7 +210,7 @@ house.</p><p align="justify">A door leads <a href="%s">inside</a>. To the
 
     public function getDoorStatusStr($item)
     {
-        return $this->isDoorUnlocked ? dptext('unlocked') : dptext('locked');
+        return $this->isDoorUnlocked ? dp_text('unlocked') : dp_text('locked');
     }
 }
 ?>

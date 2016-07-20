@@ -2,7 +2,7 @@
 /**
  * Provides 'DpServer' class to answer normal and AJAX requests from web clients
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpserver.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: dpserver.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpclient.php, dpuniverse.php
  */
@@ -94,6 +94,10 @@ final class DpServer
         /* Get the server settings */
         require_once($iniFile);
 
+        require_once(DPSERVER_LIB_PATH . 'dpmbstring_'
+            . (!DPSERVER_ENABLE_MBSTRING || !function_exists('mb_strlen')
+            ? 'disabled' : 'enabled') . '.php');
+
         error_reporting(DPSERVER_ERROR_REPORTING);
 
         ini_set('memory_limit', DPSERVER_MEMORY_LIMIT);
@@ -120,25 +124,25 @@ final class DpServer
         if (file_exists(DPSERVER_SOCKET_PATH)) {
             /* :KLUDGE: should be improved */
             unlink(DPSERVER_SOCKET_PATH);
-            //die(dptext("Cannot start server: server already running\n"));
+            //die(dp_text("Cannot start server: server already running\n"));
         }
 
         if (DPSERVER_SOCKET_TYPE === AF_UNIX) {
             /* Initialize the server, first create a socket */
             if (FALSE === ($socket = socket_create(AF_UNIX, SOCK_STREAM, 0))) {
-                die(sprintf(dptext(
+                die(sprintf(dp_text(
                     "socket_create(): unable to create socket [%u]: %s\n"),
                     socket_last_error(), socket_strerror(socket_last_error())));
             }
 
             /* Bind the socket to a file, for example /tmp/dutchpipesock */
             if (FALSE === socket_bind($socket, DPSERVER_SOCKET_PATH)) {
-                die(sprintf(dptext(
+                die(sprintf(dp_text(
                     "socket_bind() unable to bind socket [%u]: %s\n"),
                     socket_last_error(), socket_strerror(socket_last_error())));
             }
             if (FALSE === chmod(DPSERVER_SOCKET_PATH, 0777)) {
-                die(sprintf(dptext(
+                die(sprintf(dp_text(
                     "Cannot start server: reason: chmod on %s failed\n"),
                     DPSERVER_SOCKET_PATH));
             }
@@ -146,7 +150,7 @@ final class DpServer
             /* Initialize the server, first create a socket */
             if (FALSE === ($socket = socket_create(AF_INET, SOCK_STREAM,
                     SOL_TCP))) {
-                die(sprintf(dptext(
+                die(sprintf(dp_text(
                     "socket_create(): unable to create socket [%u]: %s\n"),
                     socket_last_error(), socket_strerror(socket_last_error())));
             }
@@ -157,23 +161,23 @@ final class DpServer
             /* Bind the socket to a file, for example /tmp/dutchpipesock */
             if (FALSE === socket_bind($socket, DPSERVER_SOCKET_ADDRESS,
                     DPSERVER_SOCKET_PORT)) {
-                die(sprintf(dptext(
+                die(sprintf(dp_text(
                     "socket_bind() unable to bind socket [%u]: %s\n"),
                     socket_last_error(), socket_strerror(socket_last_error())));
             }
         } else {
-            die(dptext("Invalid socket protocol.\n"));
+            die(dp_text("Invalid socket protocol.\n"));
         }
         /* Start listening to the socket which dpclient.php talks to */
         if (FALSE === socket_listen($socket, DPSERVER_MAX_SOCKET_BACKLOG)) {
-            die(sprintf(dptext("socket_listen(): failure [%u]: %s\n"),
+            die(sprintf(dp_text("socket_listen(): failure [%u]: %s\n"),
                 socket_last_error(), socket_strerror(socket_last_error())));
         }
 
         /* Accept connections and loop for each request */
         do {
             if (FALSE === ($this->mMsgsock = socket_accept($socket))) {
-                echo sprintf(dptext("socket_accept(): failure [%u]: %s\n"),
+                echo sprintf(dp_text("socket_accept(): failure [%u]: %s\n"),
                     socket_last_error(), socket_strerror(socket_last_error()));
                 break;
             }
@@ -191,13 +195,13 @@ final class DpServer
                     /* Read in what dpclient.php is telling us in chunks */
                     if (FALSE === ($buf = socket_read($this->mMsgsock,
                             DPSERVER_SERVER_CHUNK, PHP_NORMAL_READ))) {
-                        echo sprintf(dptext(
+                        echo sprintf(dp_text(
                             "socket_read(): failure [%u]: %s\n"),
                             socket_last_error(),
                             socket_strerror(socket_last_error()));
                         break 2;
                     }
-                    if (!strlen($buf = trim($buf))) {
+                    if (!dp_strlen($buf = trim($buf))) {
                         continue;
                     }
                     /* This can be used to shutdown the server */
@@ -217,36 +221,36 @@ final class DpServer
                     /* Read in what dpclient.php is telling us in chunks */
                     if (FALSE === ($buf = socket_read($this->mMsgsock,
                             DPSERVER_SERVER_CHUNK))) {
-                        echo sprintf(dptext(
+                        echo sprintf(dp_text(
                             "socket_read(): failure [%u]: %s\n"),
                             socket_last_error(),
                             socket_strerror(socket_last_error()));
                         break 2;
                     }
-                    if (!strlen($buf = trim($buf))) {
+                    if (!dp_strlen($buf = trim($buf))) {
                         continue;
                     }
                     $allbuf .= $buf;
-
                     /* This can be used to shutdown the server */
-                    if (strlen($allbuf) >= 7 &&
-                            substr($allbuf, -7) == 'shutdown') {
+                    if (dp_strlen($allbuf) >= 7 &&
+                            dp_substr($allbuf, -7) == 'shutdown') {
                         socket_close($this->mMsgsock);
                         break 2;
                     }
-
                     /*
                      * Read the 2KB blocks until dpclient.php sends us a 'quit'
                      */
-                    if (strlen($allbuf) < 4 || substr($allbuf, -4) != 'quit') {
+                    if (dp_strlen($allbuf) < 4
+                            || dp_substr($allbuf, -4) != 'quit') {
                         continue;
                     }
-                    //$allbuf = substr($allbuf, 0, strlen($allbuf - 4));
+                    //$allbuf = dp_substr($allbuf, 0, dp_strlen($allbuf - 4));
                 }
+
                 /* Check for invalid input from dpclient.php */
-                if (strlen($allbuf) <= 6
-                        || FALSE === ($pos1 = strpos($allbuf, "<vars>"))
-                        || FALSE === ($pos2 = strpos($allbuf, "</vars>"))
+                if (dp_strlen($allbuf) <= 6
+                        || FALSE === ($pos1 = dp_strpos($allbuf, "<vars>"))
+                        || FALSE === ($pos2 = dp_strpos($allbuf, "</vars>"))
                         || $pos2 <= $pos1 + 7) {
                     echo 'allbuf: ' . $allbuf . "\n";
                     break;
@@ -256,18 +260,19 @@ final class DpServer
                  * Cut out and unserialize the three global PHP vars
                  * dpclient.php passed on
                  */
-                $vars = substr($allbuf, 0, $pos2);
-                $vars = substr($vars, $pos1 + 6);
+                $vars = dp_substr($allbuf, 0, $pos2);
+                $vars = dp_substr($vars, $pos1 + 6);
                 if (TRUE === DPSERVER_BASE64_CLIENT2SERVER) {
                     $vars = base64_decode($vars);
                 }
                 $tmp = unserialize($vars);
+
                 if (FALSE === $tmp) {
                     //$handle = fopen('/tmp/dpserver.log', 'a');
-                    //fwrite($handle, sprintf(dptext("No unserialize: %s\n"),
+                    //fwrite($handle, sprintf(dp_text("No unserialize: %s\n"),
                     //$vars));
                     //fclose($handle);
-                    echo sprintf(dptext("No unserialize: %s\n"), $vars);
+                    echo sprintf(dp_text("No unserialize: %s\n"), $vars);
                     $__SERVER = $__SESSION = $__COOKIE = $__GET = $__POST =
                         $__FILES = array();
                 }
@@ -318,7 +323,7 @@ final class DpServer
      */
     function tellCurrentDpUserRequest($talkback)
     {
-        if (0 === strlen($talkback)) {
+        if (0 === dp_strlen($talkback)) {
             return;
         }
 
@@ -328,8 +333,8 @@ final class DpServer
         $talkback .= chr(0);
 
         if (FALSE === socket_write($this->mMsgsock, $talkback,
-                strlen($talkback))) {
-            echo sprintf(dptext("socket_write(): failure [%u]: %s\n"),
+                dp_strlen($talkback))) {
+            echo sprintf(dp_text("socket_write(): failure [%u]: %s\n"),
                 socket_last_error(), socket_strerror(socket_last_error()));
         }
     }
@@ -383,17 +388,17 @@ final class DpServer
         if (0 === (int)$this->mShowedStatusHeader) {
             $keys = array_keys($dat);
             foreach ($keys as $i => $k) {
-                $keys[$i] = substr($keys[$i], 3);
-                if (strlen($keys[$i]) > 7) {
-                    $keys[$i] = substr($keys[$i], 0, 7);
+                $keys[$i] = dp_substr($keys[$i], 3);
+                if (dp_strlen($keys[$i]) > 7) {
+                    $keys[$i] = dp_substr($keys[$i], 0, 7);
                 }
             }
             $this->mShowedStatusHeader = 30;
 
-            echo sprintf(dptext("Memory\t%s\n"), implode("\t", $keys));
+            echo sprintf(dp_text("Memory\t%s\n"), implode("\t", $keys));
         }
 
-        echo sprintf(dptext("%uKB\t%s\n"), round(memory_get_usage() / 1024),
+        echo sprintf(dp_text("%uKB\t%s\n"), round(memory_get_usage() / 1024),
             implode("\t", $dat));
         $this->mShowedStatusHeader--;
     }

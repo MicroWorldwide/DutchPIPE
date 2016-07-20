@@ -2,7 +2,7 @@
 /**
  * The standard object which is built upon by all other objects
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpObject.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: DpObject.php 291 2007-08-22 20:42:12Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  */
 
@@ -162,6 +162,16 @@ class DpObject extends DpProperties
     private $mCheckPresentObjects = array();
 
     /**
+     * Array of strings with method names which the DutchPIPE client may call
+     *
+     * @var        array
+     * @access     private
+     * @see        addValidClientCall, removeValidClientCall, isValidClientCall
+     * @since      DutchPIPE 0.4.0
+     */
+    private $mValidClientCalls = array();
+
+    /**
      * Creates this object
      *
      * Called by the universe object when the object is created.
@@ -215,7 +225,7 @@ class DpObject extends DpProperties
          */
         $this->template = new_dp_property(NULL);
 
-        $this->addId(dptext('object'));
+        $this->addId(dp_text('object'));
 
         /*
          * Title, 'Cool, fresh beer'
@@ -246,13 +256,17 @@ class DpObject extends DpProperties
         /*
          * The long description or page content
          */
-        $this->body = new_dp_property(dptext('You see nothing special.<br />'));
+        $this->body = new_dp_property(
+            dp_text('You see nothing special.<br />'));
 
         $this->creationTime = new_dp_property(time(), FALSE);
         $this->lastEventTime = new_dp_property(time());
 
         $this->navigationTrailHtml = new_dp_property(NULL, FALSE);
         $this->value = new_dp_property(0);
+
+        $this->addValidClientCall('getActionsMenu');
+        $this->addValidClientCall('reportMove');
     }
 
     /**
@@ -272,9 +286,9 @@ class DpObject extends DpProperties
         $this->createDpObject();
 
         if (!isset($this->title)) {
-            $this->title = dptext('initialized object');
-            $this->titleDefinite = dptext('the initialized object');
-            $this->titleIndefinite = dptext('an initialized object');
+            $this->title = dp_text('initialized object');
+            $this->titleDefinite = dp_text('the initialized object');
+            $this->titleIndefinite = dp_text('an initialized object');
         }
 
         $this->resetDpObject();
@@ -360,7 +374,7 @@ class DpObject extends DpProperties
             $this->removeDpObject();
         }
 
-        echo sprintf(dptext("__destruct() called in object %s (%s).\n"),
+        echo sprintf(dp_text("__destruct() called in object %s (%s).\n"),
             $this->uniqueId,
             $this->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE));
     }
@@ -377,7 +391,7 @@ class DpObject extends DpProperties
      */
     function removeDpObject()
     {
-        echo dptext("removeDpObject() called in object " . $this->getTitle()
+        echo dp_text("removeDpObject() called in object " . $this->getTitle()
             . ".\n");
 
         foreach ($this->mCheckPresentObjects as $key => &$ob) {
@@ -791,7 +805,7 @@ function init_drag() {
     {
         $this->mIds = array();
         foreach ($ids as $id) {
-            $this->mIds[strtolower($id)] = TRUE;
+            $this->mIds[dp_strtolower($id)] = TRUE;
         }
     }
 
@@ -810,13 +824,13 @@ function init_drag() {
             for ($i = 0; $i < $sz; $i++) {
                 $ids = func_get_arg($i);
                 if (FALSE === is_array($ids)) {
-                    if (strlen($ids)) {
-                        $this->mIds[strtolower($ids)] = TRUE;
+                    if (dp_strlen($ids)) {
+                        $this->mIds[dp_strtolower($ids)] = TRUE;
                     }
                 } else {
                     foreach ($ids as $id) {
-                        if (strlen($id)) {
-                            $this->mIds[strtolower($id)] = TRUE;
+                        if (dp_strlen($id)) {
+                            $this->mIds[dp_strtolower($id)] = TRUE;
                         }
                     }
                 }
@@ -839,12 +853,12 @@ function init_drag() {
             for ($i = 0; $i < $sz && sizeof($this->mIds); $i++) {
                 $ids = func_get_arg($i);
                 if (FALSE === is_array($ids)) {
-                    if (strlen($ids) && isset($this->mIds[$ids])) {
+                    if (dp_strlen($ids) && isset($this->mIds[$ids])) {
                         unset($this->mIds[$ids]);
                     }
                 } else {
                     foreach ($ids as $id) {
-                        if (strlen($id) && isset($this->mIds[$id])) {
+                        if (dp_strlen($id) && isset($this->mIds[$id])) {
                             unset($this->mIds[$id]);
                         }
                     }
@@ -881,8 +895,8 @@ function init_drag() {
     function isId($id, $checkWithArticle = TRUE)
     {
         $id = trim($id);
-        return strlen($id) && (isset($this->mIds[$id = strtolower($id)])
-            || $id == strtolower($this->getTitle()))
+        return dp_strlen($id) && (isset($this->mIds[$id = dp_strtolower($id)])
+            || $id == dp_strtolower($this->getTitle()))
             || $id == $this->uniqueId
             || ($checkWithArticle && $this->_isIdWithArticle($id));
     }
@@ -900,14 +914,14 @@ function init_drag() {
      */
     private function _isIdWithArticle($id)
     {
-        $articles = explode('#', dptext('a#an#the'));
-        $space_pos = strpos($id, ' ');
+        $articles = explode('#', dp_text('a#an#the'));
+        $space_pos = dp_strpos($id, ' ');
         if (FALSE === $space_pos) {
             return FALSE;
         }
 
-        $first_word = substr($id, 0, $space_pos);
-        $rest = substr($id, $space_pos + 1);
+        $first_word = dp_substr($id, 0, $space_pos);
+        $rest = dp_substr($id, $space_pos + 1);
         return in_array($first_word, $articles) && $this->isId($rest, FALSE);
     }
 
@@ -986,7 +1000,7 @@ function init_drag() {
             switch ($this->getTitleType()) {
             case DPUNIVERSE_TITLE_TYPE_DEFINITE:
                 return !is_null($this->titleDefinite) ? $this->titleDefinite
-                    : sprintf(dptext('the %s'), $this->getDpProperty('title'));
+                    : sprintf(dp_text('the %s'), $this->getDpProperty('title'));
             case DPUNIVERSE_TITLE_TYPE_NAME: case DPUNIVERSE_TITLE_TYPE_PLURAL:
                 return $this->getDpProperty('title');
             default:
@@ -994,10 +1008,10 @@ function init_drag() {
                     return $this->titleIndefinite;
                 }
                 $title = $this->getDpProperty('title');
-                return (FALSE === strpos(dptext('aeioux'),
-                    strtolower($title{0}))
-                    ? sprintf(dptext('a %s'), $title)
-                    : sprintf(dptext('an %s'), $title));
+                return (FALSE === dp_strpos(dp_text('aeioux'),
+                    dp_strtolower($title{0}))
+                    ? sprintf(dp_text('a %s'), $title)
+                    : sprintf(dp_text('an %s'), $title));
             }
         case DPUNIVERSE_TITLE_TYPE_DEFINITE:
             switch ($this->getTitleType()) {
@@ -1005,7 +1019,7 @@ function init_drag() {
                 return $this->getDpProperty('title');
             default:
                 return !is_null($this->titleDefinite) ? $this->titleDefinite
-                    : sprintf(dptext('the %s'), $this->getDpProperty('title'));
+                    : sprintf(dp_text('the %s'), $this->getDpProperty('title'));
             }
         default:
             return $this->getDpProperty('title');
@@ -1114,7 +1128,7 @@ function init_drag() {
      */
     private function _getBodyUrl($url)
     {
-        echo dptext("Getting mailman contents\n");
+        echo dp_text("Getting mailman contents\n");
 
         inherit(DPUNIVERSE_STD_PATH . 'mailman.php');
 
@@ -1152,9 +1166,9 @@ function init_drag() {
         */
         $pos1 = stripos($tmp, '<title>');
         $pos2 = stripos($tmp, '</title>');
-        $len = strlen($tmp);
+        $len = dp_strlen($tmp);
         if (FALSE !== $pos1 && FALSE !== $pos2) {
-            $this->setTitle($tmp2 = substr($tmp, $pos1 + 7, $pos2 -
+            $this->setTitle($tmp2 = dp_substr($tmp, $pos1 + 7, $pos2 -
                 ($pos1 + 7)));
             $this->setNavigationTrail(array(DPUNIVERSE_NAVLOGO, ''),
                 $tmp2);
@@ -1208,17 +1222,17 @@ function init_drag() {
                         || TRUE !== $user->isRegistered
                         ? '<a href="' . DPSERVER_CLIENT_URL . '?location='
                         . DPUNIVERSE_PAGE_PATH. 'login.php" style='
-                        . '"padding-left: 4px">' . dptext('Login/register')
+                        . '"padding-left: 4px">' . dp_text('Login/register')
                         . '</a>'
                         : '<a href="' . DPSERVER_CLIENT_URL . '?location='
                         . DPUNIVERSE_PAGE_PATH . 'login.php&amp;act=logout" '
-                        . 'style="padding-left: 4px">' . dptext('Logout')
+                        . 'style="padding-left: 4px">' . dp_text('Logout')
                         . '</a>';
-                    $bottom = dptext('Go to Bottom');
+                    $bottom = dp_text('Go to Bottom');
                     $titlebar = '<div id="titlebarleft">' .
                         $navtrail . '</div><div id='
                         . '"titlebarright">&#160;<div id="dploginout">'
-                        .sprintf(dptext('Welcome %s'), '<span id="username">'
+                        .sprintf(dp_text('Welcome %s'), '<span id="username">'
                         . $user->getTitle() . '</span>')
                         . ' <span id="loginlink">'
                         . $login_link . '</span>&#160;&#160;&#160;&#160;'
@@ -1252,16 +1266,16 @@ function init_drag() {
                             && get_current_dpobject() === $this
                             ? (!isset($this->isRegistered)
                                 || TRUE !== $this->isRegistered
-                                ? dptext("You have been %s on this site.",
+                                ? dp_text("You have been %s on this site.",
                                 $this->sessionAge)
-                                : dptext("This session, you have been %s on this site.",
+                                : dp_text("This session, you have been %s on this site.",
                                 $this->sessionAge))
                             : (!isset($this->isRegistered)
-                                || TRUE !== $this->isRegistered
-                                ? ucfirst(dptext("%s has been %s on this site.",
+                                || TRUE !== $this->isRegistered ? ucfirst(
+                                dp_text("%s has been %s on this site.",
                                 $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
                                 $this->sessionAge))
-                                : dptext("This session, %s has been %s on this site.",
+                                : dp_text("This session, %s has been %s on this site.",
                                 $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
                                 $this->sessionAge))) . '<br /><br />';
                     }
@@ -1270,26 +1284,26 @@ function init_drag() {
                         || TRUE !== $this->isRegistered
                         ? '' : (get_current_dpobject()
                         && get_current_dpobject() === $this ?
-                        dptext("In total, you have been %s on this site.",
+                        dp_text("In total, you have been %s on this site.",
                         $this->age)
-                        : dptext("In total, %s has been %s on this site.",
+                        : dp_text("In total, %s has been %s on this site.",
                         $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
                         $this->age)) . '<br /><br />';
 
                     $inactive_time = !isset($this->isInactive)
                         || TRUE !== $this->isInactive ? ''
-                        : dptext('%s has been inactive for %s.',
+                        : dp_text('%s has been inactive for %s.',
                         $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
                         $this->inactive) . '<br /><br />';
                 }
 
                 return $body . $session_age . $reguser_age . $inactive_time .
                     (get_current_dpobject() && get_current_dpobject() === $this
-                    ? dptext('You are carrying:')
-                    : ucfirst(dptext('%s is carrying:',
+                    ? dp_text('You are carrying:')
+                    : ucfirst(dp_text('%s is carrying:',
                         $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))))
                     . '<br />'
-                    . ($inventory == '' ? dptext('Nothing') : $inventory)
+                    . ($inventory == '' ? dp_text('Nothing') : $inventory)
                     . '</div></div></div>';
             }
             $body .= $inventory . '</div></div></div>';
@@ -1340,7 +1354,7 @@ function init_drag() {
                 . ucfirst($this->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE))
                 . $status . '</div>';
         }
-        return $body . (0 === strlen($inventory) ? "" : $inventory)
+        return $body . (0 === dp_strlen($inventory) ? "" : $inventory)
             . '</div></div></div>';
     }
 
@@ -1376,7 +1390,7 @@ function init_drag() {
             $title_pre = '<span class="dpinactive_txt">';
             $title_post = '</span>';
         }
-        $alt = dptext('Click me!');
+        $alt = dp_text('Click me!');
 
         $img_title = '<img src="' . $this->titleImg . '" '
             . 'border="0" class="' . $title_img_class . '" '
@@ -1515,10 +1529,10 @@ function init_drag() {
             $mapArea = $mapArea[1];
         }
         if (is_null($mapAreaActionMenu)) {
-            $mapAreaActionMenu = dptext('examine');
+            $mapAreaActionMenu = dp_text('examine');
         }
         $this->addMapAreaAction($mapArea, $mapAreaActionMenu,
-            sprintf(dptext("examine %s"), $item));
+            sprintf(dp_text("examine %s"), $item));
     }
 
     /**
@@ -1540,11 +1554,11 @@ function init_drag() {
             return $this->mItems[$this->mItemAliases[$item]];
         }
 
-        $articles = explode('#', dptext('a#an#the'));
-        $space_pos = strpos($item, ' ');
+        $articles = explode('#', dp_text('a#an#the'));
+        $space_pos = dp_strpos($item, ' ');
         if (FALSE !== $space_pos) {
-            $first_word = substr($item, 0, $space_pos);
-            $rest = substr($item, $space_pos + 1);
+            $first_word = dp_substr($item, 0, $space_pos);
+            $rest = dp_substr($item, $space_pos + 1);
             if (in_array($first_word, $articles)) {
                 return $this->getItem($item);
             }
@@ -1571,11 +1585,11 @@ function init_drag() {
         } elseif (isset($this->mItemAliases[$item])) {
             $item_data =& $this->mItems[$this->mItemAliases[$item]];
         } else {
-            $articles = explode('#', dptext('a#an#the'));
-            $space_pos = strpos($item, ' ');
+            $articles = explode('#', dp_text('a#an#the'));
+            $space_pos = dp_strpos($item, ' ');
             if (FALSE !== $space_pos) {
-                $first_word = substr($item, 0, $space_pos);
-                $rest = substr($item, $space_pos + 1);
+                $first_word = dp_substr($item, 0, $space_pos);
+                $rest = dp_substr($item, $space_pos + 1);
                 if (in_array($first_word, $articles)) {
                     return $this->getItemDescription($item);
                 }
@@ -2163,8 +2177,8 @@ function init_drag() {
             for ($i = 0; $i < $level; $i++) {
                 $action_menu_title = !is_array($actionData[0])
                     ? $actionData[0] : $actionData[0][$i];
-                if (FALSE !== ($pos = strrpos($action_menu_title, '#'))) {
-                    $action_menu_title = substr($action_menu_title,
+                if (FALSE !== ($pos = dp_strrpos($action_menu_title, '#'))) {
+                    $action_menu_title = dp_substr($action_menu_title,
                         $pos + 1);
                 }
 
@@ -2228,7 +2242,7 @@ function init_drag() {
             }
 
             $icon = $icon_over = FALSE;
-            if (FALSE !== strpos($title, '#')) {
+            if (FALSE !== dp_strpos($title, '#')) {
                 $tmp = explode('#', $title);
                 if (2 == count($tmp)) {
                     $icon = $tmp[0];
@@ -2419,10 +2433,11 @@ function init_drag() {
                     $actionstr = $action;
                 } elseif (is_string($operant)) {
                     $actionstr = $action . ' ' . $operant;
-                    if (strlen($actionstr) && ' ' === substr($actionstr, -1)) {
+                    if (dp_strlen($actionstr)
+                            && ' ' === dp_substr($actionstr, -1)) {
                         if (isset($user->inputMode)
                                 && 'say' === $user->inputMode
-                                && dptext('say') !== $action) {
+                                && dp_text('say') !== $action) {
                             $actionstr = '/' . $actionstr;
                         }
                         $send_action = FALSE;
@@ -2431,7 +2446,7 @@ function init_drag() {
                     /* DP_ACTION_OPERANT_COMPLETE */
                     $actionstr = $action . ' ';
                     if (isset($user->inputMode) && 'say' === $user->inputMode) {
-                        $actionstr = dptext('say') === $action ? ''
+                        $actionstr = dp_text('say') === $action ? ''
                             : '/' . $actionstr;
                     }
                     $send_action = FALSE;
@@ -2650,7 +2665,7 @@ function init_drag() {
                 $action = current($actions);
                 $alt = $action[0];
             } else {
-                $alt = dptext('Click for menu');
+                $alt = dp_text('Click for menu');
             }
             $rval .= "<area shape=\"{$map_area_data[0]}\" "
                 . "coords=\"{$map_area_data[1]}}\" "
@@ -2685,20 +2700,20 @@ function init_drag() {
      */
     final public function performActionSubject($action, &$living)
     {
-        if (strlen($action) >= 1 && substr($action, 0, 1) == "'") {
-            $say = dptext('say');
-            $action = strlen($action) == 1 ? $say : $say . ' '
-                . substr($action, 1);
-        } elseif (strlen($action) >= 1 && substr($action, 0, 1) == '"') {
-            $tell = dptext('tell');
-            $action = strlen($action) == 1 ? $tell : $tell . ' '
-                . substr($action, 1);
+        if (dp_strlen($action) >= 1 && dp_substr($action, 0, 1) == "'") {
+            $say = dp_text('say');
+            $action = dp_strlen($action) == 1 ? $say : $say . ' '
+                . dp_substr($action, 1);
+        } elseif (dp_strlen($action) >= 1 && dp_substr($action, 0, 1) == '"') {
+            $tell = dp_text('tell');
+            $action = dp_strlen($action) == 1 ? $tell : $tell . ' '
+                . dp_substr($action, 1);
         }
 
-        if (FALSE !== ($x = strpos($action, ' '))) {
-            $verb = substr($action, 0, $x);
-            $noun = trim(substr($action, $x));
-            if (!strlen($noun)) {
+        if (FALSE !== ($x = dp_strpos($action, ' '))) {
+            $verb = dp_substr($action, 0, $x);
+            $noun = trim(dp_substr($action, $x));
+            if (!dp_strlen($noun)) {
                 $noun = null;
             }
         } else {
@@ -2838,16 +2853,17 @@ function init_drag() {
      * To save some memory, the universe object will call this method in objects
      * with no environment, which haven't been referenced for a while.
      *
-     * If no users or special object using the isNoCleanup property are present,
+     * If no users or special object using the isNoCleanUp property are present,
      * the object and all of its inventory is destroyed.
      *
      * @since      DutchPIPE 0.2.0
      */
-    function handleCleanup()
+    function handleCleanUp()
     {
         foreach ($this->mCheckPresentObjects as $i => &$ob) {
             if ($ob->getEnvironment() !== $this) {
-                echo sprintf(dptext("handleCleanup() called in %s: not removed",
+                echo sprintf(
+                    dp_text("handleCleanUp() called in %s: not removed",
                     $this->getTitle()));
                 return;
             }
@@ -2855,14 +2871,15 @@ function init_drag() {
 
         $inv = $this->getInventory();
         foreach ($inv as &$ob) {
-            if ($ob->isUser || $ob->isNoCleanup) {
-                echo sprintf(dptext("handleCleanup() called in %s: not removed",
+            if ($ob->isUser || $ob->isNoCleanUp) {
+                echo sprintf(
+                    dp_text("handleCleanUp() called in %s: not removed",
                     $this->getTitle()));
                 return;
             }
         }
 
-        echo sprintf(dptext("handleCleanup() called in %s: removing\n",
+        echo sprintf(dp_text("handleCleanUp() called in %s: removing\n",
             $this->getTitle()));
         $this->removeDpObject();
     }
@@ -2902,7 +2919,7 @@ function init_drag() {
         foreach ($inv as &$ob) {
             if ($ob !== $user && $ob->isUser) {
                 if ($user !== $this) {
-                    $ob->tell(sprintf(dptext("%s moves %s around.<br />"),
+                    $ob->tell(sprintf(dp_text("%s moves %s around.<br />"),
                         $user->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
                         $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
                 }
@@ -2965,6 +2982,7 @@ function init_drag() {
      *
      * @param      int|float $credits    amount of credits
      * @return     boolean   TRUE for success, FALSE otherwise
+     * @see        getCredits
      * @since      DutchPIPE 0.2.0
      */
     function setCredits($credits)
@@ -2977,11 +2995,51 @@ function init_drag() {
      * Gets the amount of credits in the inventory of this object
      *
      * @return     int|float amount of credits
+     * @see        setCredits
      * @since      DutchPIPE 0.2.0
      */
     function getCredits()
     {
         return $this->getHeapAmount('isCredits');
+    }
+
+    /**
+     * Makes the given method callable from the DutchPIPE client
+     *
+     * @param      string    $methodName  method to add
+     * @see        removeValidClientCall, isValidClientCall
+     * @since      DutchPIPE 0.4.0
+     */
+    protected final function addValidClientCall($methodName)
+    {
+        $this->mValidClientCalls[] = $methodName;
+    }
+
+    /**
+     * Removes the given method from callable methods from the DutchPIPE client
+     *
+     * @param      string    $methodName  method to remove
+     * @see        addValidClientCall, isValidClientCall
+     * @since      DutchPIPE 0.4.0
+     */
+    protected final function removeValidClientCall($methodName)
+    {
+        if (in_array($methodName, $this->mValidClientCalls, TRUE)) {
+            unset($this->mValidClientCalls[$methodName]);
+        }
+    }
+
+    /**
+     * May the given method be called in this object from the DutchPIPE client?
+     *
+     * @param      string    $methodName  method to check
+     * @return     boolean   TRUE if the method can be called, FALSE otherwise
+     * @see        addValidClientCall, removeValidClientCall
+     * @since      DutchPIPE 0.4.0
+     */
+    final function isValidClientCall($methodName)
+    {
+        return in_array($methodName, $this->mValidClientCalls, TRUE);
     }
 }
 ?>

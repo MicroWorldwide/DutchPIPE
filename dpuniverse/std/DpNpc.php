@@ -2,7 +2,7 @@
 /**
  * A 'non playing character', a bot
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpNpc.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: DpNpc.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpLiving
  */
@@ -55,10 +55,10 @@ class DpNpc extends DpLiving
     final function createDpLiving()
     {
         // Standard setup calls to set some default values:
-        $this->addId(dptext('npc'));
-        $this->setTitle(dptext('NPC'));
-        $this->setTitleDefinite(dptext('the NPC'));
-        $this->setTitleIndefinite(dptext('a NPC'));
+        $this->addId(dp_text('npc'));
+        $this->setTitle(dp_text('NPC'));
+        $this->setTitleDefinite(dp_text('the NPC'));
+        $this->setTitleIndefinite(dp_text('a NPC'));
         $this->setTitleImg(DPUNIVERSE_IMAGE_URL . 'npc.gif');
         $this->isNpc = new_dp_property(TRUE);
 
@@ -135,22 +135,23 @@ class DpNpc extends DpLiving
         if (is_array($data)) {
             $data = $data[$this->displayMode];
         }
-        if (strlen($data) >=3 && substr($data, 0, 1) == '<'
-                && FALSE !== ($pos = strpos($data, '>'))) {
-            $type = substr($data, 1, $pos - 1);
-            $endpos = strrpos($data, '<');
-            $data = "<$type><![CDATA[" . substr($data, strlen($type) + 2,
-                $endpos - strlen($type) - 2) . ']]>' . substr($data, $endpos);
+        if (dp_strlen($data) >=3 && dp_substr($data, 0, 1) == '<'
+                && FALSE !== ($pos = dp_strpos($data, '>'))) {
+            $type = dp_substr($data, 1, $pos - 1);
+            $endpos = dp_strrpos($data, '<');
+            $data = "<$type><![CDATA[" . dp_substr($data, dp_strlen($type) + 2,
+                $endpos - dp_strlen($type) - 2) . ']]>'
+                . dp_substr($data, $endpos);
         } else {
             $type = 'message';
             $data = "<message><![CDATA[$data]]></message>";
         }
-        if (strlen($data) > 19
-                && FALSE !== ($pos1 = strpos($data, '<location><![CDATA['))
-                && FALSE !== ($pos2 = strpos($data, ']]></location>'))
+        if (dp_strlen($data) > 19
+                && FALSE !== ($pos1 = dp_strpos($data, '<location><![CDATA['))
+                && FALSE !== ($pos2 = dp_strpos($data, ']]></location>'))
                 && $pos2 > $pos1 + 14) {
-            $data = substr($data, 0, $pos2);
-            $data = substr($data, $pos1 + 19);
+            $data = dp_substr($data, 0, $pos2);
+            $data = dp_substr($data, $pos1 + 19);
             $newlocation = $data;
             if (!$newlocation || '/' === $newlocation) {
                 $newlocation = DPUNIVERSE_PAGE_PATH . 'index.php';
@@ -159,15 +160,15 @@ class DpNpc extends DpLiving
             if (FALSE === ($env = $this->getEnvironment())
                     || $env !== $newlocation) {
                 if (!$env) {
-                    $from_where = sprintf(dptext("%s enters the site.<br />"),
+                    $from_where = sprintf(dp_text("%s enters the site.<br />"),
                         ucfirst($this->getTitle(
                         DPUNIVERSE_TITLE_TYPE_DEFINITE)));
                 } else {
-                    $env->tell(sprintf(dptext("%s leaves to %s.<br />"),
+                    $env->tell(sprintf(dp_text("%s leaves to %s.<br />"),
                         ucfirst($this->getTitle(
                         DPUNIVERSE_TITLE_TYPE_DEFINITE)),
                         $newlocation->getTitle()), $this);
-                    $from_where = sprintf(dptext("%s arrives from %s.<br />"),
+                    $from_where = sprintf(dp_text("%s arrives from %s.<br />"),
                         ucfirst($this->getTitle(
                         DPUNIVERSE_TITLE_TYPE_DEFINITE)), $env->getTitle());
                 }

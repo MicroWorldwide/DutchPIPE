@@ -2,7 +2,7 @@
 /**
  * 'Drunk' class to create a drunk man carrying a golden key
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: drunk.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: drunk.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpNpc
  */
@@ -64,22 +64,22 @@ final class Drunk extends DpNpc
     public function createDpNpc()
     {
         // Standard setup calls:
-        $this->addId(explode('#', dptext('drunk#man')));
-        $this->title = dptext('drunk man');
-        $this->titleDefinite = dptext('the drunk man');
-        $this->titleIndefinite = dptext('a drunk man');
+        $this->addId(explode('#', dp_text('drunk#man')));
+        $this->title = dp_text('drunk man');
+        $this->titleDefinite = dp_text('the drunk man');
+        $this->titleIndefinite = dp_text('a drunk man');
         $this->titleImg = DPUNIVERSE_IMAGE_URL . 'drunk.gif';
 
         $this->body = '<img src="' . DPUNIVERSE_IMAGE_URL
             . 'drunk_body.gif" width="115" height="200" border="0" alt="" '
             . 'align="left" style="margin-right: 15px" />'
-            . dptext('A drunk man. He looks thirsty.<br />');
+            . dp_text('A drunk man. He looks thirsty.<br />');
 
         // Sets up chat lines:
         $this->mChat = array(
-            dptext('The drunk man says: *hIc* hEelLo thERe! *BuUrp*<br />'),
-            dptext('The drunk man says: whAaaT I *HiC* NEed iS a dRInK!<br />'),
-            dptext('The drunk man says: raaAAaH!<br />'));
+            dp_text('The drunk man says: *hIc* hEelLo thERe! *BuUrp*<br />'),
+            dp_text('The drunk man says: whAaaT I *HiC* NEed iS a dRInK!<br />'),
+            dp_text('The drunk man says: raaAAaH!<br />'));
     }
 
     /**
@@ -93,16 +93,16 @@ final class Drunk extends DpNpc
             // here:
             $this->mrGoldenKeyObj = get_current_dpuniverse()->newDpObject(
                 DPUNIVERSE_STD_PATH . 'DpObject.php');
-            $this->mrGoldenKeyObj->addId(dptext('key'));
-            $this->mrGoldenKeyObj->title = dptext('golden key');
-            $this->mrGoldenKeyObj->titleDefinite = dptext('the golden key');
-            $this->mrGoldenKeyObj->titleIndefinite = dptext('a golden key');
+            $this->mrGoldenKeyObj->addId(dp_text('key'));
+            $this->mrGoldenKeyObj->title = dp_text('golden key');
+            $this->mrGoldenKeyObj->titleDefinite = dp_text('the golden key');
+            $this->mrGoldenKeyObj->titleIndefinite = dp_text('a golden key');
             $this->mrGoldenKeyObj->titleImg = DPUNIVERSE_IMAGE_URL
                 . 'golden_key.png';
             $this->mrGoldenKeyObj->body = '<img src="' . DPUNIVERSE_IMAGE_URL
                 . 'golden_key.png" width="44" height="100" border="0" '
                 . 'alt="" align="left" style="margin-right: 15px" />'
-                . dptext('A golden key.<br />You wonder what it can unlock...');
+                . dp_text('A golden key.<br />You wonder what it can unlock...');
             $this->mrGoldenKeyObj->value = 180;
             $this->mrGoldenKeyObj->coinherit(DPUNIVERSE_STD_PATH . 'mass.php');
             $this->mrGoldenKeyObj->weight = 1;
@@ -130,7 +130,7 @@ final class Drunk extends DpNpc
         // Do something when someone drops an empty glass on this page:
         if (EVENT_ENTERED_INV === $name) {
             $ob = func_get_arg(1);
-            if ($ob->isId(dptext('glass')) && TRUE === $ob->isFull) {
+            if ($ob->isId(dp_text('glass')) && TRUE === $ob->isFull) {
                 $this->setTimeout('timeoutCheckInventory', 4);
             } else {
                 $from = func_get_arg(2);
@@ -148,11 +148,11 @@ final class Drunk extends DpNpc
         $inv = $this->getInventory();
         $count = 0;
         foreach ($inv as &$ob) {
-            if ($ob->isId(dptext('glass')) && TRUE === $ob->isFull) {
-                $this->performAction(dptext('drink beer'));
+            if ($ob->isId(dp_text('glass')) && TRUE === $ob->isFull) {
+                $this->performAction(dp_text('drink beer'));
                 if (!$ob->isFull) {
                     $this->performAction(
-                        dptext('say thAT\'S muCH *Hic* BEtTer!'));
+                        dp_text('say thAT\'S muCH *Hic* BEtTer!'));
                     $this->setTimeout('timeoutDropKey', 4);
                 }
             }
@@ -161,10 +161,10 @@ final class Drunk extends DpNpc
 
     function timeoutDropKey()
     {
-        if ($this->isPresent(dptext('golden key'))) {
+        if ($this->isPresent(dp_text('golden key'))) {
             $this->performAction(
-                dptext('say pErhAPs yOU hAvE a *BuUURp* USe foR thIS?'));
-            $this->performAction(dptext('drop golden key'));
+                dp_text('say pErhAPs yOU hAvE a *BuUURp* USe foR thIS?'));
+            $this->performAction(dp_text('drop golden key'));
         }
     }
 
@@ -177,8 +177,8 @@ final class Drunk extends DpNpc
             if ($this->getEnvironment()->isPresent($from)
                     && $this->isPresent($ob)) {
                 $this->performAction(
-                    dptext('say tHanX *bUUrp* bUu-UUUt I doN\'T NEed tHaT! *hIC*'));
-                $this->performAction(sprintf(dptext("give %s to %s"),
+                    dp_text('say tHanX *bUUrp* bUu-UUUt I doN\'T NEed tHaT! *hIC*'));
+                $this->performAction(sprintf(dp_text("give %s to %s"),
                     $ob->getTitle(DPUNIVERSE_TITLE_TYPE_NAME),
                     $from->getTitle(DPUNIVERSE_TITLE_TYPE_NAME)));
            }

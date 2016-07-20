@@ -2,7 +2,7 @@
 /**
  * 'Shopkeeper' class to create a shopkeeper
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: shopkeeper.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: shopkeeper.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpNpc
  */
@@ -35,7 +35,7 @@ inherit(DPUNIVERSE_INCLUDE_PATH . 'events.php');
  * @package    DutchPIPE
  * @subpackage dpuniverse_npc
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
  * @version    Release: 0.2.1
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
@@ -49,15 +49,15 @@ final class Shopkeeper extends DpNpc
     public function createDpNpc()
     {
         // Standard setup calls:
-        $this->addId(explode('#', dptext('shopkeeper')));
-        $this->title = dptext('shopkeeper');
-        $this->titleDefinite = dptext('the shopkeeper');
-        $this->titleIndefinite = dptext('a shopkeeper');
+        $this->addId(explode('#', dp_text('shopkeeper')));
+        $this->title = dp_text('shopkeeper');
+        $this->titleDefinite = dp_text('the shopkeeper');
+        $this->titleIndefinite = dp_text('a shopkeeper');
         $this->titleImg = DPUNIVERSE_IMAGE_URL . 'shopkeeper.gif';
         $this->body = '<img src="' . DPUNIVERSE_IMAGE_URL
             . 'shopkeeper_body.gif" width="85" height="200" border="0" alt="" '
             . 'align="left" style="margin-right: 15px" />'
-            . dptext('A shopkeeper selling and buying items.<br />');
+            . dp_text('A shopkeeper selling and buying items.<br />');
     }
 }
 ?>

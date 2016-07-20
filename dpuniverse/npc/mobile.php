@@ -2,7 +2,7 @@
 /**
  * 'Mobile' class to create a mobile computer generated character
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: mobile.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: mobile.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpNpc
  */
@@ -59,17 +59,17 @@ final class Mobile extends DpNpc
     public function createDpNpc()
     {
         // Standard setup calls:
-        $this->addId = explode('#', dptext('mobile#npc#mobile npc'));
-        $this->title = dptext('mobile NPC');
-        $this->titleDefinite = dptext('the mobile NPC');
-        $this->titleIndefinite = dptext('a mobile NPC');
+        $this->addId = explode('#', dp_text('mobile#npc#mobile npc'));
+        $this->title = dp_text('mobile NPC');
+        $this->titleDefinite = dp_text('the mobile NPC');
+        $this->titleIndefinite = dp_text('a mobile NPC');
         $this->titleImg = DPUNIVERSE_IMAGE_URL . 'npc.gif';
         $this->body =
-            dptext('A mobile computer generated character that runs around the website.<br />');
-        $this->addAction(dptext('kick'), dptext('kick'), 'actionKick',
+            dp_text('A mobile computer generated character that runs around the website.<br />');
+        $this->addAction(dp_text('kick'), dp_text('kick'), 'actionKick',
             DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
             DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_ENVIRONMENT);
-        $this->addAction(array(dptext('admin'), dptext('silence')), 'silence',
+        $this->addAction(array(dp_text('admin'), dp_text('silence')), 'silence',
             'actionSilence', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
             DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_ENVIRONMENT);
         $this->isSilent = new_dp_property(FALSE);
@@ -77,9 +77,9 @@ final class Mobile extends DpNpc
 
         // Sets up chat lines:
         $this->mChat = array(
-            dptext("The mobile NPC says: This is sooo depressing.<br />"),
-            dptext("The mobile NPC says: How boring.<br />"),
-            dptext("The mobile NPC says: Oh this is so exciting.<br />"));
+            dp_text("The mobile NPC says: This is sooo depressing.<br />"),
+            dp_text("The mobile NPC says: How boring.<br />"),
+            dp_text("The mobile NPC says: Oh this is so exciting.<br />"));
     }
 
     /**
@@ -96,8 +96,8 @@ final class Mobile extends DpNpc
 
                 if ($env_is_bar) {
                     for ($max = 10;
-                            $this->isPresent(dptext('glass')) && $max--; ) {
-                        $this->performAction(dptext('drop glass'));
+                            $this->isPresent(dp_text('glass')) && $max--; ) {
+                        $this->performAction(dp_text('drop glass'));
                     }
                 }
 
@@ -109,11 +109,11 @@ final class Mobile extends DpNpc
                     $this->randomWalk();
                 }
                 elseif ((33 === mt_rand(30, 40)) && FALSE === $env_is_bar
-                        && FALSE == $this->isPresent(dptext('glass 4'))) {
-                    if ($env->isPresent(dptext('glass'))) {
+                        && FALSE == $this->isPresent(dp_text('glass 4'))) {
+                    if ($env->isPresent(dp_text('glass'))) {
                         $this->performAction(
-                            dptext('say What a mess, and who has to clean it up? Yes...'));
-                        $this->performAction(dptext('get glass'));
+                            dp_text('say What a mess, and who has to clean it up? Yes...'));
+                        $this->performAction(dp_text('get glass'));
                     }
                 }
             }
@@ -140,12 +140,12 @@ final class Mobile extends DpNpc
             if ($i++ > 9) {
                 return;
             }
-        } while ($rnd_link === dptext('login'));
+        } while ($rnd_link === dp_text('login'));
         if ($rnd_link[0] === DPUNIVERSE_NAVLOGO) {
-            $linkcommand = dptext('home');
+            $linkcommand = dp_text('home');
         } else {
             $linkcommand = explode(' ', $rnd_link);
-            $linkcommand = strtolower($rnd_link);
+            $linkcommand = dp_strtolower($rnd_link);
         }
         $this->performAction($linkcommand);
     }
@@ -161,8 +161,8 @@ final class Mobile extends DpNpc
     {
         $living = get_current_dpobject();
 
-        if (!strlen($noun)) {
-            $living->setActionFailure(dptext('Kick who?<br />'));
+        if (!dp_strlen($noun)) {
+            $living->setActionFailure(dp_text('Kick who?<br />'));
             return FALSE;
         }
 
@@ -172,20 +172,20 @@ final class Mobile extends DpNpc
 
         if (!$this->isId($noun)) {
             $living->setActionFailure(ucfirst(sprintf(
-                dptext('%s is not here.<br />'), $noun)));
+                dp_text('%s is not here.<br />'), $noun)));
             return FALSE;
         }
 
-        $living->tell(sprintf(dptext('You give %s a good hard kick!<br />'),
+        $living->tell(sprintf(dp_text('You give %s a good hard kick!<br />'),
             $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
-        $env->tell(sprintf(dptext('%s gives %s a good hard kick!<br />'),
+        $env->tell(sprintf(dp_text('%s gives %s a good hard kick!<br />'),
             $living->getTitle(),
             $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)), $living);
-        $this->tell($living->getTitle(sprintf(dptext(
+        $this->tell($living->getTitle(sprintf(dp_text(
             '%s gives you a good hard kick!<br/>'),
             DPUNIVERSE_TITLE_TYPE_DEFINITE)));
         $env->tell('<window autoclose="2500" styleclass="dpwindow_drink">'
-            . '<div style="text-align: center"><h1>' . dptext('*KICK*')
+            . '<div style="text-align: center"><h1>' . dp_text('*KICK*')
             . '</h1></div></window>');
 
         // Fetch beer in a few seconds:
@@ -199,7 +199,8 @@ final class Mobile extends DpNpc
      */
     function timeoutKicked()
     {
-        $this->performAction(dptext("say Oh, ok, I know when I'm not wanted."));
+        $this->performAction(
+            dp_text("say Oh, ok, I know when I'm not wanted."));
         $this->randomWalk();
     }
 
@@ -214,8 +215,8 @@ final class Mobile extends DpNpc
     {
         $living = get_current_dpobject();
 
-        if (!strlen($noun)) {
-            $living->setActionFailure(dptext('Silence who?<br />'));
+        if (!dp_strlen($noun)) {
+            $living->setActionFailure(dp_text('Silence who?<br />'));
             return FALSE;
         }
 
@@ -224,7 +225,7 @@ final class Mobile extends DpNpc
         }
 
         if (!$this->isId($noun)) {
-            $living->setActionFailure(sprintf(dptext('%s is not here.<br />'),
+            $living->setActionFailure(sprintf(dp_text('%s is not here.<br />'),
                 ucfirst($noun)));
             return FALSE;
         }
@@ -232,18 +233,18 @@ final class Mobile extends DpNpc
         $this->isSilent = !$this->isSilent;
 
         if ($this->isSilent) {
-            $living->tell(sprintf(dptext('You silence %s.<br />'),
+            $living->tell(sprintf(dp_text('You silence %s.<br />'),
                 $this->getTitle()));
-            $env->tell(sprintf(dptext('%s silences %s.<br />'),
+            $env->tell(sprintf(dp_text('%s silences %s.<br />'),
                 $living->getTitle(), $this->getTitle()), $living);
-            $this->tell(sprintf(dptext('%s silences you.<br/>'),
+            $this->tell(sprintf(dp_text('%s silences you.<br/>'),
                 $living->getTitle()));
         } else {
-            $living->tell(sprintf(dptext('You allow %s to talk again.<br />'),
+            $living->tell(sprintf(dp_text('You allow %s to talk again.<br />'),
                 $this->getTitle()));
-            $env->tell(sprintf(dptext('%s allows %s to talk again.<br />'),
+            $env->tell(sprintf(dp_text('%s allows %s to talk again.<br />'),
                 $living->getTitle(), $this->getTitle()), $living);
-            $this->tell(sprintf(dptext('%s allows you to talk again.<br/>'),
+            $this->tell(sprintf(dp_text('%s allows you to talk again.<br/>'),
                 $living->getTitle()));
         }
 

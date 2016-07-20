@@ -2,7 +2,7 @@
 /**
  * A Village Square
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: square.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: square.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -44,14 +44,14 @@ final class Square extends DpPage
     public function createDpPage()
     {
         // Standard setup calls:
-        $this->title = dptext('A Village Square');
+        $this->title = dp_text('A Village Square');
         $this->setBody('<img src="' . DPUNIVERSE_IMAGE_URL . 'square.jpg"
 width="450" height="330" border="0" usemap="#square_map" alt=""
 style="border: solid 1px black; margin-right: 10px" title="" alt=""
 align="left" />
-<div style="width: 220px; float: left"><br /><b>' . dptext('A Village Square')
+<div style="width: 220px; float: left"><br /><b>' . dp_text('A Village Square')
             . '</b><br />'
-            . sprintf(dptext('<p align="justify">You\'re on a village square. A
+            . sprintf(dp_text('<p align="justify">You\'re on a village square. A
 beautiful fountain catches your attention.</p><p align="justify">To the
 <a href="%s">north</a> you see a bar where they serve cold beer and to the
 <a href="%s">east</a> is a small shop. An alley leads
@@ -70,34 +70,35 @@ beautiful fountain catches your attention.</p><p align="justify">To the
             '113,288,113,254,136,248,136,226,148,222,148,205,176,205,176,224,'
             . '187,224,187,249,207,251,212,258,212,282,190,290,140,292,113,'
             . '288');
-        $this->addItem(dptext('fountain'),
-            dptext('A beautiful fountain. '), 'getFountainItem',
+        $this->addItem(dp_text('fountain'),
+            dp_text('A beautiful fountain. '), 'getFountainItem',
             'fountain_area');
-        $this->addAction(dptext('search'), dptext('search'), 'actionSearch',
+        $this->addAction(dp_text('search'), dp_text('search'), 'actionSearch',
             DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
             DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY,
             'fountain_area',
-            dptext('search fountain'));
+            dp_text('search fountain'));
         $this->setNavigationTrail(
             array(DPUNIVERSE_NAVLOGO, ''),
-            array(dptext('Showcases'), DPUNIVERSE_PAGE_PATH . 'showcases.php'));
-        $this->addExit(explode('#', dptext('n#bar#enter bar')),
+            array(dp_text('Showcases'), DPUNIVERSE_PAGE_PATH
+            . 'showcases.php'));
+        $this->addExit(explode('#', dp_text('n#bar#enter bar')),
             DPUNIVERSE_PAGE_PATH . 'bar.php', NULL, array('square_map',
             'bar_area', 'poly',
             '37,216,37,182,228,179,229,212,177,213,177,203,147,204,147,213,37,'
-            . '216'), dptext('enter bar'));
-        $this->addExit(explode('#', dptext('e#shop#enter shop')),
+            . '216'), dp_text('enter bar'));
+        $this->addExit(explode('#', dp_text('e#shop#enter shop')),
             DPUNIVERSE_PAGE_PATH . 'shop.php', NULL, array('square_map',
             'shop_area', 'poly', '435,241,355,213,355,157,437,162,435,241'),
-            dptext('enter shop'));
-        $this->addExit(explode('#', dptext('ne#alley#enter alley')),
+            dp_text('enter shop'));
+        $this->addExit(explode('#', dp_text('ne#alley#enter alley')),
             DPUNIVERSE_PAGE_PATH . 'alley.php', NULL, array('square_map',
             'alley_area', 'poly', '240,207,240,187,249,187,292,207,240,207'),
-            dptext('enter alley'));
-        $this->addExit(explode('#', dptext('nw#dark alley#enter dark alley')),
+            dp_text('enter alley'));
+        $this->addExit(explode('#', dp_text('nw#dark alley#enter dark alley')),
             DPUNIVERSE_PAGE_PATH . 'alley2.php', NULL, array('square_map',
             'alley2_area', 'poly', '7,226,0,226,0,197,22,197,22,217,7,226'),
-            dptext('enter dark alley'));
+            dp_text('enter dark alley'));
 
         $this->fountainSearched = new_dp_property(FALSE);
     }
@@ -117,25 +118,25 @@ beautiful fountain catches your attention.</p><p align="justify">To the
         }
 
         if (FALSE === in_array($noun,
-                explode('#', dptext('fountain#the fountain')))) {
-            $user->setActionFailure(dptext('Search what?<br />'));
+                explode('#', dp_text('fountain#the fountain')))) {
+            $user->setActionFailure(dp_text('Search what?<br />'));
             return FALSE;
         }
 
         if ($this->fountainSearched) {
             $user->tell(
-                dptext('You search the fountain but find nothing.<br />'));
+                dp_text('You search the fountain but find nothing.<br />'));
             $this->tell(ucfirst(sprintf(
-                dptext("%s searches the fountain but doesn't seem to find anything.<br />"),
+                dp_text("%s searches the fountain but doesn't seem to find anything.<br />"),
                 $user->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))), $user);
                 return TRUE;
         }
 
         $this->fountainSearched = TRUE;
         $user->tell(
-            dptext('You search the fountain and find some credits!<br />'));
+            dp_text('You search the fountain and find some credits!<br />'));
         $this->tell(ucfirst(sprintf(
-            dptext("%s searches the fountain and finds some credits!<br />"),
+            dp_text("%s searches the fountain and finds some credits!<br />"),
             $user->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))), $user);
         $this->credits += 100;
 
@@ -145,8 +146,8 @@ beautiful fountain catches your attention.</p><p align="justify">To the
     public function getFountainItem($item)
     {
         return !$this->fountainSearched
-            ? dptext('You can search it.<br />')
-            : dptext('It look like someone just searched it.<br />');
+            ? dp_text('You can search it.<br />')
+            : dp_text('It look like someone just searched it.<br />');
     }
 }
 ?>

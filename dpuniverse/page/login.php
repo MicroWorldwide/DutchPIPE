@@ -2,7 +2,7 @@
 /**
  * The Login/register/Logout page
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: login.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: login.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -49,11 +49,11 @@ final class Login extends DpPage
     public function createDpPage()
     {
         // Standard setup calls:
-        $this->setTitle(dptext('Login/register'));
-        $this->setBody(dptext(DPUNIVERSE_PAGE_PATH . 'login.html'), 'file');
+        $this->setTitle(dp_text('Login/register'));
+        $this->setBody(dp_text(DPUNIVERSE_PAGE_PATH . 'login.html'), 'file');
         $this->setNavigationTrail(
             array(DPUNIVERSE_NAVLOGO, ''),
-            dptext('Login/register'));
+            dp_text('Login/register'));
     }
 
     /**

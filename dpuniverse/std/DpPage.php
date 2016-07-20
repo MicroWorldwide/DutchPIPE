@@ -2,7 +2,7 @@
 /**
  * A DutchPIPE enabled web page
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpPage.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: DpPage.php 281 2007-08-20 21:45:53Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -31,6 +31,7 @@ inherit(DPUNIVERSE_STD_PATH . 'DpObject.php');
  *
  * - boolean <b>isPage</b> - Set to TRUE
  * - boolean|integer <b>isMovingArea</b> - Set to FALSE, can be type 1 or 2
+ * - boolean <b>isStandalone</b> - Set to TRUE if this is a "standalone" page
  *
  * @package    DutchPIPE
  * @subpackage dpuniverse_std
@@ -70,13 +71,17 @@ class DpPage extends DpObject
     final function createDpObject()
     {
         $this->setTitleType(DPUNIVERSE_TITLE_TYPE_NAME);
-        $this->addId(dptext('page'));
-        $this->addExit(dptext('login'), DPUNIVERSE_PAGE_PATH . 'login.php');
+        $this->addId(dp_text('page'));
+        $this->addExit(dp_text('login'), DPUNIVERSE_PAGE_PATH . 'login.php');
 
         $this->isPage = new_dp_property(TRUE);
         $this->isMovingArea = new_dp_property(FALSE);
 
         $this->createDpPage();
+
+        $this->addValidClientCall('getInputAreaOptions');
+        $this->addValidClientCall('openInputArea');
+        $this->addValidClientCall('closeInputArea');
     }
 
     /**
@@ -450,10 +455,10 @@ class DpPage extends DpObject
         foreach ($this->mNavigationTrail as $link) {
             if (is_array($link)) {
                 if ($link[0] === DPUNIVERSE_NAVLOGO) {
-                    $link[0] = dptext('home');
+                    $link[0] = dp_text('home');
                 }
                 $link[0] = explode(' ', $link[0]);
-                $link[0] = strtolower($link[0][0]);
+                $link[0] = dp_strtolower($link[0][0]);
                 $this->addExit($link[0], $link[1]);
             }
         }
@@ -477,7 +482,8 @@ class DpPage extends DpObject
     function getNavigationTrailHtml()
     {
         if (0 === sizeof($this->mNavigationTrail)) {
-            return '<div id="navlink">' . dptext(DPUNIVERSE_NAVLOGO) . '</div>';
+            return '<div id="navlink">' . dp_text(DPUNIVERSE_NAVLOGO)
+                . '</div>';
         }
         $trail = array();
         foreach ($this->mNavigationTrail as $navitem) {
@@ -502,8 +508,9 @@ class DpPage extends DpObject
             return '<div id="navlink">' . $navitem . '</div>';
         }
 
-        if (strlen($navitem[1]) >= 6 && substr($navitem[1], 0, 6) == 'uri://') {
-            $link = substr($navitem[1], 6);
+        if (dp_strlen($navitem[1]) >= 6
+                && dp_substr($navitem[1], 0, 6) == 'uri://') {
+            $link = dp_substr($navitem[1], 6);
         } else {
             $link = $navitem[1] == '' ? DPUNIVERSE_WWW_URL
                 : DPSERVER_CLIENT_URL . '?location=' . $navitem[1];
@@ -513,7 +520,7 @@ class DpPage extends DpObject
             ? '<div id="navlink"><a class="navtrail" href="' . $link . '">'
                 . $navitem[0] . '</a></div>'
             : '<div id="navlink"><a class="navtrail" href="' . $link
-                . '" style="cursor: pointer">' . dptext(DPUNIVERSE_NAVLOGO)
+                . '" style="cursor: pointer">' . dp_text(DPUNIVERSE_NAVLOGO)
                 . '</a></div>';
     }
 
@@ -534,12 +541,12 @@ class DpPage extends DpObject
         $user->tell('<actions id="' . $this->uniqueId
             . '" level="0" checksum="' . $user->_GET['checksum'] . '">'
             . '<div class="actionwindow_inner">'
-            . $this->_getInputAreaOption(dptext('hide after use'), 'once',
-            dptext('mode once'), 'once' === $user->inputPersistent)
-            . $this->_getInputAreaOption(dptext('show while on this page'),
-            'page', dptext('mode page'), 'page' === $user->inputPersistent)
-            . $this->_getInputAreaOption(dptext('always show'), 'always',
-            dptext('mode always'), 'always' === $user->inputPersistent)
+            . $this->_getInputAreaOption(dp_text('hide after use'), 'once',
+            dp_text('mode once'), 'once' === $user->inputPersistent)
+            . $this->_getInputAreaOption(dp_text('show while on this page'),
+            'page', dp_text('mode page'), 'page' === $user->inputPersistent)
+            . $this->_getInputAreaOption(dp_text('always show'), 'always',
+            dp_text('mode always'), 'always' === $user->inputPersistent)
             . '</div></actions>');
     }
 
@@ -588,9 +595,9 @@ class DpPage extends DpObject
         $user->inputEnabled = 'on';
 
         if ($user->isRegistered) {
-            mysql_query("UPDATE Users set userInputEnabled='on' WHERE "
-                . "userUsernameLower='"
-                . addslashes(strtolower($user->getTitle())) . "'");
+            dp_db_exec('UPDATE Users set userInputEnabled='
+                . dp_db_quote('on', 'text') . ' WHERE userUsernameLower='
+                . dp_db_quote(dp_strtolower($user->getTitle()), 'text'));
         }
     }
 
@@ -606,9 +613,9 @@ class DpPage extends DpObject
         $user->inputEnabled = 'off';
 
         if ($user->isRegistered) {
-            mysql_query("UPDATE Users set userInputEnabled='off' WHERE "
-                . "userUsernameLower='"
-                . addslashes(strtolower($user->getTitle())) . "'");
+            dp_db_exec('UPDATE Users set userInputEnabled='
+                . dp_db_quote('off', 'text') . ' WHERE userUsernameLower='
+                . dp_db_quote(dp_strtolower($user->getTitle()), 'text'));
         }
     }
 }

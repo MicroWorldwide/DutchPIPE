@@ -2,7 +2,7 @@
 /**
  * Credits object for monetary system
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: credits.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: credits.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpHeap
  */
@@ -48,15 +48,15 @@ final class Credits extends DpHeap
      */
     public function createDpHeap()
     {
-        $this->heapTitleSingular = dptext('1 credit');
-        $this->heapTitlePlural = dptext('%d credits');
+        $this->heapTitleSingular = dp_text('1 credit');
+        $this->heapTitlePlural = dp_text('%d credits');
 
         $this->titleImg = DPUNIVERSE_IMAGE_URL . 'credits.gif';
-        $this->addId(explode('#', dptext('credit#credits')));
+        $this->addId(explode('#', dp_text('credit#credits')));
         $this->body = '<img src="' . DPUNIVERSE_IMAGE_URL
             . 'credits_body.gif" width="43" height="36" border="0" alt="" '
             . 'align="left" style="margin-right: 15px" /><br />'
-            . dptext('It is real money!');
+            . dp_text('It is real money!');
 
         if (WEIGHT_TYPE_NONE !== WEIGHT_TYPE) {
             if (WEIGHT_TYPE_ABSTRACT === WEIGHT_TYPE) {

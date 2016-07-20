@@ -2,7 +2,7 @@
 /**
  * A common drink which can be turned into beers, wine, etc.
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpDrink.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: DpDrink.php 278 2007-08-19 22:52:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -66,18 +66,19 @@ final class DpDrink extends DpObject
      */
     final function createDpObject()
     {
-        $this->addId(dptext('bottle'));
+        $this->addId(dp_text('bottle'));
 
         $this->isFull = new_dp_property(TRUE);
         $this->isDrink = new_dp_property(TRUE);
         $this->isNoSell = new_dp_property(TRUE);
-        $this->emptyTitle = new_dp_property(dptext('empty bottle'));
-        $this->emptyTitleDefinite = new_dp_property(dptext('the empty bottle'));
+        $this->emptyTitle = new_dp_property(dp_text('empty bottle'));
+        $this->emptyTitleDefinite = new_dp_property(
+            dp_text('the empty bottle'));
         $this->emptyTitleIndefinite = new_dp_property(
-            dptext('an empty bottle'));
+            dp_text('an empty bottle'));
         $this->emptyTitleImg = new_dp_property(NULL);
         $this->emptyIds =
-            new_dp_property(explode('#', dptext('bottle#empty bottle')));
+            new_dp_property(explode('#', dp_text('bottle#empty bottle')));
         $this->emptyBody = new_dp_property($this->emptyTitleIndefinite);
 
         $this->origIds = new_dp_property(NULL);
@@ -85,7 +86,7 @@ final class DpDrink extends DpObject
         $this->origTitleImg = new_dp_property(NULL);
         $this->origBody = new_dp_property(NULL);
 
-        $this->addAction(dptext('drink'), dptext('drink'), 'actionDrink',
+        $this->addAction(dp_text('drink'), dp_text('drink'), 'actionDrink',
             DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
             DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_ALL);
 
@@ -208,23 +209,24 @@ final class DpDrink extends DpObject
     {
         $user = get_current_dpobject();
         if (empty($noun)) {
-            $user->setActionFailure(dptext('What do you want to drink?<br />'));
+            $user->setActionFailure(
+                dp_text('What do you want to drink?<br />'));
             return FALSE;
         }
 
         if (FALSE !== ($env = $this->getEnvironment())
                 && $env->isPresent($noun) !== $this) {
-            $user->setActionFailure(sprintf(dptext("You can't drink: %s<br />"),
+            $user->setActionFailure(sprintf(dp_text("You can't drink: %s<br />"),
                 $noun));
             return FALSE;
         }
 
         if ($env !== $user) {
-            $user->tell(dptext('You must pick it up first.<br />'));
+            $user->tell(dp_text('You must pick it up first.<br />'));
             return TRUE;
         }
         if (FALSE === $this->isFull) {
-            $user->tell(ucfirst(sprintf(dptext('%s is empty.<br />'),
+            $user->tell(ucfirst(sprintf(dp_text('%s is empty.<br />'),
                 $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))));
             return TRUE;
         }
@@ -235,19 +237,19 @@ final class DpDrink extends DpObject
         $this->origBody = $this->getBody();
 
         if (FALSE !== ($env = $user->getEnvironment())) {
-            $env->tell(ucfirst(sprintf(dptext('%s drinks %s.<br />'),
+            $env->tell(ucfirst(sprintf(dp_text('%s drinks %s.<br />'),
                 $user->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
                 $this->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE))),
                 $user);
             $env->tell('<window autoclose="2500" styleclass="dpwindow_drink">'
-                . '<h1>' . dptext('BUUUUUUUUUUUUUURRRP!') . '</h1></window>',
+                . '<h1>' . dp_text('BUUUUUUUUUUUUUURRRP!') . '</h1></window>',
                 $user);
         }
 
-        $user->tell(sprintf(dptext('You drink %s.<br />'),
+        $user->tell(sprintf(dp_text('You drink %s.<br />'),
             $this->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE)));
         $user->tell('<window autoclose="2500" styleclass="dpwindow_drink">'
-            . '<h1>' . dptext('BUUUUUUUUUUUUUURRRP!') . '</h1></window>');
+            . '<h1>' . dp_text('BUUUUUUUUUUUUUURRRP!') . '</h1></window>');
         $this->setFull(FALSE);
         $env->tell(array('abstract' =>
             '<changeDpElement id="'
@@ -275,7 +277,7 @@ final class DpDrink extends DpObject
 
         if (get_current_dpobject()) {
             get_current_dpobject()->tell(
-                dptext('You would spill it out.<br />'));
+                dp_text('You would spill it out.<br />'));
         }
         return TRUE;
     }

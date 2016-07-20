@@ -8,7 +8,7 @@
  * dpclient-js.php. It talks to the PHP server using a fast file socket
  * connection.
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -20,7 +20,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpclient.php 255 2007-08-03 13:15:59Z ls $
+ * @version    Subversion: $Id: dpclient.php 280 2007-08-20 20:38:21Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver-ini.php, dpserver.php, dpclient.css
  */
@@ -42,6 +42,13 @@ require_once(DPSERVER_DPUNIVERSE_CONFIG_PATH . 'dpuniverse-ini.php');
  * Common functions for templates available to universe objects and dpclient.php
  */
 require_once(DPSERVER_LIB_PATH . 'dptemplates.php');
+
+/**
+ * Provides alternatives to multibyte string functions if not supported
+ */
+require_once(DPSERVER_LIB_PATH . 'dpmbstring_'
+    . (!DPSERVER_ENABLE_MBSTRING || !function_exists('mb_strlen')
+    ? 'disabled' : 'enabled') . '.php');
 
 error_reporting(DPSERVER_ERROR_REPORTING);
 
@@ -72,14 +79,14 @@ function talk2server()
         /* Creates a file socket and connects to it */
         if (FALSE === ($socket = socket_create(AF_UNIX, SOCK_STREAM, 0))) {
             $gLastErrorMsg = '<h1>' . DPSERVER_SOCKERR_MSG . '</h1>'
-                . sprintf(dptext(
+                . sprintf(dp_text(
                 "socket_create(): unable to create socket [%u]: %s\n"),
                 socket_last_error(), socket_strerror(socket_last_error()));
             return FALSE;
         }
         if (FALSE === @socket_connect($socket, DPSERVER_SOCKET_PATH)) {
             $gLastErrorMsg = '<h1>' . DPSERVER_SOCKERR_MSG . '</h1>'
-                . sprintf(dptext(
+                . sprintf(dp_text(
                 "socket_create(): unable to connect [%u]: %s\n"),
                 socket_last_error(), socket_strerror(socket_last_error()));
             return FALSE;
@@ -89,7 +96,7 @@ function talk2server()
         if (FALSE === ($socket = socket_create(AF_INET, SOCK_STREAM,
                 SOL_TCP))) {
             $gLastErrorMsg = '<h1>' . DPSERVER_SOCKERR_MSG . '</h1>'
-                . sprintf(dptext(
+                . sprintf(dp_text(
                 "socket_create(): unable to create socket [%u]: %s\n"),
                 socket_last_error(), socket_strerror(socket_last_error()));
             return FALSE;
@@ -97,14 +104,14 @@ function talk2server()
         if (FALSE === @socket_connect($socket, DPSERVER_SOCKET_ADDRESS,
                 DPSERVER_SOCKET_PORT)) {
             $gLastErrorMsg = '<h1>' . DPSERVER_SOCKERR_MSG . '</h1>'
-                . sprintf(dptext(
+                . sprintf(dp_text(
                 "socket_create(): unable to connect [%u]: %s\n"),
                 socket_last_error(), socket_strerror(socket_last_error()));
             return FALSE;
         }
     } else {
         $gLastErrorMsg = '<h1>' . DPSERVER_SOCKERR_MSG. '</h1>'
-            . dptext('Invalid socket protocol');
+            . dp_text('Invalid socket protocol');
         return FALSE;
     }
 
@@ -122,7 +129,6 @@ function talk2server()
     $in = "<vars>$in</vars>\r\nquit\r\n";
 
     socket_write($socket, $in, strlen($in));
-
     /* Read and process server reply, filter header info given by the server,
       put the remainder in $output */
     $cookie_set = $remove_guest_cookie = $remove_registered_cookie = FALSE;
@@ -134,30 +140,31 @@ function talk2server()
     $arroutput = explode(chr(0), $output);
     $output = '';
     foreach ($arroutput as $buf) {
-        if (!strlen($buf) || isset($newlocation)) {
+        if (!dp_strlen($buf) || isset($newlocation)) {
             continue;
         }
         $bufdec = TRUE === DPSERVER_BASE64_SERVER2CLIENT ? base64_decode($buf)
             : $buf;
-        if (strlen($bufdec) > 11 && substr($bufdec, 0, 11) == "Set-Login: ") {
-            $cookie_data = substr($bufdec, 11);
+        if (dp_strlen($bufdec) > 11
+                && dp_substr($bufdec, 0, 11) == "Set-Login: ") {
+            $cookie_data = dp_substr($bufdec, 11);
             setcookie(DPSERVER_COOKIE_NAME, $cookie_data, FALSE, '/');
             $cookie_set = TRUE;
         }
 
-        elseif (strlen($bufdec) > 17 && FALSE !== ($pos1 = strpos($bufdec,
-                "<header><![CDATA[")) && FALSE !== ($pos2 = strpos($bufdec,
+        elseif (dp_strlen($bufdec) > 17 && FALSE !== ($pos1 = dp_strpos($bufdec,
+                "<header><![CDATA[")) && FALSE !== ($pos2 = dp_strpos($bufdec,
                 "]]></header>")) && $pos2 > $pos1 + 12) {
-            $header_data = substr($bufdec, 0, $pos2);
-            $header_data = substr($header_data, $pos1 + 17);
+            $header_data = dp_substr($bufdec, 0, $pos2);
+            $header_data = dp_substr($header_data, $pos1 + 17);
             header($header_data);
         }
 
-        elseif (strlen($bufdec) > 17 && FALSE !== ($pos1 = strpos($bufdec,
-                "<cookie><![CDATA[")) && FALSE !== ($pos2 = strpos($bufdec,
+        elseif (dp_strlen($bufdec) > 17 && FALSE !== ($pos1 = dp_strpos($bufdec,
+                "<cookie><![CDATA[")) && FALSE !== ($pos2 = dp_strpos($bufdec,
                 "]]></cookie>")) && $pos2 > $pos1 + 12) {
-            $cookie_data = substr($bufdec, 0, $pos2);
-            $cookie_data = substr($cookie_data, $pos1 + 17);
+            $cookie_data = dp_substr($bufdec, 0, $pos2);
+            $cookie_data = dp_substr($cookie_data, $pos1 + 17);
             if ($cookie_data == 'removeguest') {
                 $remove_guest_cookie = TRUE;
             }
@@ -171,11 +178,11 @@ function talk2server()
             }
         }
 
-        elseif (strlen($bufdec) > 19 && FALSE !== ($pos1 = strpos($bufdec,
-                "<location><![CDATA[")) && FALSE !== ($pos2 = strpos($bufdec,
+        elseif (dp_strlen($bufdec) > 19 && FALSE !== ($pos1 = dp_strpos($bufdec,
+                "<location><![CDATA[")) && FALSE !== ($pos2 = dp_strpos($bufdec,
                 "]]></location>")) && $pos2 > $pos1 + 14) {
-            $bufdec = substr($bufdec, 0, $pos2);
-            $bufdec = substr($bufdec, $pos1 + 19);
+            $bufdec = dp_substr($bufdec, 0, $pos2);
+            $bufdec = dp_substr($bufdec, $pos1 + 19);
             $newlocation = $bufdec;
             $newlocation = $newlocation == '' ? DPSERVER_CLIENT_DIR
                 : DPSERVER_CLIENT_URL . "?location=$newlocation";
@@ -217,10 +224,19 @@ function talk2server()
  */
 function handle_ajax_request($output)
 {
+    set_time_limit(round(DPUNIVERSE_LINKDEATH_KICKTIME / 2));
     if (FALSE === $output || $output == '1') {
+        if (is_integer(DPSERVER_APACHE_GZIP_MIN)
+                && DPSERVER_APACHE_GZIP_MIN > 1) {
+            apache_setenv('no-gzip', '1');
+        }
         echo '1';
     }
     elseif (FALSE === $output || $output == '2') {
+        if (is_integer(DPSERVER_APACHE_GZIP_MIN)
+                && DPSERVER_APACHE_GZIP_MIN > 1) {
+            apache_setenv('no-gzip', '1');
+        }
         echo '2';
     }
     else {
@@ -234,6 +250,11 @@ function handle_ajax_request($output)
                 handle_cookies($xml2);
             }
         }
+        if (is_integer(DPSERVER_APACHE_GZIP_MIN)
+                && DPSERVER_APACHE_GZIP_MIN > dp_strlen($output)) {
+            apache_setenv('no-gzip', '1');
+        }
+
         header('Content-Type: text/xml');
         echo "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>
 <dutchpipe>$output</dutchpipe>\n";
@@ -254,7 +275,7 @@ function handle_cookies(&$xml)
                 $name = $attval;
                 break;
             case 'expire':
-                $expire = strlen($attval) ? $attval : FALSE;
+                $expire = dp_strlen($attval) ? $attval : FALSE;
                 break;
             case 'path':
                 $path = $attval;
@@ -311,7 +332,7 @@ function handle_normal_request($output)
         $body = $gLastErrorMsg;
 
         /* Otherwise serve the page with the retrieved content in it */
-        echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+        echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
         require_once(DPSERVER_TEMPLATE_PATH . DPSERVER_TEMPLATE_DOWN_FILE);
         exit;
     }
@@ -325,7 +346,7 @@ function handle_normal_request($output)
 
     $messages = $windows = array();
     $body = $dpelements = $scripts = '';
-    $closetext = dptext('close');
+    $closetext = dp_text('close');
     $inputpersistent = $template_file = FALSE;
 
     handle_cookies($xml);
@@ -348,14 +369,17 @@ function handle_normal_request($output)
             case 'moveDpElement':
                 $dpelements .= $data->asXML();
                 break;
+            case 'stylesheet':
+                $dpelements .= $data->asXML();
+                break;
             case 'script':
                 $tmp = $data->asXML();
-                $pos1 = strpos($tmp, '<![CDATA[');
-                $pos2 = strpos($tmp, ']]>');
+                $pos1 = dp_strpos($tmp, '<![CDATA[');
+                $pos2 = dp_strpos($tmp, ']]>');
                 if (FALSE !== $pos1 && FALSE !== $pos2 && $pos1 < $pos2) {
-                    $tmp = substr($tmp,  0, $pos1)
-                        . substr($tmp, $pos1 + 9, $pos2 - $pos1 - 9)
-                        . substr($tmp, $pos2 + 3);
+                    $tmp = dp_substr($tmp,  0, $pos1)
+                        . dp_substr($tmp, $pos1 + 9, $pos2 - $pos1 - 9)
+                        . dp_substr($tmp, $pos2 + 3);
                 }
                 $scripts .= $tmp;
                 break;
@@ -387,12 +411,12 @@ function handle_normal_request($output)
         }
     }
 
-    if (0 === strlen($body)) {
-        $body = '<h1>' . dptext('Error fetching page. Invalid page XML.')
+    if (0 === dp_strlen($body)) {
+        $body = '<h1>' . dp_text('Error fetching page. Invalid page XML.')
             . '</h1>';
     }
 
-    if (strlen($dpelements)) {
+    if (dp_strlen($dpelements)) {
         $dpelements = "        <script type=\"text/javascript\">
             function dp_load_xml(text)
             {
@@ -454,5 +478,4 @@ function handle_normal_request($output)
     require_once(!$template_file
         ? DPSERVER_TEMPLATE_PATH . DPSERVER_TEMPLATE_FILE : $template_file);
 }
-
 ?>

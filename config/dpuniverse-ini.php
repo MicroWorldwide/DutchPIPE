@@ -6,7 +6,7 @@
  * define the settings and behavious of "the universe".
  * See dpserver-ini.php for settings dealing with the server related settings.
  *
- * DutchPIPE version 0.3; PHP version 5
+ * DutchPIPE version 0.4; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -18,13 +18,27 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpuniverse-ini.php 252 2007-08-02 23:30:58Z ls $
+ * @version    Subversion: $Id: dpuniverse-ini.php 280 2007-08-20 20:38:21Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php, dpserver-ini.php
  */
 
 /*
- * MySQL settings
+ * Database settings
+ *
+ * DutchPIPE comes with MySQL sypport out of the box. If this works for you,
+ * leave DPUNIVERSE_MDB2_ENABLED set to FALSE and use the DPUNIVERSE_MYSQL_*
+ * constants.
+ *
+ * To use PHP PEAR's MDB2 database abstraction layer, make sure you have MDB2
+ * and the module for your database installed, for example by entering in a *NIX
+ * shell:
+ *
+ * $ pear install MDB2
+ * $ pear install MDB2#mysql
+ *
+ * This installs MDB2 and the MySQL module for it. Set DPUNIVERSE_MDB2_ENABLED
+ * to TRUE and complete the other DPUNIVERSE_MDB2_* constants.
  */
 
 /**
@@ -59,6 +73,95 @@ define('DPUNIVERSE_MYSQL_PASSWORD', '<yourpass>');
  *             PUNIVERSE_MYSQL_PASSWORD
  */
 define('DPUNIVERSE_MYSQL_DB', 'dutchpipe');
+
+
+/**
+ * Enable MDB2 database abstraction layer instead of using MySQL without it?
+ *
+ * @see        DPUNIVERSE_MDB2_PEAR_PATH, $DPUNIVERSE_MDB2_DSN,
+ *             $DPUNIVERSE_MDB2_CONNECT_OPTIONS
+ */
+define('DPUNIVERSE_MDB2_ENABLED', FALSE);
+
+/**
+ * Path to PEAR installation
+ *
+ * Leave empty if it is already in the include path, which is most likely the
+ * case.
+ *
+ * @see        DPUNIVERSE_MDB2_ENABLED, $DPUNIVERSE_MDB2_DSN,
+ *             $DPUNIVERSE_MDB2_CONNECT_OPTIONS
+ */
+define('DPUNIVERSE_MDB2_PEAR_PATH', '');
+
+/**
+ * Database Data Source Name (DSN) in array format
+ *
+ * Enter your database settings here. The array has the following format.
+ *
+ * $GLOBALS['DPUNIVERSE_MDB2_DSN'] = array(
+ *     'phptype'  => false,
+ *     'dbsyntax' => false,
+ *     'username' => false,
+ *     'password' => false,
+ *     'protocol' => false,
+ *     'hostspec' => false,
+ *     'port'     => false,
+ *     'socket'   => false,
+ *     'database' => false,
+ *     'new_link' => false,
+ *     'service'  => false, // only in oci8
+ * );
+ *
+ * Usually a lot of options can be skipped as your database provides defaults
+ * for them. See the links below to the PEAR manual for more information.
+ * Examples for a number of databases can be found below.
+ *
+ * @see        http://pear.php.net/manual/en/package.database.mdb2.intro-dsn.php,
+ *             http://pear.php.net/manual/en/package.database.mdb2.intro-connect.php,
+ *             $DPUNIVERSE_MDB2_CONNECT_OPTIONS, DPUNIVERSE_MDB2_ENABLED,
+ *             DPUNIVERSE_MDB2_PEAR_PATH
+ */
+$GLOBALS['DPUNIVERSE_MDB2_DSN'] = array(
+    'phptype' => 'mysql',
+    'database' => 'dutchpipe',
+    'username' => '<youruser>',
+    'password' => '<yourpass>'
+);
+
+/*
+$GLOBALS['DPUNIVERSE_MDB2_DSN'] = array(
+    'phptype' => 'mysqli',
+    'database' => 'dutchpipe',
+    'username' => '<youruser>',
+    'password' => '<yourpass>'
+);
+
+$GLOBALS['DPUNIVERSE_MDB2_DSN'] = array(
+    'phptype' => 'sqlite',
+    'database' => '/path/to/dutchpipe.db',
+    'options' => 'mode=0666'
+);
+
+$GLOBALS['DPUNIVERSE_MDB2_DSN'] = array(
+    'phptype'  => 'pgsql',
+    'username' => '<youruser>',
+    'password' => '<yourpass>',
+    'database' => 'dutchpipe'
+);
+*/
+
+/**
+ * Optional runtime configuration settings for this database
+ *
+ * See the link below to the PEAR manual for more information.
+ *
+ * @see        http://pear.php.net/manual/en/package.database.mdb2.intro-connect.php,
+ *             $DPUNIVERSE_MDB2_DSN, DPUNIVERSE_MDB2_ENABLED,
+ *             DPUNIVERSE_MDB2_PEAR_PATH
+ */
+$GLOBALS['DPUNIVERSE_MDB2_CONNECT_OPTIONS'] = array();
+
 
 /**
  * File owner
@@ -298,7 +401,7 @@ define('DPUNIVERSE_USERAGENT_MANDATORY', TRUE);
  * Default message for invalid commands
  */
 define('DPUNIVERSE_ACTION_DEFAULT_FAILURE',
-    dptext('What? Enter <tt>help</tt> for a list of commands.<br />'));
+    dp_text('What? Enter <tt>help</tt> for a list of commands.<br />'));
 
 /**
  * How many secs must be a connection be dead before a user is thrown out?
@@ -345,7 +448,7 @@ define('DPUNIVERSE_MAX_RESETS', 10);
 /**
  * Used by DutchPIPE.org in the title bar
  */
-define('DPUNIVERSE_NAVLOGO', sprintf(dptext('<img src="%snavlogo.gif"
+define('DPUNIVERSE_NAVLOGO', sprintf(dp_text('<img src="%snavlogo.gif"
 align="left" width="73" height="15" border="0" alt="DutchPIPE"
 style="margin-top: 1px" />Home'), DPUNIVERSE_IMAGE_URL));
 
