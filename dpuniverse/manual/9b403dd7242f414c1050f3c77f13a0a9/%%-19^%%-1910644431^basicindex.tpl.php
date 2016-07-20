@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.0, created on 2006-08-13 20:42:24
+<?php /* Smarty version 2.6.0, created on 2007-06-11 15:25:40
          compiled from basicindex.tpl */ ?>
 <?php if (isset($this->_sections['letter'])) unset($this->_sections['letter']);
 $this->_sections['letter']['name'] = 'letter';

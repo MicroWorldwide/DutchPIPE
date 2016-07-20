@@ -12,7 +12,7 @@
  * @package    DutchPIPE
  * @subpackage dpuniverse_page
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
  * @version    Subversion: $Id: index.php 22 2006-05-30 20:40:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
@@ -30,9 +30,9 @@ inherit(DPUNIVERSE_STD_PATH . 'DpPage.php');
  * @package    DutchPIPE
  * @subpackage dpuniverse_page
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: @package_version@
+ * @version    Release: 0.2.0
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -43,15 +43,15 @@ final class Manual extends DpPage
      */
     public function createDpPage()
     {
-        if (FALSE === ($sublocation = $this->getProperty('sublocation'))) {
+        if (FALSE === ($sublocation = $this->sublocation)) {
             $this->removeDpObject();
             return;
         }
-        $this->setTemplateFile(DPSERVER_TEMPLATE_PATH . 'dpmanual.tpl');
-        $this->addProperty('is_layered', TRUE);
+        $this->templateFile = DPSERVER_TEMPLATE_PATH . 'dpmanual.tpl';
+        $this->isLayered = TRUE;
         $this->setBody(dptext('/manual/' . $sublocation), 'file');
 
-        $body = $this->getBody();
+        $body = $this->body;
         $title = 'No title';
         $pos = strpos($body, $teststr = '<h1>');
         if (FALSE === $pos) {
@@ -68,11 +68,11 @@ final class Manual extends DpPage
 
         if ('index.html' === $sublocation) {
             $this->setNavigationTrail(
-                array(DPUNIVERSE_NAVLOGO, '/'),
+                array(DPUNIVERSE_NAVLOGO, ''),
                 'Documentation');
         } else {
             $this->setNavigationTrail(
-                array(DPUNIVERSE_NAVLOGO, '/'),
+                array(DPUNIVERSE_NAVLOGO, ''),
                 array('Documentation',
                     '/page/manual.php&sublocation=index.html'),
                 $title);

@@ -12,9 +12,9 @@
  * @package    DutchPIPE
  * @subpackage dpuniverse_npc
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: barkeeper.php 45 2006-06-20 12:38:26Z ls $
+ * @version    Subversion: $Id: barkeeper.php 185 2007-06-09 21:53:43Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpNpc
  */
@@ -35,9 +35,9 @@ inherit(DPUNIVERSE_INCLUDE_PATH . 'events.php');
  * @package    DutchPIPE
  * @subpackage dpuniverse_npc
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: @package_version@
+ * @version    Release: 0.2.0
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpNpc
  */
@@ -49,20 +49,25 @@ final class Barkeeper extends DpNpc
     private $mChat;
 
     /**
+     * Has it resetted before? TRUE if it hasn't.
+     */
+    private $mFirstReset = TRUE;
+
+    /**
      * Sets up the NPC at object creation time
      */
     public function createDpNpc()
     {
         // Standard setup calls:
         $this->addId(explode('#', dptext('barkeeper')));
-        $this->setTitle(dptext('barkeeper'));
-        $this->setTitleDefinite(dptext('the barkeeper'));
-        $this->setTitleIndefinite(dptext('a barkeeper'));
-        $this->setTitleImg(DPUNIVERSE_IMAGE_URL . 'barkeeper.gif');
-        $this->setBody('<img src="' . DPUNIVERSE_IMAGE_URL
+        $this->title = dptext('barkeeper');
+        $this->titleDefinite = dptext('the barkeeper');
+        $this->titleIndefinite = dptext('a barkeeper');
+        $this->titleImg = DPUNIVERSE_IMAGE_URL . 'barkeeper.gif';
+        $this->body = '<img src="' . DPUNIVERSE_IMAGE_URL
             . 'barkeeper_body.gif" width="125" height="200" border="0" alt="" '
             . 'align="left" style="margin-right: 15px" />'
-            . dptext('The barkeeper is serving free beer!<br />'));
+            . dptext('The barkeeper is serving free beer!<br />');
 
         // Sets up chat lines:
         $this->mChat = array(
@@ -82,6 +87,10 @@ final class Barkeeper extends DpNpc
      */
     function resetDpNpc()
     {
+        if ($this->mFirstReset) {
+            $this->mFirstReset = FALSE;
+            return;
+        }
         $this->actionShout(dptext('shout'),
             dptext('Today free beer in the bar for everyone!'));
         $this->timeoutMakeNewBeer();
@@ -96,13 +105,13 @@ final class Barkeeper extends DpNpc
      * @param   boolean $name       name of event
      * @see     timeoutCheckEmptyGlasses()
      */
-    function event($name)
+    function eventDpNpc($name)
     {
         // Do something when someone drops an empty glass on this page:
         if (EVENT_ENTERED_ENV === $name) {
             $ob = func_get_arg(1);
             if ($ob->isId(dptext('glass'))
-                    && FALSE === $ob->getProperty('is_full')) {
+                    && FALSE === $ob->isFull) {
                 $this->setTimeout('timeoutCheckEmptyGlasses', 4);
             }
         }
@@ -124,8 +133,7 @@ final class Barkeeper extends DpNpc
         $inv = $env->getInventory();
         $count = 0;
         foreach ($inv as &$ob) {
-            if ($ob->isId(dptext('glass'))
-                    && FALSE === $ob->getProperty('is_full')) {
+            if ($ob->isId(dptext('glass')) && FALSE === $ob->isFull) {
                 $ob->removeDpObject();
                 $count++;
             }
@@ -157,8 +165,7 @@ final class Barkeeper extends DpNpc
         $inv = $env->getInventory();
         $nr_of_beers = 0;
         foreach ($inv as &$ob) {
-            if ($ob->isId(dptext('glass'))
-                    && FALSE !== $ob->getProperty('is_full')) {
+            if ($ob->isId(dptext('glass')) && FALSE !== $ob->isFull) {
                 $nr_of_beers++;
             }
         }
@@ -186,8 +193,9 @@ final class Barkeeper extends DpNpc
                 $beer_obj->setEmptyTitleIndefinite(dptext('an empty beer glass'));
                 $beer_obj->setEmptyTitleImg(DPUNIVERSE_IMAGE_URL . 'beer_empty.gif');
                 $beer_obj->setEmptyBody('<img src="' . DPUNIVERSE_IMAGE_URL
-                    . 'beer_empty_body.gif" alt="" border="0" align="left" style="margin-'
-                    . 'right: 20px"/>' . dptext('An empty beer glass.<br />'));
+                    . 'beer_empty_body.gif" alt="" border="0" align="left" '
+                    . 'style="margin-right: 20px"/>'
+                    . dptext('An empty beer glass.<br />'));
 
                 $beer_obj->moveDpObject($env);
                 $nr_of_beers--;

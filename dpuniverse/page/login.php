@@ -12,9 +12,9 @@
  * @package    DutchPIPE
  * @subpackage dpuniverse_page
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: login.php 77 2006-07-13 20:39:04Z ls $
+ * @version    Subversion: $Id: login.php 196 2007-06-10 22:54:38Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -35,9 +35,9 @@ inherit(DPUNIVERSE_INCLUDE_PATH . 'events.php');
  * @package    DutchPIPE
  * @subpackage dpuniverse_page
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: @package_version@
+ * @version    Release: 0.2.0
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -52,7 +52,7 @@ final class Login extends DpPage
         $this->setTitle(dptext('Login/register'));
         $this->setBody(dptext(DPUNIVERSE_PAGE_PATH . 'login.html'), 'file');
         $this->setNavigationTrail(
-            array(DPUNIVERSE_NAVLOGO, '/'),
+            array(DPUNIVERSE_NAVLOGO, ''),
             dptext('Login/register'));
     }
 
@@ -69,7 +69,7 @@ final class Login extends DpPage
     {
         if (($user = get_current_dpuser()) && isset($user->_GET['act'])
                 && 'logout' === $user->_GET['act']
-                && $user->getProperty('is_registered')) {
+                && $user->isRegistered) {
             get_current_dpuniverse()->logoutUser($user);
             return FALSE;
         }
@@ -91,7 +91,6 @@ final class Login extends DpPage
     function validateNewUser()
     {
         $x = get_current_dpuser();
-        print_r($x);
         get_current_dpuniverse()->validateNewUser($x);
         return TRUE;
     }

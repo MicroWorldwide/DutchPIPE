@@ -14,9 +14,9 @@
  * @package    DutchPIPE
  * @subpackage lib
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpuniverse.php 93 2006-08-07 13:46:21Z ls $
+ * @version    Subversion: $Id: dpuniverse.php 198 2007-06-10 23:43:06Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        currentdpuserrequest.php, dpserver.php, dpfunctions.php
  */
@@ -52,9 +52,9 @@ define('_DPUSER_LAST_SCRIPTID', 8);    /* Script id of last AJAX request */
  * @package    DutchPIPE
  * @subpackage lib
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: @package_version@
+ * @version    Release: 0.2.0
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  */
 final class DpUniverse
@@ -147,6 +147,22 @@ final class DpUniverse
     private $mLastNewUserErrors = array();
 
     /**
+     * UNIX time stamp when cleanup mechanism was last called
+     *
+     * @var         array
+     * @access      private
+     */
+    private $mLastCleanupTime = 0;
+
+    /**
+     * Lists of objects listening to certain events
+     *
+     * @var         array
+     * @access      private
+     */
+    private $mAlertEvents = array();
+
+    /**
      * Constructs this universe based on a universe ini file
      *
      * @param      string    $iniFile    path to settings file for this universe
@@ -157,6 +173,7 @@ final class DpUniverse
         require_once($iniFile);
 
         $this->mGuestCnt = mt_rand(25, 75);
+        $this->mLastCleanupTime = time();
 
         require_once(DPSERVER_LIB_PATH . 'dpcurrentrequest.php');
 
@@ -220,21 +237,32 @@ final class DpUniverse
             $rFilesVars);
         $this->mrCurrentDpUserRequest->handleRequest();
 
-        if (FALSE === $this->mrCurrentDpUserRequest->isRegistered() && FALSE === $this->mrCurrentDpUserRequest->getUserAgent()) {
+        if (FALSE === $this->mrCurrentDpUserRequest->isRegistered()
+                && FALSE === $this->mrCurrentDpUserRequest->getUserAgent()) {
             if (!isset($rGetVars['ajax'])) {
                 $this->tellCurrentDpUserRequest('<event><div id="dppage">'
                     . '<![CDATA['
                     . dptext('Your browser did not report a User Agent string to the server. This is required.<br />')
                     . ']]></div></event>');
             }
+            unset($this->mrCurrentDpUserRequest);
+            unset($this->mCurrentDpUserKey);
             return;
         }
         if (FALSE === $this->mrCurrentDpUserRequest->isCookieEnabled()) {
             $this->tellCurrentDpUserRequest('2');
+            unset($this->mrCurrentDpUserRequest);
+            unset($this->mCurrentDpUserKey);
             return;
         }
 
-        $user_arr_key = $this->_getCurrentDpUserKey();
+        if (isset($this->mCurrentDpUserKey)) {
+            $user_arr_key = $this->mCurrentDpUserKey;
+        } else {
+            end($this->mDpUsers);
+            $user_arr_key = key($this->mDpUsers);
+        }
+
         $this->mDpUsers[$user_arr_key][_DPUSER_TIME_LASTREQUEST] = time();
 
         /*
@@ -270,15 +298,11 @@ final class DpUniverse
 
         unset($this->mrCurrentDpUserRequest);
         unset($this->mCurrentDpUserKey);
-    }
 
-    private function _getCurrentDpUserKey()
-    {
-        if (isset($this->mCurrentDpUserKey)) {
-            return $this->mCurrentDpUserKey;
+        if ($this->mLastCleanupTime < time() - DPUNIVERSE_RESET_CYCLE * 2) {
+            $this->handleCleanups();
+            $this->mLastCleanupTime = time();
         }
-        end($this->mDpUsers);
-        return key($this->mDpUsers);
     }
 
     /**
@@ -311,7 +335,8 @@ final class DpUniverse
     {
         $rval = FALSE;
 
-        if (isset($this->mDpUsers[$this->mCurrentDpUserKey])) {
+        if (isset($this->mCurrentDpUserKey)
+                && isset($this->mDpUsers[$this->mCurrentDpUserKey])) {
             return $this->mDpUsers[$this->mCurrentDpUserKey][_DPUSER_MESSAGES];
         }
 
@@ -395,8 +420,8 @@ final class DpUniverse
              * simple for now.
              */
             $lastrequest_time = $u[_DPUSER_TIME_LASTREQUEST];
-            $ajax_capable = $u[_DPUSER_OBJECT]->getProperty(
-                'is_ajax_capable');
+            $ajax_capable = isset($u[_DPUSER_OBJECT]->isAjaxCapable)
+                && TRUE === $u[_DPUSER_OBJECT]->isAjaxCapable;
 
             /* The "linkdeath" check */
             if (($ajax_capable && $lastrequest_time < $linkdeath_time)
@@ -420,10 +445,27 @@ final class DpUniverse
                         /* Drop stuff, tell people on the page the user left */
                         $u[_DPUSER_OBJECT]->actionDrop(dptext('drop'),
                             dptext('all'));
-                        $env->tell(sprintf(dptext('%s left the site.<br />'),
+                        $env->tell($left_msg = sprintf(
+                            dptext('%s left the site.<br />'),
                             ucfirst($u[_DPUSER_OBJECT]->getTitle(
                             DPUNIVERSE_TITLE_TYPE_DEFINITE))),
                             $u[_DPUSER_OBJECT]);
+                        if (!$u[_DPUSER_OBJECT]->isKnownBot) {
+                            $listeners = get_current_dpuniverse()->
+                                getAlertEvent('people_leaving');
+                            if (is_array($listeners)) {
+                                $listener_msg = sprintf(
+                                    dptext("%s left the site at %s.<br />"),
+                                    ucfirst($u[_DPUSER_OBJECT]->getTitle(
+                                    DPUNIVERSE_TITLE_TYPE_DEFINITE)),
+                                    $env->title);
+                                foreach ($listeners as &$listener) {
+                                    if ($listener->getEnvironment() !== $env) {
+                                        $listener->tell($listener_msg);
+                                    }
+                                }
+                            }
+                        }
                     } else {
                         /* Drop all silently */
                         $u[_DPUSER_OBJECT]->actionDrop(dptext('drop'),
@@ -444,6 +486,8 @@ final class DpUniverse
 
     /**
      * Calls '__reset' in each object every DPUNIVERSE_RESET_CYCLE seconds
+     *
+     * @access     private
      */
     private function handleReset()
     {
@@ -453,14 +497,14 @@ final class DpUniverse
         /* Pick up where we were in the reset array */
         while (($ob = current($this->mDpObjectResets)) && $max_resets--) {
             /* Checks if the current object ready to reset */
-            if ($ob->getProperty('reset_time') > time()) {
+            if ($ob->resetTime > time()) {
                 /* No need to go on, check next http request cycle */
                 return;
             }
 
             /* Resets the object, sets next reset time */
             $ob->__reset();
-            $ob->addProperty('reset_time', time() + DPUNIVERSE_RESET_CYCLE);
+            $ob->resetTime = time() + DPUNIVERSE_RESET_CYCLE;
 
             if (FALSE === next($this->mDpObjectResets)) {
                 reset($this->mDpObjectResets);
@@ -485,7 +529,7 @@ final class DpUniverse
                 }
                 $this->__GET['location'] =
                     FALSE === is_null($this->mrEnvironment)
-                    ? $this->mrEnvironment->getProperty('location')
+                    ? $this->mrEnvironment->location
                     : DPUNIVERSE_PAGE_PATH . 'index.php';
                 $this->mrUser->tell('<location>' . $__GET['location']
                     . '</location>');
@@ -497,21 +541,24 @@ final class DpUniverse
 
     /**
      * Handles delayed function calls requested by objects in the universe
+     *
+     * @access     private
      */
     private function handleTimeouts()
     {
         while (sizeof($this->mTimeouts)) {
             foreach ($this->mTimeouts as $i => $to) {
-                if (FALSE !==
-                        $this->mTimeouts[$i][0]->getProperty('is_removed')) {
+                if (isset($this->mTimeouts[$i][0]->isRemoved)
+                        && TRUE === $this->mTimeouts[$i][0]->isRemoved) {
+                    unset($this->mTimeouts[$i][0]);
                     unset($this->mTimeouts[$i]);
                     break;
                 }
                 $cur_time = time();
                 if ($this->mTimeouts[$i][2] <= $cur_time) {
-                    $object = $this->mTimeouts[$i][0];
                     $method = $this->mTimeouts[$i][1];
-                    $object->$method();
+                    $this->mTimeouts[$i][0]->$method();
+                    unset($this->mTimeouts[$i][0]);
                     unset($this->mTimeouts[$i]);
                     break;
                 }
@@ -521,42 +568,56 @@ final class DpUniverse
     }
 
     /**
+     * Handles removal of unused object instances
+     *
+     * @access     private
+     */
+    private function handleCleanups()
+    {
+        foreach ($this->mDpObjects as $i => &$ob) {
+            if (!$ob->getEnvironment()
+                    && $ob->lastEventTime < time() - DPUNIVERSE_RESET_CYCLE) {
+                $ob->handleCleanup();
+            }
+        }
+    }
+
+    /**
      * Stores user agent information in the database
      *
      * Experimental. Used to catch search bots.
+     *
+     * @access     private
+     * @param      string    &$user      user object
      */
-    function saveUserAgent(&$user)
+    private function saveUserAgent(&$user)
     {
-        $agent = !isset($user->__SERVER['HTTP_USER_AGENT'])
-            || 0 === strlen($user->__SERVER['HTTP_USER_AGENT'])
+        $agent = !isset($user->_SERVER['HTTP_USER_AGENT'])
+            || 0 === strlen($user->_SERVER['HTTP_USER_AGENT'])
             ? '[Undefined]'
-            : addslashes($user->__SERVER['HTTP_USER_AGENT']);
+            : addslashes($user->_SERVER['HTTP_USER_AGENT']);
 
-        if ($user->getProperty('is_ajax_capable')) {
+        if (isset($user->isAjaxCapable) && TRUE === $user->isAjaxCapable) {
             $result = mysql_query($query = "SELECT userAgentId from UserAgents "
                 . "WHERE userAgentString='$agent'");
-            echo "$query\n";
             if (FALSE === $result
                     || !($num_rows = mysql_num_rows($result))) {
                 mysql_query($query = "INSERT INTO UserAgents (userAgentString) "
                     . "VALUES ('$agent')");
-                echo "$query\n";
             }
         } else {
-            $remote_address = !isset($user->__SERVER['REMOTE_ADDR'])
-                || 0 === strlen($user->__SERVER['REMOTE_ADDR'])
+            $remote_address = !isset($user->_SERVER['REMOTE_ADDR'])
+                || 0 === strlen($user->_SERVER['REMOTE_ADDR'])
                 ? '[Undefined]'
-                : addslashes($user->__SERVER['REMOTE_ADDR']);
+                : addslashes($user->_SERVER['REMOTE_ADDR']);
             $result = mysql_query($query = "SELECT userAgentId from UserAgents "
                 . "WHERE userAgentString='$agent' and userAgentRemoteAddress="
                 . "'$remote_address'");
-            echo "$query\n";
             if (FALSE === $result
                     || !($num_rows = mysql_num_rows($result))) {
                 mysql_query($query = "INSERT INTO UserAgents (userAgentString, "
                     . "userAgentRemoteAddress) VALUES ('$agent', "
                     . "'$remote_address')");
-                echo "$query\n";
             }
         }
     }
@@ -566,15 +627,21 @@ final class DpUniverse
      *
      * Called from tell in DpUser.php
      *
-     * :WARNING: This method should normally only be called from DpUser.php.
+     * :WARNING: This method should normally only be called the tell method in
+     * DpUser.php.
      *
      * @access     private
+     * @param      object    $user        recipient user of message
+     * @param      string    $data        message string
+     * @param      object    $binded_env  optional binded environment
+     * @see        DpObject::tell()
+     *
      */
-    function storeTell(&$user, $data, &$binded_environment = NULL)
+    function storeTell(&$user, $data, &$binded_env = NULL)
     {
         foreach ($this->mDpUsers as $i => &$u) {
             if ($u[_DPUSER_OBJECT] === $user) {
-                $this->mDpUsers[$i][1][] = array($data, $binded_environment);
+                $this->mDpUsers[$i][1][] = array($data, $binded_env);
             }
         }
     }
@@ -624,20 +691,44 @@ final class DpUniverse
      * You MUST call this function to create new objects in a DutchPIPE
      * universe, don't use the 'new' construct directly.
      *
-     * @param      string    $pathname   path to code from universe base path
-     * @param      boolean   $proxy      expirimental, ignore
+     * The object can have a unique location, given with $pathname, or just be
+     * based on $pathname, with a sublocation handling multiple objects. For
+     * example, the URL in uour browser contains the following bit for the
+     * DutchPIPE "about" page: location=/page/about.php
+     *
+     * It is a unique page with a unique location. The manual however is not
+     * based on many unique locations, but just one object which spawns pages
+     * based on the sublocation given in the URL:
+     * location=/page/manual.php&sublocation=index.html
+     *
+     * @param      string    $pathname     path to code from universe base path
+     * @param      string    $sublocation  optional sublocation
      * @return     object    The newly created object
      */
     function &newDpObject($pathname, $sublocation = FALSE)
     {
+        if (!$pathname) {
+            $pathname = DPUNIVERSE_PAGE_PATH . 'index.php';
+        }
+
         echo "Making: $pathname, $sublocation\n";
+
+        if (strlen($pathname) >= 7 && substr($pathname, 0, 7) == 'http://') {
+            if (($len = strlen(DPSERVER_HOST_URL)) >= strlen($pathname)
+                    || DPSERVER_HOST_URL !== substr($pathname, 0, $len)) {
+                echo dptext("Illegal object requested!\n");
+                $rval = FALSE;
+                return $rval;
+            }
+        }
+
         $unique_id = $this->mUniqueDpObjectCnt;
         $this->mUniqueDpObjectCnt++;
 
-        if (substr($pathname, 0, 1) != '/'
+        if ($pathname && substr($pathname, 0, 1) != '/'
                 || ((FALSE === strpos($pathname, '://'))
                 && (strlen($pathname) < 4
-                || substr($pathname, -4) != '.php'))) {
+                || substr($pathname, - 4) != '.php'))) {
             require_once(DPUNIVERSE_PREFIX_PATH . DPUNIVERSE_STD_PATH
                 . 'DpPage.php');
             $object = new DpPage($unique_id, time() + DPUNIVERSE_RESET_CYCLE,
@@ -656,7 +747,8 @@ final class DpUniverse
                 time() + DPUNIVERSE_RESET_CYCLE, $pathname, $sublocation);
         }
         if (empty($object)) {
-            return FALSE;
+            $rval = FALSE;
+            return $rval;
         }
 
         $this->__GET['location'] = $pathname;
@@ -666,6 +758,8 @@ final class DpUniverse
 
         $this->mDpObjects[] =& $object;
         $this->mDpObjectResets[] =& $object;
+
+        $object->__construct2();
 
         echo sprintf(dptext("made new object %s\n"), $pathname);
 
@@ -712,25 +806,32 @@ final class DpUniverse
      */
     function removeDpObject(&$rTarget)
     {
-        echo dptext("removeDpObject() called in universe.\n");
+        global $grCurrentDpObject;
+
         foreach ($this->mDpUsers as $i => &$u) {
             if ($u[_DPUSER_OBJECT] === $rTarget) {
                 $del_user = $i;
                 break;
             }
         }
+
+        $del_envs = array();
         foreach ($this->mEnvironments as $i => &$env) {
             if ($env[0] === $rTarget) {
                 $del_env = $i;
-                break;
+            }
+            if ($env[1] === $rTarget) {
+                $del_envs[] = $i;
             }
         }
+
         foreach ($this->mDpObjects as $i => &$ob) {
             if ($ob === $rTarget) {
                 $del_obj = $i;
                 break;
             }
         }
+
         foreach ($this->mDpObjectResets as $i => &$ob) {
             if ($ob === $rTarget) {
                 $del_reset = $i;
@@ -738,11 +839,32 @@ final class DpUniverse
             }
         }
 
+        $del_timeouts = array();
+        foreach ($this->mTimeouts as $i => &$ob) {
+            if ($ob[0] === $rTarget) {
+                $del_timeouts[] = $i;
+            }
+        }
+
+        $del_events = array();
+        foreach ($this->mAlertEvents as $event => &$listeners) {
+            foreach ($listeners as $i => &$ob) {
+                if ($ob === $rTarget) {
+                    $del_events[] = array($event, $i);
+                }
+            }
+        }
         if (isset($del_user)) {
+            unset($this->mDpUsers[$del_user][_DPUSER_OBJECT]);
             unset($this->mDpUsers[$del_user]);
         }
         if (isset($del_env)) {
+            unset($this->mEnvironments[$del_env][0]);
             unset($this->mEnvironments[$del_env]);
+        }
+        foreach ($del_envs as $del_env) {
+            unset($this->mEnvironments[$del_env][1]);
+            $this->mEnvironments[$del_env][0]->removeDpObject();
         }
         if (isset($del_obj)) {
             unset($this->mDpObjects[$del_obj]);
@@ -750,6 +872,14 @@ final class DpUniverse
         if (isset($del_reset)) {
             unset($this->mDpObjectResets[$del_reset]);
         }
+        foreach ($del_timeouts as $del_timeout) {
+            unset($this->mTimeouts[$del_timeout][0]);
+            unset($this->mTimeouts[$del_timeout]);
+        }
+        foreach ($del_events as $event => $i) {
+            unset($this->mAlertEvents[$event][$i]);
+        }
+        unset($rTarget);
     }
 
     /**
@@ -778,26 +908,42 @@ final class DpUniverse
      * is returned. Otherwise a new instance of the class found at $pathname
      * is created and returned.
      *
-     * @param      string    $pathname   a path within dpuniverse/
-     * @param      boolean   $proxy      experimental, ignore
+     * The object can have a unique location, given with $pathname, or just be
+     * based on $pathname, with a sublocation handling multiple objects. For
+     * example, the URL in uour browser contains the following bit for the
+     * DutchPIPE "about" page: location=/page/about.php
+     *
+     * It is a unique page with a unique location. The manual however is not
+     * based on many unique locations, but just one object which spawns pages
+     * based on the sublocation given in the URL:
+     * location=/page/manual.php&sublocation=index.html
+     *
+     *
+     * @param      string    $pathname     a path within dpuniverse/
+     * @param      string    $sublocation  optional sublocation
      * @return     object    Reference to instance of $pathname
+     * @see        newDpObject
      */
     function &getDpObject($pathname, $sublocation = FALSE)
     {
+        if (!$pathname) {
+            $pathname = DPUNIVERSE_PAGE_PATH . 'index.php';
+        }
+
         if (FALSE === $sublocation) {
             foreach ($this->mDpObjects as $i => &$ob) {
-                if ($pathname === $ob->getProperty('location')) {
-                    echo dptext("getDpObject(): returning existing object with location %s, no sublocation\n",
-                        $pathname);
+                if ($pathname === $ob->location) {
+                    //echo dptext("getDpObject(): returning existing object with location %s, no sublocation\n",
+                    //    $pathname);
                     return $ob;
                 }
             }
         } else {
             foreach ($this->mDpObjects as $i => &$ob) {
-                if ($pathname === $ob->getProperty('location')
-                        && $sublocation === $ob->getProperty('sublocation')) {
-                    echo dptext("getDpObject(): returning existing object with location %s, sublocation %s\n",
-                        $pathname, $sublocation);
+                if ($pathname === $ob->location
+                        && $sublocation === $ob->sublocation) {
+                    //echo dptext("getDpObject(): returning existing object with location %s, sublocation %s\n",
+                    //    $pathname, $sublocation);
                     return $ob;
                 }
             }
@@ -873,7 +1019,7 @@ final class DpUniverse
      * @param       string|object   $what   object to search for
      * @param       object          &$where object to search in
      * @return      object|boolean  the found object or FALSE if not found
-     * @see         getEnvironment(), getInventory()
+     * @see         DpObject::getEnvironment(), DpObject::getInventory()
      */
     function &isPresent($what, &$where)
     {
@@ -915,15 +1061,15 @@ final class DpUniverse
      * Gets the current user connected to the server
      *
      * If a user page or AJAX request caused the current chain of execution that
-     * caused this function to be called, that user object is returned. Otherwise
-     * FALSE is returned. For example, if the chain of execution if caused by a
-     * setTimeout, this will return FALSE.
+     * caused this function to be called, that user object is returned.
+     * Otherwise FALSE is returned. For example, if the chain of execution if
+     * caused by a setTimeout, this will return FALSE.
      *
      * :WARNING: Use the function get_current_dpuser() instead of calling this
      * method.
      *
      * @access     private
-     * @return     object    Reference to user object of FALSE for no current user
+     * @return     object    Reference to user object, FALSE for no current user
      */
     function &getCurrentDpUser()
     {
@@ -936,8 +1082,8 @@ final class DpUniverse
     /**
      * Finds the user with the given user name or id.
      *
-     * @param       string   $name   user name or id of player
-     * @return      object|boolean   The found player or FALSE if not found
+     * @param       string   $userName  user name or id of player
+     * @return      object|boolean      the found player or FALSE if not found
      */
     function &findUser($userName)
     {
@@ -1021,16 +1167,28 @@ final class DpUniverse
      */
     function getUniverseInfo()
     {
-        return array(
+        /*
+        echo "Saving...\n";
+        $serialized_universe = serialize($this);
+        $fp = fopen('/tmp/serialized_universe', 'w');
+        fwrite($fp, $serialized_universe);
+        fclose($fp);
+        */
+        $arr = array(
             'memory_usage' => memory_get_usage(),
             'nr_of_objects' => sizeof($this->mDpObjects),
             'nr_of_users' => sizeof($this->mDpUsers),
             'nr_of_environments' => sizeof($this->mEnvironments),
             'nr_of_timeouts' => sizeof($this->mTimeouts));
+
+        return $arr;
     }
 
     /**
      * Attempts to login the given user object of a guest as a registered user
+     *
+     * @param      object    &$user      user to validate
+     * @return     boolean   TRUE for succesful login, FALSE otherwise
      */
     function validateExisting(&$user)
     {
@@ -1078,19 +1236,21 @@ final class DpUniverse
         $cookie_pass = $row[3];
         $user->tell('<cookie>removeguest</cookie>');
         $user->_COOKIE[DPSERVER_COOKIE_NAME] = "$cookie_id;$cookie_pass";
-        $user->tell('<cookie>' . $user->_COOKIE[DPSERVER_COOKIE_NAME] . '</cookie>');
+        $user->tell('<cookie>' . $user->_COOKIE[DPSERVER_COOKIE_NAME]
+            . '</cookie>');
         $user->_GET['username'] = $username;
         $user->addId($user->_GET['username']);
         $user->addId(strtolower($user->_GET['username']));
         $user->setTitle(ucfirst($user->_GET['username']));
-        $user->addProperty('is_registered');
+        $user->isRegistered = TRUE;
         if ($user === get_current_dpuser()) {
             $this->mrCurrentDpUserRequest->setUsername($username);
         }
 
         /* :TODO: Move admin flag to user table in db */
-        if ($user->_GET['username'] == 'Lennert') {
-            $user->addProperty('is_admin');
+        if (in_array($user->_GET['username'],
+                explode('#', DPUNIVERSE_ADMINISTRATORS))) {
+            $user->isAdmin = TRUE;
         }
         foreach ($this->mDpUsers as $user_nr => &$u) {
             if ($u[0] === $user) {
@@ -1131,6 +1291,8 @@ final class DpUniverse
 
     /**
      * Logs out a given registered user and turns the user into a guest
+     *
+     * @param      object    &$user      user to logout
      */
     function logoutUser(&$user)
     {
@@ -1146,8 +1308,8 @@ final class DpUniverse
         $user->removeId($oldtitle);
         $user->addId($username);
         $user->setTitle(ucfirst($username));
-        $user->removeProperty('is_registered');
-        $user->removeProperty('is_admin');
+        $user->isRegistered = FALSE;
+        $user->isAdmin = FALSE;
         if ($user === get_current_dpuser()) {
             $this->mrCurrentDpUserRequest->setUsername($username);
         }
@@ -1181,6 +1343,9 @@ final class DpUniverse
 
     /**
      * Attempts the first step in registering a new user, throws CAPTCHA
+     *
+     * @param      object    &$user      user to register
+     * @return     boolean   TRUE to continue to CAPTCHA, FALSE for errors
      */
     function validateNewUser(&$user)
     {
@@ -1196,8 +1361,9 @@ final class DpUniverse
                 if (FALSE === ($captcha_id = $this->getRandCaptcha())) {
                     return TRUE;
                 }
-                $user->tell('<window><form method="post" onsubmit="return '
-                    . 'send_captcha(' . $captcha_id . ')"><div align="center">'
+                $user->tell('<window><form method="post" '
+                    . 'onsubmit="send_captcha(' . $captcha_id
+                    . '); return false"><div align="center">'
                     . '<img id="captchaimage" src="/dpcaptcha.php?captcha_id='
                     . $captcha_id . '" border="0" alt="" /></div>'
                     . '<br clear="all" />'
@@ -1219,6 +1385,8 @@ to complete registration.') . '</form></window>');
 
     /**
      * Attempts the second step in registering a new user, validates CAPTCHA
+     *
+     * @param      object    &$user      user to register
      */
     function validateCaptcha(&$user)
     {
@@ -1229,14 +1397,13 @@ to complete registration.') . '</form></window>');
                 || !isset($user->_GET['givencode']) || FALSE ===
                 $this->validateCaptcha2($user->_GET['captcha_id'],
                 $user->_GET['givencode'])) {
-            if (FALSE === ($captcha_attempts =
-                    $user->getProperty('captcha_attempts'))
+            if (NULL === ($captcha_attempts = $user->captchaAttempts)
                     || $captcha_attempts < 2) {
-                $user->addProperty('captcha_attempts',
-                    FALSE === $captcha_attempts ? 1 : $captcha_attempts + 1);
+                $user->captchaAttempts = new_dp_property(
+                    NULL === $captcha_attempts ? 1 : $captcha_attempts + 1);
                 return;
             }
-            $user->removeProperty('captcha_attempts');
+            unset($user->captchaAttempts);
             $user->tell('<window styleclass="dpwindow_error"><h1>'
                 . dptext('Failure validating code') . '</h1><br />'
                 . dptext('Please try again.') . '</window>');
@@ -1266,8 +1433,8 @@ to complete registration.') . '</form></window>');
             . '</cookie>');
         $user->addId($username);
         $user->setTitle(ucfirst($username));
-        $user->addProperty('is_registered');
-        $user->removeProperty('is_admin');
+        $user->isRegistered = TRUE;
+        $user->isAdmin = FALSE;
         if ($user === get_current_dpuser()) {
             $this->mrCurrentDpUserRequest->setUsername($username);
         }
@@ -1328,7 +1495,15 @@ to complete registration.') . '</form></window>');
     }
 
     /**
-     * Is the given login info valid?
+     * Is the given login info valid for a new user?
+     *
+     * In case of errors, fills array $this->mLastNewUserErrors with one or more
+     * error strings.
+     *
+     * @param      string    $userName   given user name to check
+     * @param      string    $password   given password
+     * @param      string    $password2  given repeated pssword
+     * @return     boolean   TRUE for valid login info, FALSE otherwise
      */
     private function validLoginInfo($userName, $password, $password2)
     {
@@ -1443,6 +1618,83 @@ to complete registration.') . '</form></window>');
     {
         return $this->mNoDirectTell;
     }
-}
 
+    /**
+     * Adds a user to the listener list of the given event
+     *
+     * @param      string    $event      Name of the event
+     * @param      string    &$who       User listening to event
+     */
+    function addAlertEvent($event, &$who)
+    {
+        if (!isset($this->mAlertEvents[$event])) {
+            $this->mAlertEvents[$event] = array();
+        }
+
+        if (FALSE === array_search($who, $this->mAlertEvents[$event], TRUE)) {
+            $this->mAlertEvents[$event][] =& $who;
+        }
+    }
+
+    /**
+     * Removes a user from the listener list of the given event
+     *
+     * @param      string    $event      Name of the event
+     * @param      string    &$who       User listening to event
+     */
+    function removeAlertEvent($event, &$who)
+    {
+        if (isset($this->mAlertEvents[$event]) && FALSE !==
+            ($key = array_search($who, $this->mAlertEvents[$event], TRUE))) {
+            unset($this->mAlertEvents[$event][$key]);
+            if (0 === count($this->mAlertEvents[$event])) {
+                unset($this->mAlertEvents[$event]);
+            }
+        }
+    }
+
+    /**
+     * Gets list of listening users to the given event
+     *
+     * @param      string    $event      Name of the event
+     * @return     array     Users listening to event
+     */
+    function &getAlertEvent($event)
+    {
+        if (!isset($this->mAlertEvents[$event])) {
+            $rval = FALSE;
+        } else {
+            /* Clean up event listeners list */
+            foreach ($this->mAlertEvents[$event] as $key => &$who) {
+                if (!isset($who) || is_null($who) || $who->isRemoved) {
+                    unset($this->mAlertEvents[$event][$key]);
+                }
+            }
+
+            $rval = $this->mAlertEvents[$event];
+        }
+
+        return $rval;
+    }
+
+    /**
+     * Shows a line with memory and universe info
+     */
+    function showStatusMemoryGetUsage()
+    {
+        if (!function_exists('memory_get_usage')) {
+            return;
+        }
+
+        $info = $this->getUniverseInfo();
+
+        printf("Memory: %dKB KB  #Objects: %d  #Users: %d  #Environments: %d  "
+            . "#Timeouts: %d\n",
+            round($info['memory_usage'] / 1024),
+            $info['nr_of_objects'],
+            $info['nr_of_users'],
+            $info['nr_of_environments'],
+            $info['nr_of_timeouts']);
+    }
+}
 ?>

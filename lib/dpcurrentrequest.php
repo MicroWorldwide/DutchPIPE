@@ -12,9 +12,9 @@
  * @package    DutchPIPE
  * @subpackage lib
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: $
+ * @version    Subversion: $Id$
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php
  */
@@ -30,9 +30,9 @@
  * @package    DutchPIPE
  * @subpackage lib
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: @package_version@
+ * @version    Release: 0.2.0
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  */
 class DpCurrentRequest
@@ -102,6 +102,24 @@ class DpCurrentRequest
      * @access      private
      */
     private $mUsername;
+
+    /**
+     * @var         string     The user's avatar number
+     * @access      private
+     */
+    private $mUserAvatarNr = FALSE;
+
+    /**
+     * @var         string     The user's display mode (abstract or graphical)
+     * @access      private
+     */
+    private $mUserDisplayMode = FALSE;
+
+    /**
+     * @var         string     Events shown to the current user
+     * @access      private
+     */
+    private $mUserAlertEvents = FALSE;
 
     /**
      * The 'cookie id' of the user client behind the current request
@@ -208,6 +226,11 @@ class DpCurrentRequest
         if (FALSE === $this->_findOrCreateDpUser()) {
             return;
         }
+        if (isset($this->__GET['gethistory'])) {
+            $this->mrUser->tell('<history>' . implode('@SEP@',
+                $this->mrUser->mActionHistory) . '</history>');
+            return;
+        }
 
         $this->mrUser->setVars($this->__SERVER, $this->__SESSION,
             $this->__COOKIE, $this->__GET, $this->__POST, $this->__FILES);
@@ -247,7 +270,7 @@ class DpCurrentRequest
              * which comes first.
              */
             $this->mCookieId = FALSE;
-            echo dptext("NO COOKIE\n");
+            //echo dptext("NO COOKIE\n");
             return FALSE;
         }
         /*
@@ -301,10 +324,10 @@ class DpCurrentRequest
         $this->mUsername = $user[_DPUSER_NAME];
 
         if ($user[_DPUSER_ISREGISTERED] == '1') {
-            $this->mrUser->addProperty('is_registered');
+            $this->mrUser->isRegistered = TRUE;
             $this->mIsRegistered = TRUE;
         } else {
-            $this->mrUser->removeProperty('is_registered');
+            $this->mrUser->isRegistered = FALSE;
         }
     }
 
@@ -329,7 +352,9 @@ class DpCurrentRequest
 
         $result = mysql_query("
             SELECT
-                userUsername
+                userUsername,userAvatarNr,userDisplayMode,
+                userEventPeopleEntering,userEventPeopleLeaving,
+                userEventBotsEntering
             FROM
                 Users
             WHERE
@@ -343,6 +368,22 @@ class DpCurrentRequest
         }
 
         $this->mUsername = $row[0];
+        $this->mUserAvatarNr = $row[1];
+        $this->mUserDisplayMode = $row[2];
+        $alert_events = array();
+        if ('1' === $row[3]) {
+            $alert_events['people_entering'] = TRUE;
+        }
+        if ('1' === $row[4]) {
+            $alert_events['people_leaving'] = TRUE;
+        }
+        if ('1' === $row[5]) {
+            $alert_events['bots_entering'] = TRUE;
+        }
+        if (count($alert_events)) {
+            $this->mUserAlertEvents = $alert_events;
+        }
+
         $this->mIsRegistered = TRUE;
 
         return TRUE;
@@ -380,7 +421,7 @@ class DpCurrentRequest
         $this->mCookiePass = make_random_id();
         $this->mIsRegistered = FALSE;
 
-        echo "Set-Login: {$this->mCookieId};{$this->mCookiePass}\n";
+        //echo "Set-Login: {$this->mCookieId};{$this->mCookiePass}\n";
         $this->mrDpUniverse->tellCurrentDpUserRequest(
             "Set-Login: {$this->mCookieId};{$this->mCookiePass}");
         return TRUE;
@@ -406,7 +447,7 @@ class DpCurrentRequest
             ? FALSE : $this->__SERVER['HTTP_USER_AGENT'];
 
         if (FALSE === $this->mUserAgent) {
-            echo dptext("No agent\n");
+            //echo dptext("No agent\n");
             return FALSE;
         }
 
@@ -464,11 +505,32 @@ class DpCurrentRequest
      */
     function _createDpUser()
     {
-        echo "_createDpUser()\n";
+        //echo "_createDpUser()\n";
         $this->mrUser = $this->mrDpUniverse->newDpObject(DPUNIVERSE_STD_PATH
             . 'DpUser.php');
         $this->mrUser->addId($this->mUsername);
         $this->mrUser->setTitle(ucfirst($this->mUsername));
+
+        if (FALSE !== $this->mUserAvatarNr) {
+            $this->mrUser->avatarNr = $this->mUserAvatarNr;
+            $this->mrUser->setTitleImg(DPUNIVERSE_AVATAR_URL . 'user'
+                . $this->mUserAvatarNr . '.gif');
+            $this->mrUser->setBody('<img src="' . DPUNIVERSE_AVATAR_URL
+                . 'user' . $this->mUserAvatarNr . '_body.gif" border="0" '
+                . 'alt="" align="left" style="margin-right: 15px" />'
+                . dptext('A user.') . '<br />');
+        }
+
+        if (FALSE !== $this->mUserDisplayMode) {
+            $this->mrUser->displayMode = $this->mUserDisplayMode;
+        }
+
+        if (FALSE !== $this->mUserAlertEvents) {
+            $this->mrUser->mAlertEvents = $this->mUserAlertEvents;
+            foreach ($this->mUserAlertEvents as $event => $foo) {
+                get_current_dpuniverse()->addAlertEvent($event, $this->mrUser);
+            }
+        }
 
         if (FALSE !== $this->mIsKnownBot) {
             $this->mrUser->setTitleImg(DPUNIVERSE_IMAGE_URL . 'bot.gif');
@@ -476,26 +538,24 @@ class DpCurrentRequest
                 . 'bot.gif" border="0" alt="" align="left" '
                 . 'style="margin-right: 15px" />'
                 . dptext('This is a search engine indexing this site.<br />'));
+            $this->mrUser->isKnownBot = TRUE;
         }
 
         if (FALSE !== $this->mIsRegistered) {
-            $this->mrUser->addProperty('is_registered');
+            $this->mrUser->isRegistered = TRUE;
         }
         if (in_array($this->mUsername,
                 explode('#', DPUNIVERSE_ADMINISTRATORS))) {
-            $this->mrUser->addProperty('is_admin');
+            $this->mrUser->isAdmin = TRUE;
         }
         if (FALSE === $this->mCookieId) {
-            $this->mrUser->addProperty('no_cookies');
-        }
-        if (FALSE !== $this->mIsKnownBot) {
-            $this->mrUser->addProperty('is_known_bot');
+            $this->mrUser->noCookies = TRUE;
         }
 
         $this->mrDpUniverse->addDpUser($this->mrUser, $this->mUsername,
             $this->mCookieId, $this->mCookiePass, $this->mIsRegistered);
 
-        echo dptext("User created\n");
+        echo sprintf(dptext("User %s created\n"), $this->mUsername);
     }
 
     /**
@@ -509,9 +569,10 @@ class DpCurrentRequest
     {
         /* Initializes a location based on the location=x part in the URL */
         $this->_getLocation();
+        //echo "_handleLocation()... " . $this->__GET['location']  . "\n";
 
-        echo sprintf(dptext("Getting location %s given by client for %s\n"),
-            $this->__GET['location'], $this->mUsername);
+        //echo sprintf(dptext("Getting location %s given by client for %s\n"),
+        //    $this->__GET['location'], $this->mUsername);
 
         $sublocation = !isset($this->__GET['sublocation']) ? FALSE
             : $this->__GET['sublocation'];
@@ -521,8 +582,10 @@ class DpCurrentRequest
         if (FALSE === $tmp) {
             $tmp = $this->mrDpUniverse->getDpObject(DPUNIVERSE_PAGE_PATH
                 . 'index.php');
+            $this->mrUser->tell('<location>' . DPSERVER_CLIENT_DIR
+                . '</location>');
         }
-        echo "\n";
+        //echo "\n";
         $this->mrEnvironment = $tmp;
 
         if (FALSE === ($from_env = $this->mrUser->getEnvironment())
@@ -532,7 +595,7 @@ class DpCurrentRequest
         }
         elseif (!isset($this->__GET['ajax'])
                 && !isset($this->__GET['method'])) {
-            /* A page request from a user who's environment did not change */
+            /* A page request from a user whose environment did not change */
             $this->_handleReloadEnvironment();
         }
         elseif (isset($this->__GET['method'])) {
@@ -550,19 +613,23 @@ class DpCurrentRequest
      */
     private function _getLocation()
     {
+        //echo "_getLocation()... ";
         if (FALSE === $this->_isValidLocation()) {
+            //echo "Not valid location\n";
             $tmp = $this->mrUser->getEnvironment();
             if (isset($this->__GET['method']) && FALSE !== $tmp) {
-                $this->__GET['location'] = $tmp->getProperty('location');
-                $this->__GET['sublocation'] = $tmp->getProperty('sublocation');
-            } elseif (isset($this->mrUser->__GET['proxy'])
-                    || (FALSE !== $tmp && (isset($this->mrUser->__GET['ajax'])
+                $this->__GET['location'] = $tmp->location;
+                $this->__GET['sublocation'] = $tmp->sublocation;
+            } elseif (isset($this->mrUser->_GET['proxy'])
+                    || (FALSE !== $tmp && (isset($this->mrUser->_GET['ajax'])
                     || isset($this->__GET['method']))
-                    && FALSE !== $tmp->getProperty('is_layered'))) {
-                $this->__GET['location'] = $tmp->getProperty('location');
+                    && isset($tmp->isLayered) && FALSE !== $tmp->isLayered)) {
+                $this->__GET['location'] = $tmp->location;
             } else {
                 $this->__GET['location'] = DPUNIVERSE_PAGE_PATH . 'index.php';
             }
+        } else {
+            //echo "Valid location\n";
         }
     }
 
@@ -573,11 +640,19 @@ class DpCurrentRequest
      */
     private function _isValidLocation()
     {
-        echo dptext("_isValidLocation: checking location \"%s\"\n",
-            !isset($this->__GET['location']) ? '' : $this->__GET['location']);
-        if (!isset($this->__GET['location'])
-                || !strlen($this->__GET['location'])) {
+        //echo dptext("_isValidLocation: checking location \"%s\"\n",
+        //    !isset($this->__GET['location']) ? '' : $this->__GET['location']);
+        if (isset($this->__GET['location'])
+                && !strlen($this->__GET['location'])) {
+            return TRUE;
+        }
+
+        if (!isset($this->__GET['location'])) {
             return isset($this->__GET['getdivs']);
+        }
+
+        if (FALSE !== strpos($this->__GET['location'], '..')) {
+            return FALSE;
         }
 
         if (FALSE !== ($pos = strpos($this->__GET['location'], '?'))) {
@@ -596,8 +671,9 @@ class DpCurrentRequest
             return TRUE;
         }
 
-        if (7 < strlen($this->__GET['location'])
-                && 'http://' === substr($this->__GET['location'], 0, 7)) {
+        if (($len = strlen(DPSERVER_HOST_URL)) < strlen($this->__GET['location'])
+                && DPSERVER_HOST_URL === substr($this->__GET['location'], 0,
+                $len)) {
             return TRUE;
         }
         return (file_exists(DPUNIVERSE_PREFIX_PATH . $this->__GET['location'])
@@ -617,54 +693,168 @@ class DpCurrentRequest
             $arrive_msg = sprintf(dptext("%s enters the site.<br />"),
                 ucfirst($this->mrUser->getTitle(
                 DPUNIVERSE_TITLE_TYPE_DEFINITE)));
+            $admin_msg = sprintf(
+                dptext("%s enters the site from <span class=\"col2\">%s</span> using <span class=\"col2\">%s</span>.<br />"),
+                ucfirst($this->mrUser->getTitle(
+                DPUNIVERSE_TITLE_TYPE_DEFINITE)),
+                (!isset($this->__SERVER['HTTP_REFERER'])
+                || !strlen($this->__SERVER['HTTP_REFERER']) ? '-'
+                : $this->__SERVER['HTTP_REFERER']),
+                (!isset($this->__SERVER['HTTP_USER_AGENT'])
+                || !strlen($this->__SERVER['HTTP_USER_AGENT']) ? '-'
+                : $this->__SERVER['HTTP_USER_AGENT']));
+            if (!$this->mIsKnownBot) {
+                $listeners = get_current_dpuniverse()->getAlertEvent('people_entering');
+                if (is_array($listeners)) {
+                    $listener_msg = sprintf(
+                        dptext("%s enters the site at %s.<br />"),
+                        ucfirst($this->mrUser->getTitle(
+                        DPUNIVERSE_TITLE_TYPE_DEFINITE)),
+                        $this->mrEnvironment->title);
+                    $listener_admin_msg = sprintf(
+                        dptext("%s enters the site at %s from <span class=\"col2\">%s</span> using <span class=\"col2\">%s</span>.<br />"),
+                        ucfirst($this->mrUser->getTitle(
+                        DPUNIVERSE_TITLE_TYPE_DEFINITE)),
+                        $this->mrEnvironment->title,
+                        (!isset($this->__SERVER['HTTP_REFERER'])
+                        || !strlen($this->__SERVER['HTTP_REFERER']) ? '-'
+                        : $this->__SERVER['HTTP_REFERER']),
+                        (!isset($this->__SERVER['HTTP_USER_AGENT'])
+                        || !strlen($this->__SERVER['HTTP_USER_AGENT']) ? '-'
+                        : $this->__SERVER['HTTP_USER_AGENT']));
+
+                    foreach ($listeners as &$listener) {
+                        if ($listener !== $this->mrUser
+                                && $listener->getEnvironment() !==
+                                $this->mrEnvironment) {
+                            $listener->tell(!$listener->isAdmin ? $listener_msg
+                            : $listener_admin_msg);
+                        }
+                    }
+                }
+            } else {
+                $listeners = get_current_dpuniverse()->getAlertEvent(
+                    'bots_entering');
+                if (is_array($listeners)) {
+                    $listener_msg = sprintf(
+                        dptext("%s indexes %s.<br />"), ucfirst(
+                        $this->mrUser->getTitle(
+                        DPUNIVERSE_TITLE_TYPE_DEFINITE)),
+                        $this->mrEnvironment->title);
+                    foreach ($listeners as &$listener) {
+                        if ($listener !== $this->mrUser
+                                && $listener->getEnvironment() !==
+                                $this->mrEnvironment) {
+                            $listener->tell($listener_msg);
+                        }
+                    }
+                }
+            }
         } else {
             $from_env->tell(sprintf(dptext("%s leaves to %s.<br />"),
                 ucfirst($this->mrUser->getTitle(
                 DPUNIVERSE_TITLE_TYPE_DEFINITE)),
                 $this->mrEnvironment->getTitle()), $this->mrUser);
-            $arrive_msg = sprintf(dptext("%s arrives from %s.<br />"),
+            $arrive_msg = $admin_msg = sprintf(
+                dptext("%s arrives from %s.<br />"),
                 ucfirst($this->mrUser->getTitle(
                 DPUNIVERSE_TITLE_TYPE_DEFINITE)), $from_env->getTitle());
         }
         $this->mrUser->moveDpObject($this->mrEnvironment);
-        $this->mrEnvironment->tell($arrive_msg, $this->mrUser);
+        $inv = $this->mrEnvironment->getInventory();
+        foreach ($inv as &$ob) {
+            if ($ob !== $this->mrUser) {
+                $ob->tell(!$ob->isAdmin ? $arrive_msg : $admin_msg);
+            }
+        }
     }
 
+    /**
+     * Handles page requests from users whose environment did not change
+     */
     private function _handleReloadEnvironment()
     {
+        $this->mrUser->lastActionTime = !isset($this->mrUser->lastActionTime)
+            ? new_dp_property(time()) : time();
+
         if (FALSE !== ($body = $this->mrEnvironment->getAppearance(0, TRUE,
-                NULL, $this->mrUser->getProperty('display_mode')))) {
+                NULL, $this->mrUser->displayMode))) {
             if (!is_null($this->mrEnvironment->getTemplateFile())) {
                 $this->mrUser->tell('<xhtml>' . $body . '</xhtml>');
             } else {
                 $this->mrUser->tell('<div id="dppage">' . $body . '</div>');
             }
-        }
-    }
-
-    private function _handleMethodCall()
-    {
-        if (!isset($this->__GET['call_object'])
-                || !strlen($call_object = $this->__GET['call_object'])) {
-            $this->mrEnvironment->{$this->__GET['method']}();
-        }
-        else {
-            if (FALSE !== ($call_object =
-                    $this->mrDpUniverse->findDpObject($call_object))) {
-                $call_object->{$this->__GET['method']}();
+            if ($type = $this->mrEnvironment->isMovingArea) {
+                $this->mrUser->tell('<script type="text/javascript" ' .
+                    'src="/interface/iutil.js"></script>');
+                $this->mrUser->tell('<script type="text/javascript" ' .
+                    'src="/interface/idrag.js"></script>');
+                $containment = $type === 1 ? "containment : 'parent',\n" : '';
+                $cssfix = $type == 1 ? '.dpinventory, .dpinventory2'
+                    : '.dpinventory';
+                $this->mrUser->tell("<script>
+function init_drag() {
+    if (\$.iDrag == undefined) return;
+    \$('div.draggable').DraggableDestroy();
+    \$('div.draggable').Draggable({
+        handle: 'img.draggable',
+        zIndex: 1000,
+        ghosting: true,
+        opacity: 0.7,{$containment}
+        onChange : function() { stopdrag(this) }
+    });
+    \$('{$cssfix}').css('position', 'relative');
+    \$('{$cssfix}').css('overflow', 'hidden');
+}
+\$(function(){init_drag();});</script>\n");
             }
         }
     }
 
+    /**
+     * Handles calls to methods in DutchPIPE objects from users' clients
+     */
+    private function _handleMethodCall()
+    {
+        if (!isset($this->__GET['call_object'])
+                || !strlen($call_object = $this->__GET['call_object'])) {
+            if (!isset($this->__GET['param'])) {
+                $this->mrEnvironment->{$this->__GET['method']}();
+            } else {
+                $this->mrEnvironment->
+                    {$this->__GET['method']}($this->__GET['param']);
+            }
+        }
+        else {
+            if (FALSE !== ($call_object =
+                    $this->mrDpUniverse->findDpObject($call_object))) {
+                if (!isset($this->__GET['param'])) {
+                    $call_object->{$this->__GET['method']}();
+                } else {
+                    $call_object->{$this->__GET['method']}
+                        ($this->__GET['param']);
+                }
+            }
+        }
+    }
+
+    /**
+     * Handles insertion of main DutchPIPE elements to standalone pages
+     *
+     * Communicates with the user's client to insert avatars and object images
+     * (the inventory), the message area and login/logout link. Used by
+     * standalone pages.
+     */
     private function _handleGetDivsCall()
     {
+        //echo "getdivs: {$this->__GET['getdivs']}\n";
         $getdivs = explode('#', trim($this->__GET['getdivs'], '#'));
         foreach ($getdivs as $getdiv) {
-            echo "getdiv: $getdiv\n";
+            //echo "getdiv: $getdiv\n";
             if ($getdiv == 'dpinventory') {
                 $this->mrUser->tell($this->mrEnvironment->
                     getAppearanceInventory(0, TRUE, $this->mrUser,
-                    $this->mrUser->getProperty('display_mode')));
+                    $this->mrUser->displayMode));
             } elseif ($getdiv == 'dpmessagearea') {
                 $this->mrUser->tell('<div id="dpmessagearea">'
                     . '<div id="dpmessagearea_inner"><div id="messages">'
@@ -672,8 +862,33 @@ class DpCurrentRequest
                     . '<form id="actionform" method="get" onSubmit="return '
                     . 'action_dutchpipe()"><input id="dpaction" type="text" '
                     . 'name="dpaction" value="" size="40" maxlength="255" '
-                    . 'style="float: left; margin-top: 0px" /></form></div>'
+                    . 'style="float: left; margin-top: 0px" '
+                    . 'autocomplete="off" /></form></div>'
                     . '<br clear="all" />&#160;</div>');
+                $this->mrUser->tell("<script>\$('#dpaction').bind('keydown', "
+                    ."bindKeyDown); \$('#dpaction').focus();</script>");
+            } elseif ($getdiv == 'dploginout') {
+                $login_link = !isset($this->mrUser->isRegistered) ||
+                    TRUE !== $this->mrUser->isRegistered
+                    ? '<a href="' . DPSERVER_CLIENT_URL . '?location='
+                    . DPUNIVERSE_PAGE_PATH. 'login.php" style='
+                    . '"padding-left: 4px">' . dptext('Login/register')
+                    . '</a>'
+                    : '<a href="' . DPSERVER_CLIENT_URL . '?location='
+                    . DPUNIVERSE_PAGE_PATH . 'login.php&amp;act=logout" '
+                    . 'style="padding-left: 4px">' . dptext('Logout')
+                    . '</a>';
+                $bottom = dptext('Go to Bottom');
+                $this->mrUser->tell('<div id="dploginout">' . sprintf(
+                        dptext('Welcome %s'), '<span id="username">'
+                        . $this->mrUser->getTitle() . '</span>')
+                        . ' <span id="loginlink">'
+                        . $login_link . '</span>&#160;&#160;&#160;&#160;'
+                        . '<img id="butbottom" src="/images/bottom.gif" '
+                        . 'align="absbottom" width="11" height="11" border="0" '
+                        . 'alt="' . $bottom . '" title="' . $bottom . '" '
+                        . 'onClick="_gel(\'dpaction\').focus(); '
+                        . 'scroll(0, 999999)" /></div>');
             }
         }
     }
@@ -685,9 +900,7 @@ class DpCurrentRequest
      */
     function handleUser()
     {
-        if (isset($this->__GET['ajax'])) {
-            $this->mrUser->addProperty('is_ajax_capable');
-        }
+        $this->mrUser->isAjaxCapable = isset($this->__GET['ajax']);
 
         /*
          * Skip once if the user has moved and hence the request died. Need to

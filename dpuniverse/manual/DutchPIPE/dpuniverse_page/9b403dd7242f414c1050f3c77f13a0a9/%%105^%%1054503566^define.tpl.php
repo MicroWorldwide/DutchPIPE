@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.0, created on 2006-08-13 20:44:07
+<?php /* Smarty version 2.6.0, created on 2007-06-11 15:25:49
          compiled from define.tpl */ ?>
 <?php if (count ( $this->_tpl_vars['defines'] ) > 0):  if (isset($this->_sections['def'])) unset($this->_sections['def']);
 $this->_sections['def']['name'] = 'def';

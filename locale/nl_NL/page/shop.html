@@ -1,0 +1,19 @@
+<script>
+function get_store_actions(id, itemid, event)
+{
+    _get_actions_init(id, event);
+    $.ajax({
+        data: 'call_object=' + escape(id) + '&method=getStoreActionsMenu&param=' + escape(itemid)
+            + _arnd()
+    });
+}
+
+function get_seller_actions(id, itemid, event)
+{
+    _get_actions_init(id, event);
+    $.ajax({
+        data: 'call_object=' + escape(id) + '&method=getSellersActionsMenu&param=' + escape(itemid)
+            + _arnd()
+    });
+}
+</script>

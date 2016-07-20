@@ -16,9 +16,9 @@
  * @package    DutchPIPE
  * @subpackage config
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpuniverse-ini.php 90 2006-07-23 17:04:04Z ls $
+ * @version    Subversion: $Id: dpuniverse-ini.php 190 2007-06-10 14:19:42Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php, dpserver-ini.php
  */
@@ -86,7 +86,7 @@ define('DPUNIVERSE_FILE_OWNER', 'dutchpipe');
  * Defaults to the mother directory of the directory this file is in.
  * Leave this untouched if the DutchPIPE directory structure wasn't changed.
  */
-define('DPUNIVERSE_ROOT_PATH', dirname(realpath(__FILE__ . '/..')) . '/');
+define('DPUNIVERSE_ROOT_PATH', realpath(dirname(__FILE__) . '/..') . '/');
 
 /**
  * Path to the library directory
@@ -96,14 +96,14 @@ define('DPUNIVERSE_ROOT_PATH', dirname(realpath(__FILE__ . '/..')) . '/');
 define('DPUNIVERSE_LIB_PATH', DPUNIVERSE_ROOT_PATH . 'lib/');
 
 /**
- * Path to the library directory
+ * Path to the script directory
  *
  * Leave this untouched if the DutchPIPE directory structure wasn't changed.
  */
 define('DPUNIVERSE_SCRIPT_PATH', DPUNIVERSE_ROOT_PATH . 'script/');
 
 /**
- * Path to the library directory
+ * Path to the universe directory
  *
  * Excludes trailing /, unlike {@link DPUNIVERSE_PATH} and other paths. Leave
  * this untouched if the DutchPIPE directory structure wasn't changed.
@@ -113,7 +113,7 @@ define('DPUNIVERSE_SCRIPT_PATH', DPUNIVERSE_ROOT_PATH . 'script/');
 define('DPUNIVERSE_BASE_PATH', DPUNIVERSE_ROOT_PATH . 'dpuniverse');
 
 /**
- * Path to the library directory
+ * Path to the universe directory
  *
  * Includes trailing /, unlike {@link DPUNIVERSE_BASE_PATH}. Leave this
  * untouched if the DutchPIPE directory structure wasn't changed.
@@ -193,7 +193,7 @@ define('DPUNIVERSE_IMAGE_PATH', DPUNIVERSE_WWW_PATH . 'images/');
  *
  * @see        DPUNIVERSE_IMAGE_PATH
  */
-define('DPUNIVERSE_IMAGE_URL', '/images/');
+define('DPUNIVERSE_IMAGE_URL', DPUNIVERSE_WWW_URL . 'images/');
 
 /**
  * Path to the publicly reachable web avatar images directory
@@ -211,7 +211,7 @@ define('DPUNIVERSE_AVATAR_PATH', DPUNIVERSE_IMAGE_PATH . 'avatar');
  *
  * @see        DPUNIVERSE_AVATAR_PATH
  */
-define('DPUNIVERSE_AVATAR_URL', '/images/avatar/');
+define('DPUNIVERSE_AVATAR_URL', DPUNIVERSE_IMAGE_URL . 'avatar/');
 
 /**
  * Path to the directory with CAPTCHA images

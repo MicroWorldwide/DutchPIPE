@@ -12,9 +12,9 @@
  * @package    DutchPIPE
  * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpNpc.php 45 2006-06-20 12:38:26Z ls $
+ * @version    Subversion: $Id: DpNpc.php 198 2007-06-10 23:43:06Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpLiving
  */
@@ -27,12 +27,16 @@ inherit(DPUNIVERSE_STD_PATH . 'DpLiving.php');
 /**
  * A 'non playing character', a bot
  *
+ * Creates the following DutchPIPE properties:<br />
+ *
+ * - boolean <b>isNpc</b> - Set to TRUE
+ *
  * @package    DutchPIPE
  * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: @package_version@
+ * @version    Release: 0.2.0
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpLiving
  */
@@ -45,8 +49,6 @@ class DpNpc extends DpLiving
      *
      * Calls {@link createDpNpc()} in the inheriting class.
      *
-     * Adds a "is_npc" property to this object, set to TRUE.
-     *
      * @access     private
      * @see        createDpNpc()
      */
@@ -58,7 +60,7 @@ class DpNpc extends DpLiving
         $this->setTitleDefinite(dptext('the NPC'));
         $this->setTitleIndefinite(dptext('a NPC'));
         $this->setTitleImg(DPUNIVERSE_IMAGE_URL . 'npc.gif');
-        $this->addProperty('is_npc');
+        $this->isNpc = new_dp_property(TRUE);
 
         // Call CreateDpNpc for objects that extend on this object:
         $this->createDpNpc();
@@ -106,6 +108,16 @@ class DpNpc extends DpLiving
     {
     }
 
+    function eventDpLiving($name)
+    {
+        $args = func_get_args();
+        call_user_func_array(array($this, 'eventDpNpc'), $args);
+    }
+
+    function eventDpNpc($name)
+    {
+    }
+
     /**
      * Tells data (message, window, location, ...) to this NPC
      *
@@ -121,7 +133,7 @@ class DpNpc extends DpLiving
         }
 
         if (is_array($data)) {
-            $data = $data[$this->getProperty('display_mode')];
+            $data = $data[$this->displayMode];
         }
         if (strlen($data) >=3 && substr($data, 0, 1) == '<'
                 && FALSE !== ($pos = strpos($data, '>'))) {
@@ -133,22 +145,23 @@ class DpNpc extends DpLiving
             $type = 'message';
             $data = "<message><![CDATA[$data]]></message>";
         }
-
+        echo "Telling NPC: $data\n";
         if (strlen($data) > 19
                 && FALSE !== ($pos1 = strpos($data, '<location><![CDATA['))
                 && FALSE !== ($pos2 = strpos($data, ']]></location>'))
                 && $pos2 > $pos1 + 14) {
+            echo "1\n";
             $data = substr($data, 0, $pos2);
             $data = substr($data, $pos1 + 19);
             $newlocation = $data;
-            if ('/' === $newlocation) {
+            if (!$newlocation) {
+                echo "2\n";
+
                 $newlocation = DPUNIVERSE_PAGE_PATH . 'index.php';
             }
             $newlocation = get_current_dpuniverse()->getDpObject($newlocation);
             if (FALSE === ($env = $this->getEnvironment())
                     || $env !== $newlocation) {
-
-
                 if (!$env) {
                     $from_where = sprintf(dptext("%s enters the site.<br />"),
                         ucfirst($this->getTitle(

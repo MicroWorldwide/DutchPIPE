@@ -18,9 +18,9 @@
  * @package    DutchPIPE
  * @subpackage lib
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpclient.php 97 2006-08-11 21:56:59Z ls $
+ * @version    Subversion: $Id: dpclient.php 196 2007-06-10 22:54:38Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver-ini.php, dpserver.php, dpclient.css
  */
@@ -29,7 +29,7 @@
  * Gets server settings
  */
 if (!defined('DPSERVER_HOST_URL')) {
-    require_once(dirname(realpath($_SERVER['SCRIPT_FILENAME']  . '/..'))
+    require_once(realpath(dirname($_SERVER['SCRIPT_FILENAME']) . '/..')
         . '/config/dpserver-ini.php');
 }
 
@@ -52,7 +52,7 @@ if (isset($_GET) && (isset($_GET['ajax']) || isset($_GET['method']))) {
 /**
  * Talks to the DutchPIPE server, returns response
  *
- * @return      string    output from the DutchPIPE server
+ * @return     boolean|string  output from the DutchPIPE server, FALSE for error
  */
 function talk2server()
 {
@@ -166,11 +166,14 @@ function talk2server()
             $bufdec = substr($bufdec, 0, $pos2);
             $bufdec = substr($bufdec, $pos1 + 19);
             $newlocation = $bufdec;
-            $output = "<location><![CDATA[$bufdec]]></location>";
+            $newlocation = $newlocation == '' ? DPSERVER_CLIENT_DIR
+                : DPSERVER_CLIENT_URL . "?location=$newlocation";
+            $output = "<location><![CDATA[$newlocation]]></location>";
             continue;
         }
         else {
-            $output .= TRUE === DPSERVER_BASE64_SERVER2CLIENT ? base64_decode($buf) : $buf;
+            $output .= TRUE === DPSERVER_BASE64_SERVER2CLIENT
+                ? base64_decode($buf) : $buf;
         }
     }
 
@@ -187,8 +190,6 @@ function talk2server()
     }
 
     if (isset($newlocation)) {
-        $newlocation = $newlocation == '/' ? '/'
-            : DPSERVER_CLIENT_URL . "?location=$newlocation";
         if (!isset($_GET) || !isset($_GET['ajax'])) {
             header("Location: $newlocation");
             exit;
@@ -214,14 +215,14 @@ function handle_ajax_request($output)
     else {
         if (isset($_GET) && isset($GET['standalone']) && isset($GET['_seq'])
                 && $GET['_seq'] == '0') {
-            $xml2 = simplexml_load_string($str = '<?xml version="1.0" encoding="UTF-8" '
-                . 'standalone="yes" ?><dutchpipe>' . $output . '</dutchpipe>');
+            $xml2 = simplexml_load_string($str =
+                '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>'
+                . '<dutchpipe>' . $output . '</dutchpipe>');
 
             if (FALSE !== $xml2) {
                 handle_cookies($xml2);
             }
         }
-
         header('Content-Type: text/xml');
         echo "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>
 <dutchpipe>$output</dutchpipe>\n";
@@ -307,10 +308,8 @@ function handle_normal_request($output)
 
     if (FALSE === $output) {
         $body = "<h1>$gLastErrorMsg</h1>";
-        $dpelements = '';
+        $dpelements = $windows = $messages = $scripts = '';
         $inputtopmargin = '0';
-        $windows = '';
-        $messages = '';
 
         /* Otherwise serve the page with the retrieved content in it */
         echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
@@ -327,7 +326,7 @@ function handle_normal_request($output)
     handle_cookies($xml);
 
     $messages = $windows = array();
-    $body = $dpelements = $html = '';
+    $body = $dpelements = $html = $scripts = '';
     $closetext = dptext('close');
 
     foreach ($xml->event as $e) {
@@ -347,6 +346,17 @@ function handle_normal_request($output)
                 break;
             case 'moveDpElement':
                 $dpelements .= $data->asXML();
+                break;
+            case 'script':
+                $tmp = $data->asXML();
+                $pos1 = strpos($tmp, '<![CDATA[');
+                $pos2 = strpos($tmp, ']]>');
+                if (FALSE !== $pos1 && FALSE !== $pos2 && $pos1 < $pos2) {
+                    $tmp = substr($tmp,  0, $pos1)
+                        . substr($tmp, $pos1 + 9, $pos2 - $pos1 - 9)
+                        . substr($tmp, $pos2 + 3);
+                }
+                $scripts .= $tmp;
                 break;
             case 'div':
                 $body .= $data;
@@ -390,8 +400,9 @@ function handle_normal_request($output)
     if (strlen($html)) {
         $html = str_replace(
             array('{$dpelements}', '{$windows}', '{$messages}',
-                '{$inputtopmargin}'),
-            array($dpelements, $windows, $messages, $inputtopmargin), $html);
+            '{$inputtopmargin}', '{$scripts}'),
+            array($dpelements, $windows, $messages, $inputtopmargin, $scripts),
+            $html);
         echo $html;
     } else {
         require_once(DPSERVER_TEMPLATE_PATH . DPSERVER_TEMPLATE_FILE);

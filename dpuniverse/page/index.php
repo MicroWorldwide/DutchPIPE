@@ -12,9 +12,9 @@
  * @package    DutchPIPE
  * @subpackage dpuniverse_page
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: index.php 45 2006-06-20 12:38:26Z ls $
+ * @version    Subversion: $Id: index.php 185 2007-06-09 21:53:43Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -30,9 +30,9 @@ inherit(DPUNIVERSE_STD_PATH . 'DpPage.php');
  * @package    DutchPIPE
  * @subpackage dpuniverse_page
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: @package_version@
+ * @version    Release: 0.2.0
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -43,21 +43,26 @@ final class Index extends DpPage
      */
     public function createDpPage()
     {
-        $this->setTitle(dptext('Home'));
+        $this->title = dptext('Home');
         $this->setBody(dptext(DPUNIVERSE_PAGE_PATH . 'index.html'), 'file');
 
-        $this->addExit(dptext('test1'), DPUNIVERSE_PAGE_PATH . 'test1.php');
-        $this->addExit(dptext('test2'), DPUNIVERSE_PAGE_PATH . 'test2.php');
+        // Alternative verbs to go to another page, also used by wandering NPCs:
+        $this->addExit('about', DPUNIVERSE_PAGE_PATH . 'about.php');
+        $this->addExit('showcases', DPUNIVERSE_PAGE_PATH . 'showcases.php');
+        $this->addExit('faq', DPUNIVERSE_PAGE_PATH . 'faq.php');
+        $this->addExit('copyright', DPUNIVERSE_PAGE_PATH . 'copyright.php');
+    }
 
+    /**
+     * Called at regular intervals
+     */
+    public function resetDpPage()
+    {
         // Creates a note, moves it here:
-        $note = get_current_dpuniverse()->newDpObject(DPUNIVERSE_OBJ_PATH
-            . 'note.php');
-        $note->moveDpObject($this);
+        $this->makePresent(DPUNIVERSE_OBJ_PATH . 'note.php');
 
         // Creates mobile NPC, moves it here:
-        $marvin = get_current_dpuniverse()->newDpObject(DPUNIVERSE_NPC_PATH
-            . 'mobile.php');
-        $marvin->moveDpObject($this);
+        $this->makePresent(DPUNIVERSE_NPC_PATH . 'mobile.php', 1, FALSE);
     }
 }
 ?>

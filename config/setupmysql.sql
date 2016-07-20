@@ -14,7 +14,7 @@
 # @author     Lennert Stock <ls@dutchpipe.org>
 # @copyright  2006 Lennert Stock
 # @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
-# @version    Subversion: $Id: setupmysql.sql 73 2006-07-13 20:30:09Z ls $
+# @version    Subversion: $Id: setupmysql.sql 187 2007-06-09 23:10:34Z ls $
 # @link       http://dutchpipe.org/manual/package/DutchPIPE
 
 CREATE DATABASE IF NOT EXISTS `dutchpipe`;
@@ -28,6 +28,12 @@ CREATE TABLE `Users` (
   `userCookieId` varchar(32) NOT NULL default '',
   `userCookiePassword` varchar(32) NOT NULL default '',
   `userUsernameLower` varchar(32) NOT NULL,
+  `userAvatarNr` tinyint(3) unsigned NOT NULL default '1',
+  `userAge` int(11) unsigned NOT NULL default '0',
+  `userDisplayMode` varchar(32) NOT NULL default 'graphical',
+  `userEventPeopleLeaving` enum('0','1') NOT NULL default '0',
+  `userEventPeopleEntering` enum('0','1') NOT NULL default '0',
+  `userEventBotsEntering` enum('0','1') NOT NULL default '0',
   PRIMARY KEY  (`userId`),
   KEY `userCookieId` (`userCookieId`,`userCookiePassword`)
 );
@@ -51,15 +57,33 @@ CREATE TABLE `UserAgents` (
 
 CREATE TABLE `UserAgentTitles` (
   `userAgentString` varchar(255) NOT NULL,
-  `userAgentTitle` varchar(32) NOT NULL,
+  `userAgentTitle` varchar(64) default NULL,
   PRIMARY KEY  (`userAgentString`)
 );
 
-INSERT INTO `UserAgentTitles` VALUES ("Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)", "Googlebot");
-INSERT INTO `UserAgentTitles` VALUES ("Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)", "Yahoo! Slurp");
+INSERT INTO `UserAgentTitles` VALUES ("Mozilla/2.0 (compatible; Ask Jeeves/Teoma; +http://about.ask.com/en/docs/about/webmasters.shtml)", "Ask Crawler");
+INSERT INTO `UserAgentTitles` VALUES ("Mozilla/5.0 (compatible; Ask Jeeves/Teoma; +http://about.ask.com/en/docs/about/webmasters.shtml)", "Ask Crawler");
+INSERT INTO `UserAgentTitles` VALUES ("Mozilla/2.0 (compatible; Ask Jeeves/Teoma; +http://sp.ask.com/docs/about/tech_crawling.html)", "Ask Crawler");
+INSERT INTO `UserAgentTitles` VALUES ("Baiduspider+(+http://www.baidu.com/search/spider_jp.html)", "Baiduspider");
+INSERT INTO `UserAgentTitles` VALUES ("Baiduspider+(+http://www.baidu.com/search/spider.htm)", "Baiduspider");
+INSERT INTO `UserAgentTitles` VALUES ("Mozilla/5.0 (compatible; BecomeBot/3.0; +http://www.become.com/site_owners.html)", "BecomeBot");
+INSERT INTO `UserAgentTitles` VALUES ("Speedy Spider (Entireweb; Beta/1.2; http://www.entireweb.com/about/search_tech/speedyspider/)", "Entireweb Speedy Spider");
+INSERT INTO `UserAgentTitles` VALUES ("Speedy Spider (http://www.entireweb.com/about/search_tech/speedyspider/)", "Entireweb Speedy Spider");
 INSERT INTO `UserAgentTitles` VALUES ("Gigabot/2.0/gigablast.com/spider.html", "Gigabot");
-INSERT INTO `UserAgentTitles` VALUES ("msnbot/0.9 (+http://search.msn.com/msnbot.htm)", "MSNBot");
-INSERT INTO `UserAgentTitles` VALUES ("Mozilla/2.0 (compatible; Ask Jeeves/Teoma; +http://sp.ask.com/docs/about/tech_crawling.html)", "Ask Web Crawler");
-INSERT INTO `UserAgentTitles` VALUES ("SurveyBot/2.3 (Whois Source)", "SurveyBot");
+INSERT INTO `UserAgentTitles` VALUES ("Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)", "Googlebot");
 INSERT INTO `UserAgentTitles` VALUES ("ichiro/2.0 (http://help.goo.ne.jp/door/crawler.html)", "Ichiro Web Crawler");
-
+INSERT INTO `UserAgentTitles` VALUES ("ilial/Nutch-0.9 (Ilial, Inc. is a Los Angeles based Internet startup company.; http://www.ilial.com/crawler; crawl@ilial.com)", "Ilial crawler");
+INSERT INTO `UserAgentTitles` VALUES ("Mozilla/5.0 (compatible; heritrix/1.10.2 +http://i.stanford.edu/)", "Internet Archive Heritrix Crawler");
+INSERT INTO `UserAgentTitles` VALUES ("IRLbot/3.0 (compatible; MSIE 6.0; http://irl.cs.tamu.edu/crawler)", "IRL crawler");
+INSERT INTO `UserAgentTitles` VALUES ("Krugle/Krugle,Nutch/0.8+ (Krugle web crawler; http://corp.krugle.com/crawler/info.html; webcrawler@krugle.com)", "Krugle Crawler");
+INSERT INTO `UserAgentTitles` VALUES ("msnbot/1.0 (+http://search.msn.com/msnbot.htm)", "MSNBot");
+INSERT INTO `UserAgentTitles` VALUES ("msnbot-media/1.0 (+http://search.msn.com/msnbot.htm)", "MSNBot");
+INSERT INTO `UserAgentTitles` VALUES ("MSRBOT (http://research.microsoft.com/research/sv/msrbot)", "MSRBot");
+INSERT INTO `UserAgentTitles` VALUES ("Mozilla/4.0 (compatible; NaverBot/1.0; http://help.naver.com/delete_main.asp)", "NaverBot");
+INSERT INTO `UserAgentTitles` VALUES ("Mozilla/4.0 (compatible; Netcraft Web Server Survey)", "Netcraft Survey Bot");
+INSERT INTO `UserAgentTitles` VALUES ("psbot/0.1 (+http://www.picsearch.com/bot.html)", "Psbot (picsearch.com)");
+INSERT INTO `UserAgentTitles` VALUES ("Sogou web spider/3.0(+http://www.sogou.com/docs/help/webmasters.htm#07)", "Sogou Spider");
+INSERT INTO `UserAgentTitles` VALUES ("SurveyBot/2.3 (Whois Source)", "SurveyBot");
+INSERT INTO `UserAgentTitles` VALUES ("Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)", "Yahoo! Slurp");
+INSERT INTO `UserAgentTitles` VALUES ("Mozilla/5.0 (compatible; Yahoo! Slurp China; http://misc.yahoo.com.cn/help.html)", "Yahoo! Slurp China");
+INSERT INTO `UserAgentTitles` VALUES ("Mozilla/5.0 (compatible; YodaoBot/1.0; http://www.yodao.com/help/webmaster/spider/; )", "YodaoBot");

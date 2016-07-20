@@ -10,48 +10,47 @@ REQUIREMENTS FOR USING AND INSTALLING DUTCHPIPE
 
     1. PHP 5
 
-       Knowledge of PHP 5 and in particular PHP 5 objects. However, if
-       you have PHP 4 experience only, DutchPIPE is an excellent
-       project to learn more about PHP 5.
+       Knowledge of PHP 5 and in particular PHP 5 objects. However, if you have
+       PHP 4 experience only, DutchPIPE is an excellent project to learn more
+       about PHP 5.
 
     2. Javascript/AJAX
 
-       If you like more magic to happen than the current library
-       provides, Javascript/AJAX knowledge is required. As with PHP 5,
-       DutchPIPE is a great project to get skilled with AJAX.
+       If you like more magic to happen than the current library provides,
+       Javascript/AJAX knowledge is required. As with PHP 5, DutchPIPE is a
+       great project to get skilled with AJAX.
 
     Software Requirements:
 
     1. A *NIX or Windows platform
 
-       DutchPIPE was developed and tested on FreeBSD 6. You must have
-       full access to a computer or server to run DutchPIPE. I also
-       installed it successfully on a Windows XP box, using
-       http://www.wampserver.com/en/ to install Apache, PHP and MySQL.
+       DutchPIPE was developed and tested on FreeBSD 6. You must have full
+       access to a computer or server to run DutchPIPE. I also installed it
+       successfully on a Windows XP box, using http://www.wampserver.com/en/ to
+       install Apache, PHP and MySQL.
 
     2. A web server
 
-       DutchPIPE.org runs on Apache 2.2, I haven't been able to test
-       on other servers yet.
+       DutchPIPE.org runs on Apache 2.2, I haven't been able to test on other
+       servers yet.
 
-    3. PHP 5 with the extensions: simple_xml and sockets (both for the
-       web server and "on the command line")
+    3. PHP 5 with the extensions: simple_xml and sockets (both for the web
+       server and "on the command line")
 
-       DutchPIPE.org has been using PHP 5.1+. The simple_xml extension
-       is supported by default on PHP 5.
+       DutchPIPE.org has been using PHP 5.1+. The simple_xml extension is
+       supported by default on PHP 5.
 
     4. MySQL
 
-       Used to store registered users. There are just a few queries,
-       more databases will be supported later. If you don't have MySQL
-       you can still test DutchPIPE if you rip some queries out, you
-       just can't register.
+       Used to store registered users. There are just a few queries, more
+       databases will be supported later. If you don't have MySQL you can still
+       test DutchPIPE if you rip some queries out, you just can't register.
 
     5. An AJAX capable web browser
 
-       Currently Firefox, IE6 and IE7 beta 2 are supported 100%. Opera
-       and Safari will be supported as soon as possible. If you can
-       help test on Safari, please contact me.
+       Currently Firefox, IE6 and IE7 and Opera 9 are supported 100%. Safari
+       will be supported as soon as possible. If you can help test on Safari,
+       please contact me.
 
 INSTRUCTIONS FOR INSTALLING DUTCHPIPE ON LINUX, BSD, UNIX, ...
 
@@ -65,13 +64,13 @@ INSTRUCTIONS FOR INSTALLING DUTCHPIPE ON LINUX, BSD, UNIX, ...
 
     2. Unpack the DutchPIPE software
 
-       Unpack to the directory of your choice. In this example
-       installation, we unpack to:
+       Unpack to the directory of your choice. In this example installation, we
+       unpack to:
 
        /path/to/dutchpipe
 
-       Relative paths in the remainder of these instructions are from
-       the top of this path.
+       Relative paths in the remainder of these instructions are from the top of
+       this path.
 
     3. Configure the DutchPIPE software
 
@@ -80,15 +79,15 @@ INSTRUCTIONS FOR INSTALLING DUTCHPIPE ON LINUX, BSD, UNIX, ...
        config/dpserver-ini.php
        config/dpuniverse-ini.php
 
-       Follow the instructions in these files or see the manual
-       entries for dpserver-ini.php and dpuniverse-ini.php.
+       Follow the instructions in these files or see the manual entries for
+       dpserver-ini.php and dpuniverse-ini.php.
 
        Make sure the first line of
 
        script/start_dpserver.php
 
-       refers to the PHP command line installation. Make sure this
-       file is executable (see man chmod under *NIX).
+       refers to the PHP command line installation. Make sure this file is
+       executable (see man chmod under *NIX).
 
     4. Setup MySQL
 
@@ -102,16 +101,16 @@ INSTRUCTIONS FOR INSTALLING DUTCHPIPE ON LINUX, BSD, UNIX, ...
 
     5. Configure your web server
 
-       If you already have a location to test DutchPIPE, you can skip
-       step 5 and 6.
+       If you already have a location to test DutchPIPE, you can skip step 5 and
+       6.
 
-       Decide on what URL you want to host your DutchPIPE
-       installation. You need to let your web server know where to
-       find the directory with the DutchPIPE public files.
+       Decide on what URL you want to host your DutchPIPE installation. You need
+       to let your web server know where to find the directory with the
+       DutchPIPE public files.
 
-       There are many ways to add DutchPIPE, this is just one of them.
-       In the example case, we added the following to the vhosts
-       configuration file of Apache 2.2 in our FreeBSD 6 installation:
+       There are many ways to add DutchPIPE, this is just one of them. In the
+       example case, we added the following to the vhosts configuration file of
+       Apache 2.2 in our FreeBSD 6 installation:
 
        /usr/local/etc/apache22/extra/httpd-vhosts.conf
 
@@ -215,7 +214,7 @@ INSTRUCTIONS FOR INSTALLING DUTCHPIPE ON WINDOWS 2000, XP, ...
 
        Click on the WAMP5 tray bar icon and select:
 
-       PHP extensions -> php_sockets
+       PHP settings -> PHP extensions -> php_sockets
 
        so that php_sockets is enabled.
 
@@ -268,16 +267,6 @@ INSTRUCTIONS FOR INSTALLING DUTCHPIPE ON WINDOWS 2000, XP, ...
 
        //define('DPSERVER_HOST_URL', 'http://www.yourdomain.com');
        define('DPSERVER_HOST_URL', 'http://localhost');
-
-       Change these two lines:
-
-       define('DPSERVER_SOCKET_TYPE', AF_UNIX);
-       //define('DPSERVER_SOCKET_TYPE', AF_INET);
-
-       into:
-
-       //define('DPSERVER_SOCKET_TYPE', AF_UNIX);
-       define('DPSERVER_SOCKET_TYPE', AF_INET);
 
        Check if the DPSERVER_SOCKET_PORT is a free port on your
        machine (3333 by default):

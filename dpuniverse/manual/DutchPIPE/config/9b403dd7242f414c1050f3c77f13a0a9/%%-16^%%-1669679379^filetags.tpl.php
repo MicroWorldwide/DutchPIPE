@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.0, created on 2006-08-13 20:43:30
+<?php /* Smarty version 2.6.0, created on 2007-06-11 15:27:33
          compiled from filetags.tpl */ ?>
 <?php require_once(SMARTY_DIR . 'core' . DIRECTORY_SEPARATOR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('modifier', 'upper', 'filetags.tpl', 5, false),)), $this); ?>

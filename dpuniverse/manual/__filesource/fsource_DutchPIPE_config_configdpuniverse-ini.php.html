@@ -37,9 +37,9 @@
 <li class="src-li"><div class="src-line"><a name="a16"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@package</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;DutchPIPE</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a17"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@subpackage</span><span class="src-doc">&nbsp;config</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a18"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@author</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lennert&nbsp;Stock&nbsp;&lt;ls@dutchpipe.org&gt;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a19"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@copyright</span><span class="src-doc">&nbsp;&nbsp;2006&nbsp;Lennert&nbsp;Stock</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a19"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@copyright</span><span class="src-doc">&nbsp;&nbsp;2006,&nbsp;2007&nbsp;Lennert&nbsp;Stock</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a20"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@license</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;http://dutchpipe.org/license/1_0.txt&nbsp;&nbsp;DutchPIPE&nbsp;License</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a21"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@version</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;Subversion:&nbsp;$Id:&nbsp;dpuniverse-ini.php&nbsp;90&nbsp;2006-07-23&nbsp;17:04:04Z&nbsp;ls&nbsp;$</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a21"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@version</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;Subversion:&nbsp;$Id:&nbsp;dpuniverse-ini.php&nbsp;190&nbsp;2007-06-10&nbsp;14:19:42Z&nbsp;ls&nbsp;$</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a22"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@link</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://dutchpipe.org/manual/package/DutchPIPE</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a23"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dpuniverse.php,&nbsp;dpserver-ini.php</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a24"></a><span class="src-doc">&nbsp;*/</span></div></li>
@@ -107,7 +107,7 @@
 <li class="src-li"><div class="src-line"><a name="a86"></a><span class="src-doc">&nbsp;*&nbsp;Defaults&nbsp;to&nbsp;the&nbsp;mother&nbsp;directory&nbsp;of&nbsp;the&nbsp;directory&nbsp;this&nbsp;file&nbsp;is&nbsp;in.</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a87"></a><span class="src-doc">&nbsp;*&nbsp;Leave&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a88"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a89"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPUNIVERSE_ROOT_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">dirname</span><span class="src-sym">(</span><span class="src-id">realpath</span><span class="src-sym">(</span>__FILE__&nbsp;.&nbsp;<span class="src-str">'/..'</span><span class="src-sym">))&nbsp;</span>.&nbsp;<span class="src-str">'/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a89"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPUNIVERSE_ROOT_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">realpath</span><span class="src-sym">(</span><span class="src-id">dirname</span><span class="src-sym">(</span>__FILE__<span class="src-sym">)&nbsp;</span>.&nbsp;<span class="src-str">'/..'</span><span class="src-sym">)&nbsp;</span>.&nbsp;<span class="src-str">'/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a90"></a>&nbsp;</div></li>
 <li class="src-li"><div class="src-line"><a name="a91"></a><span class="src-doc">/**</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a92"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;library&nbsp;directory</span></div></li>
@@ -117,14 +117,14 @@
 <li class="src-li"><div class="src-line"><a name="a96"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPUNIVERSE_LIB_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPUNIVERSE_ROOT_PATH&nbsp;</span>.&nbsp;<span class="src-str">'lib/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a97"></a>&nbsp;</div></li>
 <li class="src-li"><div class="src-line"><a name="a98"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a99"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;library&nbsp;directory</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a99"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;script&nbsp;directory</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a100"></a><span class="src-doc">&nbsp;*</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a101"></a><span class="src-doc">&nbsp;*&nbsp;Leave&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a102"></a><span class="src-doc">&nbsp;*/</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a103"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPUNIVERSE_SCRIPT_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPUNIVERSE_ROOT_PATH&nbsp;</span>.&nbsp;<span class="src-str">'script/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a104"></a>&nbsp;</div></li>
 <li class="src-li"><div class="src-line"><a name="a105"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a106"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;library&nbsp;directory</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a106"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;universe&nbsp;directory</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a107"></a><span class="src-doc">&nbsp;*</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a108"></a><span class="src-doc">&nbsp;*&nbsp;Excludes&nbsp;trailing&nbsp;/,&nbsp;unlike&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPUNIVERSE_PATH}</span><span class="src-doc">&nbsp;and&nbsp;other&nbsp;paths.&nbsp;Leave</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a109"></a><span class="src-doc">&nbsp;*&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
@@ -134,7 +134,7 @@
 <li class="src-li"><div class="src-line"><a name="a113"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPUNIVERSE_BASE_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPUNIVERSE_ROOT_PATH&nbsp;</span>.&nbsp;<span class="src-str">'dpuniverse'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a114"></a>&nbsp;</div></li>
 <li class="src-li"><div class="src-line"><a name="a115"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a116"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;library&nbsp;directory</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a116"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;universe&nbsp;directory</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a117"></a><span class="src-doc">&nbsp;*</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a118"></a><span class="src-doc">&nbsp;*&nbsp;Includes&nbsp;trailing&nbsp;/,&nbsp;unlike&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPUNIVERSE_BASE_PATH}</span><span class="src-doc">.&nbsp;Leave&nbsp;this</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a119"></a><span class="src-doc">&nbsp;*&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
@@ -214,7 +214,7 @@
 <li class="src-li"><div class="src-line"><a name="a193"></a><span class="src-doc">&nbsp;*</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a194"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPUNIVERSE_IMAGE_PATH</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a195"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a196"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPUNIVERSE_IMAGE_URL'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'/images/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a196"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPUNIVERSE_IMAGE_URL'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPUNIVERSE_WWW_URL&nbsp;</span>.&nbsp;<span class="src-str">'images/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a197"></a>&nbsp;</div></li>
 <li class="src-li"><div class="src-line"><a name="a198"></a><span class="src-doc">/**</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a199"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;publicly&nbsp;reachable&nbsp;web&nbsp;avatar&nbsp;images&nbsp;directory</span></div></li>
@@ -232,7 +232,7 @@
 <li class="src-li"><div class="src-line"><a name="a211"></a><span class="src-doc">&nbsp;*</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a212"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPUNIVERSE_AVATAR_PATH</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a213"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a214"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPUNIVERSE_AVATAR_URL'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'/images/avatar/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a214"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPUNIVERSE_AVATAR_URL'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPUNIVERSE_IMAGE_URL&nbsp;</span>.&nbsp;<span class="src-str">'avatar/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a215"></a>&nbsp;</div></li>
 <li class="src-li"><div class="src-line"><a name="a216"></a><span class="src-doc">/**</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a217"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;directory&nbsp;with&nbsp;CAPTCHA&nbsp;images</span></div></li>
@@ -377,7 +377,7 @@
 </span></div>
         <div class="credit">
 		    <hr class="separator" />
-		    Documentation generated on Sun, 13 Aug 2006 20:43:32 +0200 by <a href="http://www.phpdoc.org">phpDocumentor 1.3.0RC6</a>
+		    Documentation generated on Mon, 11 Jun 2007 15:27:35 +0200 by <a href="http://www.phpdoc.org">phpDocumentor 1.3.0RC6</a>
 	      </div>
       </td></tr></table>
     </td>

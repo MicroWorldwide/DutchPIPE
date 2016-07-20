@@ -15,56 +15,41 @@ CONTENTS
 
 WELCOME TO DUTCHPIPE
 
-    With open source DutchPIPE software, web developers can make
-    virtual multi-user environments. Each web page becomes an
-    abstracted environment or location where visitors and other items
-    on the page are visualized. This status is retained as visitors
-    move around. A lot of real-time interaction is possible. The
-    result: Persistent Interactive Page Environments. DutchPIPE uses
-    AJAX and the DOM for the browser - it works without Java, Flash,
+    With open source DutchPIPE software, web developers can make virtual
+    multi-user environments. Each web page becomes an abstracted environment or
+    location where visitors and other items on the page are visualized. This
+    status is retained as visitors move around. A lot of real-time interaction
+    is possible. The result: Persistent Interactive Page Environments. DutchPIPE
+    uses AJAX and the DOM for the browser - it works without Java, Flash,
     plug-in or firewall adjustments. On the server, PHP 5 is used.
 
 WARNING
 
-    This is unfinished "alpha" software. It is not for the faint of
-    heart. Both code and documentation are in alpha status. This is
-    the work of one man, in four months, after work. There will be
-    bugs, issues, and even plain unfinished parts. Some parts are
-    quite clean, others still the result of organic growth. This
-    release is aimed at those interested to play around with it, to
-    increase interest, get bug reports, attract contributors, and all
-    that.
-
-    You should be aware that DutchPIPE is not secure yet, if there is
-    such a thing. For example, the AJAX engine uses lazy GETs all over
-    the place, even when POSTs should be used, and the consequences of
-    tinkering these requests have not been fully explored or closed
-    yet. In other words: Only use this alpha software if you know what
-    you are doing. Try this on a test machine, not your public company
-    server with other sites or anything like that.
+    This is "beta" software. Beta-software has bugs and the usual disclaimers
+    apply. This software is aimed at experienced developers.
 
 INSTALLATION
 
-    See the INSTALL file for installation requirements and step-by-
-    step guides for both *NIX and Windows platforms.
+    See the INSTALL file for installation requirements and step-by-step guides
+    for both *NIX and Windows platforms.
 
 DIRECTORY LAYOUT
 
-    Although this will most likely change in the near future,
-    currently DutchPIPE has the following directory structure:
+    DutchPIPE has the following directory structure by default (directory
+    locations can be changed):
 
     config/
         Configuration files
 
-    doc/
-        Documentation files
-
     dpuniverse/
-        Your "universe", you can build a site inside this directory
-        without worrying much of what goes on beyond it
+        Your "universe", you can build a site inside this directory without
+        worrying much of what goes on beyond it
 
     lib/
         The DutchPIPE server/engine and other DutchPIPE components
+
+    locale/
+        Language files for internationalization and localization support
 
     public/
         Web enabled and publicly reachable directory
@@ -77,121 +62,90 @@ DIRECTORY LAYOUT
 
 TROUBLESHOOTING/GETTING HELP/GIVING FEEDBACK
 
-    I'll try to test usage on as many platforms as possible to allow
-    for painless installation, but obviously I didn't have much time
-    for that yet. Since this is all new and tested on a limited number
-    of platforms, with lack of documentation, feel welcome to share
-    your experiences or particular pains and problems with the
-    DutchPIPE installation.
+    DutchPIPE has been tested on a number of platforms, but obviously not all of
+    them. Feel welcome to share your experiences or particular pains and
+    problems with the DutchPIPE installation.
 
-    See the MANUAL, DEVELOPER'S LOUNGE, MAILING LISTS and THE AUTHOR
-    sections below for information and contact details. If you solved
-    a particular installation problem, or installed it successfully in
-    a previously untested platform, please also let me know, so I can
-    update the documentation.
+    See the MANUAL, DEVELOPER'S LOUNGE, MAILING LISTS and THE AUTHOR sections
+    below for information and contact details. If you solved a particular
+    installation problem, please also let us know, so the software and/or
+    documentation can be updated.
 
 MANUAL
 
-    The DutchPIPE Manual is the DutchPIPE's developer prime source
-    of information:
+    The DutchPIPE Manual is the DutchPIPE's developer prime source of
+    information:
 
     http://manual.dutchpipe.org/
 
-    This README file and the INSTALL file are copies from the
-    manual's Introduction and Installation chapters, you might prefer
-    the HTML pages.
+    This README file and the INSTALL file are copies from the manual's
+    Introduction and Installation chapters, you might prefer the HTML pages.
 
 HOMEPAGE
 
-    For the latest releases, news, et cetera, see the DutchPIPE
-    website at:
+    For the latest releases, news, et cetera, see the DutchPIPE website at:
 
     http://dutchpipe.org/
 
 
 DEVELOPER'S LOUNGE
 
-    If you're experiencing problems, want to share ideas or just want
-    to lay back and sip on hot coffee, visit the developers lounge at:
+    If you're experiencing problems, want to share ideas or just want to lay
+    back and sip on hot coffee, visit the developers lounge at:
 
     http://dutchpipe.org/dpclient.php?location=/page/lounge.php
 
 MAILING LISTS
 
-    There are a number of DutchPIPE mailing lists, for instance to
-    talk about DutchPIPE or to discuss installation problems. For an
-    overview and to (un)subscribe, browse to:
+    There are a number of DutchPIPE mailing lists, for instance to talk about
+    DutchPIPE or to discuss installation problems. For an overview and to
+    (un)subscribe, browse to:
 
     http://dutchpipe.org/mailman/
 
-    If you're a serious developer, dutchpipe-talk is the best way to
-    discuss issues.
+    If you're a serious developer, dutchpipe-talk is the best way to discuss
+    issues.
 
 THE AUTHOR
 
-    DutchPIPE was made by Lennert Stock. Feel free to send comments
-    and bug reports to the author at:
+    DutchPIPE was made by Lennert Stock. Feel free to send comments and bug
+    reports to the author at:
 
     mailto:ls@dutchpipe.org
 
 ROADMAP
 
-    Well there isn't exactly a roadmap yet, but here are just -a few-
-    of the things on the wish list.
+    A few of the things on the wish list:
 
-    First of all I must spend some time on non-coding issues so I can
-    properly start this project up. Provide proper documentation so
-    people can, eh, actually use it, provide the usual tools such as
-    bug trackers and subversion access, and market the thing if
-    necessary, although I'm hoping you pass the word though.
-
-    The interface is still crude and must be made more user friendly.
-    The verb noun commands should only remain for power users and
-    under the hood, input fields for communications should pop up or
-    whatever.
+    The interface is still crude and must be made more user friendly. The verb
+    noun commands should only remain for power users and under the hood, input
+    fields for communications should pop up or whatever.
 
     Debugging and making DutchPIPE more secure.
 
     Movable or even animated objects.
 
-    Debugging and enhancements on running DutchPIPE on .html pages.
-    Making it possible to run DutchPIPE on pages on another server.
-    For this we need a proxy script to forward AJAX requests as AJAX
-    cannot be used across domains for security reasons.
+    Debugging and enhancements on running DutchPIPE on .html pages. Making it
+    possible to run DutchPIPE on pages on another server. For this we need a
+    proxy script to forward AJAX requests as AJAX cannot be used across domains
+    for security reasons.
 
     Make options to let visitors make their own objects and "area".
 
-    Distributed DutchPIPE: Make it possible for DutchPIPE sites to
-    see, communicate and switch to other DutchPIPE sites, making it
-    one big, sprawling universe.
+    Distributed DutchPIPE: Make it possible for DutchPIPE sites to see,
+    communicate and switch to other DutchPIPE sites, making it one big,
+    sprawling universe.
 
-    Better dpuniverse/std library. The library provided for the
-    universe is very basic now, and lots of functionality will be
-    added.
+    Better dpuniverse/std library. The library provided for the universe is very
+    basic now, and lots of functionality will be added.
 
     More showcases.
 
-    Learn English/learn how to spell.
-
-    Et cetera, et cetera. Of course this can't be done by one man, so
-    if you'd like any of the above or any other ideas implemented,
-    please read on...
-
 CONTRIBUTING
 
-    DutchPIPE is a brand new, fresh open source project. If you'd like
-    to contribute in any way, be it code, bugs, documentation, or open
-    source experience such as project setup and management, please
-    mail ls@dutchpipe.org. The DutchPIPE "noosphere" is huge and for the
-    taking. This will be a free project in any sense, if you shine at
-    some particular skill or knowledge, you'll be able to pretty much
-    give it shape any way you please. Again, this project is fresh.
-    If you like established projects with all the tools firmly in
-    place, DutchPIPE is not for you. However, if you're full of
-    inspiration and just like to code, no one is in your way, no one
-    has done it yet and probably no one is even planning it. You keep
-    the copyright of your OS licensed contributions and are fully
-    credited for your efforts. Also, if you disliked certain things or
-    setups in other projects which appear to be written in stone, this
-    is your change to make your mark and make your experience count.
+    If you'd like to contribute in any way, be it code, bugs or documentation,
+    please mail ls@dutchpipe.org. The DutchPIPE "noosphere" is huge and for the
+    taking. This will be a free project in any sense, if you shine at some
+    particular skill or knowledge, you'll be able to pretty much give it shape
+    any way you please.
 

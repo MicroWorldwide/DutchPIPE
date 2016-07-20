@@ -12,9 +12,9 @@
  * @package    DutchPIPE
  * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpPage.php 97 2006-08-11 21:56:59Z ls $
+ * @version    Subversion: $Id: DpPage.php 196 2007-06-10 22:54:38Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -27,12 +27,17 @@ inherit(DPUNIVERSE_STD_PATH . 'DpObject.php');
 /**
  * A DutchPIPE enabled web page
  *
+ * Creates the following DutchPIPE properties:<br />
+ *
+ * - boolean <b>isPage</b> - Set to TRUE
+ * - boolean|integer <b>isMovingArea</b> - Set to FALSE, can be type 1 or 2
+ *
  * @package    DutchPIPE
  * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: @package_version@
+ * @version    Release: 0.2.0
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  */
 class DpPage extends DpObject
@@ -42,6 +47,14 @@ class DpPage extends DpObject
      * @access      private
      */
     private $mExits = array();
+
+    /**
+     * Aliases used for exits, e.g. 'enter bar' for 'north'
+     *
+     * @var        array
+     * @access     private
+     */
+    private $mExitAliases = array();
 
     /**
      * @var         array     Elements to make a navigation trail
@@ -54,32 +67,147 @@ class DpPage extends DpObject
      *
      * Calls the method 'createDpPage' in this page, if it exists.
      */
-    function createDpObject()
+    final function createDpObject()
     {
         $this->setTitleType(DPUNIVERSE_TITLE_TYPE_NAME);
         $this->addId(dptext('page'));
-        $this->addProperty('is_page');
         $this->addExit(dptext('login'), DPUNIVERSE_PAGE_PATH . 'login.php');
-        if (method_exists($this, 'createDpPage')) {
-            $this->createDpPage();
-        }
+
+        $this->isPage = new_dp_property(TRUE);
+        $this->isMovingArea = new_dp_property(FALSE);
+
+        $this->createDpPage();
+    }
+
+    /**
+     * Creates this object
+     *
+     * @see        createDpObject
+     */
+    function createDpPage()
+    {
+    }
+
+    /**
+     * Creates this page
+     *
+     * Calls the method 'createDpPage' in this page, if it exists.
+     */
+    final function resetDpObject()
+    {
+        $this->resetDpPage();
+    }
+
+    /**
+     * Creates this object
+     *
+     * @see        createDpObject
+     */
+    function resetDpPage()
+    {
+    }
+
+    function eventDpObject($name)
+    {
+        $args = func_get_args();
+        call_user_func_array(array($this, 'eventDpPage'), $args);
+    }
+
+    function eventDpPage($name)
+    {
     }
 
     /**
      * Adds an "exit" out of this page
      *
      * Exits are links that can be typed on the command line or used by computer
-     * controlled character to wander around the site.
+     * controlled character to wander around the site. Adding compass directions
+     * like 'nw' will also add the full 'northwest' action, and vice versa, if
+     * not defined.
      *
      * @param       string    $direction    Command to use link, "home", "bar"
+     * @param       array     $direction    Multiple directions, "bar", "north"
      * @param       string    $destination  URL
      */
-    final function addExit($direction, $destination)
+    final function addExit($direction, $destination, $method = NULL,
+        $mapArea = NULL, $mapAreaActionTitle = NULL)
     {
-        $this->mExits[$direction] = $destination;
-        $this->addAction($direction, $direction, 'useExit',
+        $short_dirs = array('n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw');
+        $long_dirs = array('north', 'northeast', 'east', 'southeast', 'south',
+            'southwest', 'west', 'northwest');
+
+        if (empty($direction)) {
+            return;
+        }
+
+        if (!is_array($direction)) {
+            $direction = array($direction);
+        }
+
+        if (FALSE !== ($x = array_search($direction[0], $short_dirs))) {
+            if (FALSE !== ($y = array_search($long_dirs[$x], $direction))) {
+                $direction[$y] = $direction[0];
+            }
+            $direction[0] = $long_dirs[$x];
+
+            //print_r($direction);
+            $test = true;
+        }
+
+        $newdirs = array();
+        foreach ($direction as $dir) {
+            if (FALSE !== ($x = array_search($dir, $short_dirs))) {
+                if (FALSE === ($y = array_search($long_dirs[$x], $direction))
+                        && FALSE === ($y = array_search($long_dirs[$x],
+                        $newdirs))) {
+                    $newdirs[] = $long_dirs[$x];
+                }
+            } elseif (FALSE !== ($x = array_search($dir, $long_dirs))) {
+                if (FALSE === ($y = array_search($short_dirs[$x], $direction))
+                        && FALSE === ($y = array_search($short_dirs[$x],
+                        $newdirs))) {
+                    $newdirs[] = $short_dirs[$x];
+                }
+            }
+        }
+
+        $direction = array_merge($direction, $newdirs);
+        //if (isset($test)) { print_r($direction); exit; }
+
+        $tmp = $direction[0];
+        if (1 < ($sz = sizeof($direction))) {
+            for ($i = 1; $i < $sz; $i++) {
+                $this->mExitAliases[$direction[$i]] = $tmp;
+            }
+        }
+
+        $this->mExits[$direction[0]] = array($destination, $method);
+
+        if (!is_null($mapArea) && is_null($mapAreaActionTitle)) {
+            $mapAreaActionTitle = $direction[0];
+        }
+
+        $this->addAction($direction[0], $direction, 'useExit',
             DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF,
-            DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY);
+            DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY,
+            $mapArea, $mapAreaActionTitle);
+    }
+
+    function removeExit($direction)
+    {
+        if (isset($this->mExitAliases[$direction])) {
+            $this->removeAction($this->mExitAliases[$direction]);
+            return;
+        }
+        if (isset($this->mExits[$direction])) {
+            $this->removeAction($direction);
+            unset($this->mExits[$direction]);
+            foreach ($this->mExitAliases as $dir_alias => $dir) {
+                if ($direction === $dir) {
+                    unset($this->mExitAliases[$dir_alias]);
+                }
+            }
+        }
     }
 
     /**
@@ -93,8 +221,13 @@ class DpPage extends DpObject
     final function setExits($exits)
     {
         $this->mExits = array();
-        foreach ($this->mExits as $direction => $destination) {
-            $this->addExit($direction, $destination);
+        foreach ($exits as $direction => $destination) {
+            if (!is_array($destination)) {
+                $this->addExit($direction, $destination);
+            } else {
+                array_unshift($destination, $direction);
+                call_user_method_array('addExit', $this, $destination);
+            }
         }
     }
 
@@ -107,9 +240,49 @@ class DpPage extends DpObject
      * @param      string    $direction   Command to use link, "home", "bar"
      * @return     string                 URL
      */
-    final function getExit($direction)
+    final function getExitDestination($direction)
     {
-        return $this->mExits[$direction];
+        if (isset($this->mExitAliases[$direction])) {
+            $direction = $this->mExitAliases[$direction];
+        }
+        return !isset($this->mExits[$direction]) ? FALSE :
+            $this->mExits[$direction][0];
+    }
+
+    /**
+     * Gets URL of "exit" out of this page
+     *
+     * Exits are links that can be typed on the command line or used by computer
+     * controlled character to wander around the site.
+     *
+     * @param      string    $direction   Command to use link, "home", "bar"
+     * @return     string                 URL
+     */
+    final function getExitMethod($direction)
+    {
+        if (isset($this->mExitAliases[$direction])) {
+            $direction = $this->mExitAliases[$direction];
+        }
+        return !isset($this->mExits[$direction]) ? FALSE :
+            $this->mExits[$direction][1];
+    }
+
+    /**
+     * Gets URL of "exit" out of this page
+     *
+     * Exits are links that can be typed on the command line or used by computer
+     * controlled character to wander around the site.
+     *
+     * @param      string    $direction   Command to use link, "home", "bar"
+     * @return     string                 URL
+     */
+    final function getExitMapArea($direction)
+    {
+        if (isset($this->mExitAliases[$direction])) {
+            $direction = $this->mExitAliases[$direction];
+        }
+        return !isset($this->mExits[$direction]) ? FALSE :
+            $this->mExits[$direction][2];
     }
 
     /**
@@ -125,6 +298,11 @@ class DpPage extends DpObject
         return (array)$this->mExits;
     }
 
+    final function getExitAliases()
+    {
+        return (array)$this->mExitAliases;
+    }
+
     /**
      * Makes the active object exit this page and go to a new URL
      *
@@ -134,8 +312,11 @@ class DpPage extends DpObject
      */
     function useExit($verb, $noun = '')
     {
-        get_current_dpobject()->tell('<location>' . $this->getExit($verb)
-            . '</location>');
+        if (!($method = $this->getExitMethod($verb))
+                || $this->{$method}($verb)) {
+            get_current_dpobject()->tell('<location>'
+                . $this->getExitDestination($verb) . '</location>');
+        }
         return TRUE;
     }
 
@@ -146,7 +327,7 @@ class DpPage extends DpObject
      * One or more extra arguments can be given to specify objects which should
      * be skipped. For example:
      *
-     *     $user->tell('You smile happily.<br />';
+     *     $user->tell('You smile happily.<br />');
      *     $user->getEnvironment()->tell(ucfirst(
      *         $user->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))
      *         . ' smiles happily.<br />', $user);
@@ -169,9 +350,9 @@ class DpPage extends DpObject
                 }
             } else {
                 foreach ($inv as &$ob) {
-                    if (isset($data[$ob->getProperty('display_mode')])
+                    if (isset($data[$ob->displayMode])
                             && ($tmp =
-                            $data[$ob->getProperty('display_mode')])) {
+                            $data[$ob->displayMode])) {
                         $ob->tell($tmp, $this);
                     }
                 }
@@ -188,9 +369,9 @@ class DpPage extends DpObject
             } else {
                 foreach ($inv as &$ob) {
                     if ($ob !== $from
-                            && isset($data[$ob->getProperty('display_mode')])
+                            && isset($data[$ob->displayMode])
                             && ($tmp =
-                            $data[$ob->getProperty('display_mode')])) {
+                            $data[$ob->displayMode])) {
                         $ob->tell($tmp, $this);
                     }
                 }
@@ -200,16 +381,16 @@ class DpPage extends DpObject
             $from = array_slice(func_get_args(), 1);
             if (FALSE === is_array($data)) {
                 foreach ($inv as &$ob) {
-                    if (FALSE === in_array($ob, $from)) {
+                    if (FALSE === in_array($ob, $from, TRUE)) {
                         $ob->tell($data, $this);
                     }
                 }
             } else {
                 foreach ($inv as &$ob) {
-                    if (FALSE === in_array($ob, $from)
-                            && isset($data[$ob->getProperty('display_mode')])
+                    if (FALSE === in_array($ob, $from, TRUE)
+                            && isset($data[$ob->displayMode])
                             && ($tmp =
-                            $data[$ob->getProperty('display_mode')])) {
+                            $data[$ob->displayMode])) {
                         $ob->tell($tmp, $this);
                     }
                 }
@@ -233,10 +414,9 @@ class DpPage extends DpObject
         }
         $this->mNavigationTrail = func_get_args();
 
-        $navlogo = dptext(DPUNIVERSE_NAVLOGO);
         foreach ($this->mNavigationTrail as $link) {
             if (is_array($link)) {
-                if ($link[0] === $navlogo) {
+                if ($link[0] === DPUNIVERSE_NAVLOGO) {
                     $link[0] = dptext('home');
                 }
                 $link[0] = explode(' ', $link[0]);
@@ -292,7 +472,7 @@ class DpPage extends DpObject
         if (strlen($navitem[1]) >= 6 && substr($navitem[1], 0, 6) == 'uri://') {
             $link = substr($navitem[1], 6);
         } else {
-            $link = $navitem[1] == '/' ? DPUNIVERSE_WWW_URL
+            $link = $navitem[1] == '' ? DPUNIVERSE_WWW_URL
                 : DPSERVER_CLIENT_URL . '?location=' . $navitem[1];
         }
 

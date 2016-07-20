@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <title>DutchPIPE - Standalone example</title>
+        <link rel="stylesheet" href="standalone.css" type="text/css" />
+        <script type="text/javascript" src="dpclient-js.php"></script>
+    </head>
+    <body>
+        <h1>DutchPIPE - Standalone Example</h1>
+        <div class="mylogin"><div id="dploginout"></div></div><br clear="all" />
+        <p>This is an example of a standalone HTML page which has been made part
+        of this DutchPIPE world.<br />Take a look at the HTML source with your
+        browser. It is done by simply inserting a script in the header of the
+        page.</p>
+        <p>The script automatically places DutchPIPE elements at the bottom of
+        the standalone page:<br />One &lt;div&gt; with the inventory, one for
+        the message area, and one for the login/logout link.</p>
+        <p>You can override the placement by inserting one or more of these
+        empty &lt;div&gt;'s in the page:<br />
+        &lt;div id="dpinventory"&gt;&lt;/div&gt;<br />
+        &lt;div id="dpmessagearea"&gt;&lt;/div&gt;<br />
+        &lt;div id="dploginout"&gt;&lt;/div&gt;</p>
+        <p>Such a &lt;div&gt; will then be replaced by the script with the right
+        HTML.<br />We only used it here to place the login/logout link
+        underneath the page title instead of the bottom of the page.
+        </p>
+        <p><a href="dpclient.php">Home</a> |
+        <a href="dpclient.php?location=/page/showcases.php">Showcases</a></p>
+    </body>
+</html>

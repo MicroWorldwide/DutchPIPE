@@ -12,9 +12,9 @@
  * @package    DutchPIPE
  * @subpackage lib
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpserver.php 77 2006-07-13 20:39:04Z ls $
+ * @version    Subversion: $Id: dpserver.php 185 2007-06-09 21:53:43Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpclient.php, dpuniverse.php
  */
@@ -37,9 +37,9 @@ error_reporting(E_ALL | E_STRICT);
  * @package    DutchPIPE
  * @subpackage lib
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: @package_version@
+ * @version    Release: 0.2.0
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpclient.php, dpuniverse.php
  */
@@ -52,7 +52,7 @@ final class DpServer
      private $mMsgsock;
 
     /**
-     * @var         resource  Used to show server status info on the command line
+     * @var         resource  Used to show server status info on the cmd line
      * @access      private
      */
     private $mShowedStatusHeader = 0;
@@ -95,6 +95,8 @@ final class DpServer
         require_once($iniFile);
 
         error_reporting(DPSERVER_ERROR_REPORTING);
+
+        ini_set('memory_limit', DPSERVER_MEMORY_LIMIT);
 
         /* Allow the script to hang around waiting for connections */
         set_time_limit(DPSERVER_MAXUPTIME);
@@ -327,32 +329,10 @@ final class DpServer
     private function _showStatus(&$universe)
     {
         if (DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE === DPSERVER_DEBUG_TYPE) {
-            $this->_showStatusMemoryGetUsage($universe);
+            $universe->showStatusMemoryGetUsage();
         } elseif (DPSERVER_DEBUG_TYPE_GETRUSAGE === DPSERVER_DEBUG_TYPE) {
             $this->_showStatusMemoryGetrusage($universe);
         }
-    }
-
-    /**
-     * Shows a line with memory and universe info
-     *
-     * @param       object    &$universe  An instance of DpUniverse
-     */
-    private function _showStatusMemoryGetUsage(&$universe)
-    {
-        if (!function_exists('memory_get_usage')) {
-            return;
-        }
-
-        $info = $universe->getUniverseInfo();
-
-        print_f("Memory: %uKB KB  #Objects: %u  #Users: %u  #Environments: %u  "
-            . "#Timeouts: %u\n",
-            round($info['memory_usage'] / 1024),
-            sizeof($info['nr_of_objects']),
-            sizeof($info['nr_of_users']),
-            sizeof($info['nr_of_environments']),
-            sizeof($info['nr_of_timeouts']));
     }
 
     /**
@@ -373,9 +353,9 @@ final class DpServer
         $stime_after = (int)$dat["ru_stime.tv_sec"]*1e6 +
             (int)$dat["ru_stime.tv_usec"];
 
-        $dat["ru_utime"] = number_format(($utime_after - $utime_before) /
+        $dat["ru_utime"] = number_format(($utime_after - $this->mUtimeBefore) /
             1000000, 2) . 's';
-        $dat["ru_stime"] = number_format(($stime_after - $stime_before) /
+        $dat["ru_stime"] = number_format(($stime_after - $this->mStimeBefore) /
             1000000, 2) . 's';
         $dat["ru_maxrss"] = $dat["ru_maxrss"] . 'kb';
         unset($dat['ru_oublock']);

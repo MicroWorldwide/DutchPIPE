@@ -12,7 +12,7 @@
  * @package    DutchPIPE
  * @subpackage lib
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
  * @version    Subversion: $Id: dpfunctions.php 15 2006-05-18 21:50:46Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE

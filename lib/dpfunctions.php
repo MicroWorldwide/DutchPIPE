@@ -12,9 +12,9 @@
  * @package    DutchPIPE
  * @subpackage lib
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpfunctions.php 77 2006-07-13 20:39:04Z ls $
+ * @version    Subversion: $Id: dpfunctions.php 159 2007-06-05 22:49:56Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php
  */
@@ -74,6 +74,21 @@ function &get_current_dpuniverse()
 }
 
 /**
+ * Initializes a new DutchPIPE property in an object
+ *
+ * Initializes a property which can be accessed in various ways.
+ *
+ * @param      mixed     $value      the initial value of the property if any
+ * @param      string    $setter     optional method to call when setting value
+ * @param      string    $getter     optional method to clal for retreival
+ * @return     array     A custom data structure, don't tamper with it
+*/
+function new_dp_property($value = NULL, $setter = NULL, $getter = NULL)
+{
+    return array('new_dp_property', $value, $setter, $getter);
+}
+
+/**
  * Includes universe object
  *
  * This is a wrapper around require_once. You can only inherit in
@@ -89,6 +104,21 @@ function &get_current_dpuniverse()
  */
 function inherit($path)
 {
+    /* PHP 5.1.5 kludge symlink bug fix */
+    $files = get_included_files();
+    $pos = strrpos($path, '/');
+    if (FALSE !== $pos && $pos != strlen($path) -1) {
+        $file = substr($path, $pos + 1);
+    }
+    foreach ($files as $f) {
+        $pos = strrpos($f, '/');
+        if (FALSE !== $pos && $pos != strlen($f) -1) {
+            if ($file === substr($f, $pos + 1)) {
+                return;
+            }
+        }
+    }
+
     require_once(DPUNIVERSE_PREFIX_PATH . $path);
 }
 
@@ -119,5 +149,59 @@ function is_whole_number($var)
        }
    }
    return TRUE;
+}
+
+/**
+ * Gets a short, descriptive string for an age in seconds
+ *
+ * This method is used for example to show the age of users. A new user could
+ * just be "1 minute and 15 seconds" old, while addicts could be hanging around
+ * for "2 years, 74 days and 20 hours".
+ *
+ * @param      int       $age        number of seconds
+ * @return     string    Short, descriptive age string
+ */
+function get_age2string($age)
+{
+    $rest_age= $age;
+
+    $rval = array();
+    if ($age >= 31536000) {
+        $tmp = floor($age / 31536000);
+        $rval[] = 1 === $tmp ? dptext('1 year') : dptext('%d years', $tmp);
+        $rest_age = $age % 31536000;
+    }
+    if ($rest_age >= 86400) {
+        $tmp = floor($rest_age / 86400);
+        $rval[] = 1 === $tmp ? dptext('1 day') : dptext('%d days', $tmp);
+        $rest_age = $rest_age % 86400;
+    }
+    if ($rest_age >= 3600) {
+        $tmp = floor($rest_age / 3600);
+        $rval[] = 1 === $tmp ? dptext('1 hour') : dptext('%d hours', $tmp);
+        $rest_age = $rest_age % 3600;
+    }
+
+    if ($age < 31536000) {
+        if ($rest_age >= 60) {
+            $tmp = floor($rest_age / 60);
+            $rval[] = 1 === $tmp ? dptext('1 minute')
+                : dptext('%d minutes', $tmp);
+            $rest_age = $rest_age % 60;
+        }
+        if ($age < 86400) {
+            $rval[] = 1 === $rest_age ? dptext('1 second')
+                : dptext('%d seconds', $rest_age);
+        }
+    }
+
+    if (1 === ($sz = count($rval))) {
+        return $rval[0];
+    }
+
+    $last = $rval[$sz - 1];
+    $rval = array_slice($rval, 0, -1);
+
+    return implode(', ', $rval) . ' ' . dptext('and') . ' ' . $last;
 }
 ?>

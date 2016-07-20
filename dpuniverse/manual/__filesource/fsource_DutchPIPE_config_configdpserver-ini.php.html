@@ -39,9 +39,9 @@
 <li class="src-li"><div class="src-line"><a name="a18"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@package</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;DutchPIPE</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a19"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@subpackage</span><span class="src-doc">&nbsp;config</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a20"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@author</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lennert&nbsp;Stock&nbsp;&lt;ls@dutchpipe.org&gt;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a21"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@copyright</span><span class="src-doc">&nbsp;&nbsp;2006&nbsp;Lennert&nbsp;Stock</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a21"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@copyright</span><span class="src-doc">&nbsp;&nbsp;2006,&nbsp;2007&nbsp;Lennert&nbsp;Stock</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a22"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@license</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;http://dutchpipe.org/license/1_0.txt&nbsp;&nbsp;DutchPIPE&nbsp;License</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a23"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@version</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;Subversion:&nbsp;$Id:&nbsp;dpserver-ini.php&nbsp;91&nbsp;2006-08-07&nbsp;13:41:53Z&nbsp;ls&nbsp;$</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a23"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@version</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;Subversion:&nbsp;$Id:&nbsp;dpserver-ini.php&nbsp;195&nbsp;2007-06-10&nbsp;22:09:08Z&nbsp;ls&nbsp;$</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a24"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@link</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://dutchpipe.org/manual/package/DutchPIPE</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a25"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@tutorial</span><span class="src-doc">&nbsp;&nbsp;&nbsp;DutchPIPE/DutchPIPE.pkg</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a26"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dpserver.php,&nbsp;dpclient.php,&nbsp;dpuniverse-ini.php</span></div></li>
@@ -58,391 +58,422 @@
 <li class="src-li"><div class="src-line"><a name="a37"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_HOST_URL'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'http://www.yourdomain.com'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a38"></a><span class="src-comm">//define('DPSERVER_HOST_URL',&nbsp;'http://localhost');</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a39"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a40"></a><span class="src-key">if&nbsp;</span><span class="src-sym">(</span><span class="src-sym">!</span><a href="http://www.php.net/defined">defined</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_CLIENT_URL'</span><span class="src-sym">))&nbsp;</span><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a40"></a><span class="src-key">if&nbsp;</span><span class="src-sym">(</span><span class="src-sym">!</span><a href="http://www.php.net/defined">defined</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_CLIENT_DIR'</span><span class="src-sym">))&nbsp;</span><span class="src-sym">{</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a41"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-doc">/**</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a42"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;The&nbsp;rest&nbsp;of&nbsp;the&nbsp;URL&nbsp;for&nbsp;the&nbsp;client&nbsp;PHP&nbsp;script,&nbsp;/dpclient.php&nbsp;by&nbsp;default</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a43"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a44"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_HOST_URL,&nbsp;DPSERVER_CLIENTJS_URL</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a45"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a46"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_CLIENT_URL'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'/dpclient.php'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a46"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_CLIENT_DIR'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a47"></a><span class="src-sym">}</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a48"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a49"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a50"></a><span class="src-doc">&nbsp;*&nbsp;The&nbsp;rest&nbsp;of&nbsp;the&nbsp;URL&nbsp;for&nbsp;the&nbsp;client&nbsp;Javascript,&nbsp;/dpclient-js.php&nbsp;by&nbsp;default</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a51"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a52"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_HOST_URL,&nbsp;DPSERVER_CLIENTJS_URL</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a53"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a54"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_CLIENTJS_URL'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'/dpclient-js.php'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a55"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a56"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a57"></a><span class="src-doc">&nbsp;*&nbsp;The&nbsp;name&nbsp;of&nbsp;the&nbsp;cookie&nbsp;DutchPIPE&nbsp;uses&nbsp;to&nbsp;store&nbsp;user&nbsp;information</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a58"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a59"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_COOKIE_NAME'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'dutchpipe'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a60"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a61"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a62"></a><span class="src-doc">&nbsp;*&nbsp;The&nbsp;timezone&nbsp;for&nbsp;the&nbsp;DutchPIPE&nbsp;site</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a63"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a64"></a><span class="src-doc">&nbsp;*&nbsp;Use&nbsp;an&nbsp;identifier&nbsp;as&nbsp;definied&nbsp;by</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a65"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;http://www.php.net/manual/en/timezones.php}</span><span class="src-doc">.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a66"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a67"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_TIMEZONE'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'Europe/Amsterdam'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a68"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a69"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a70"></a><span class="src-doc">&nbsp;*&nbsp;Type&nbsp;of&nbsp;socket&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;dpserver.php}</span><span class="src-doc">&nbsp;and&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;dpclient.php}</span><span class="src-doc">&nbsp;use&nbsp;to</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a71"></a><span class="src-doc">&nbsp;*&nbsp;communicate</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a72"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a73"></a><span class="src-doc">&nbsp;*&nbsp;See&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;http://www.php.net/socket_create}</span><span class="src-doc">&nbsp;for&nbsp;more&nbsp;information.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a74"></a><span class="src-doc">&nbsp;*&nbsp;For&nbsp;*NIX,&nbsp;use&nbsp;AF_UNIX,&nbsp;for&nbsp;Windows,&nbsp;use&nbsp;AF_INET.&nbsp;AF_UNIX&nbsp;is&nbsp;a&nbsp;file&nbsp;based</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a75"></a><span class="src-doc">&nbsp;*&nbsp;socket,&nbsp;AF_INET&nbsp;uses&nbsp;a&nbsp;local&nbsp;connection&nbsp;(can&nbsp;be&nbsp;remote&nbsp;but&nbsp;that&nbsp;is&nbsp;untested).</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a76"></a><span class="src-doc">&nbsp;*&nbsp;AF_UNIX&nbsp;is&nbsp;much&nbsp;faster&nbsp;but&nbsp;isn't&nbsp;supported&nbsp;on&nbsp;Windows.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a77"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a78"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_PATH,&nbsp;DPSERVER_SOCKET_ADDRESS,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a79"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_PORT,&nbsp;DPSERVER_MAX_SOCKET_BACKLOG,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a80"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKERR_MSG</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a81"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a82"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_SOCKET_TYPE'</span><span class="src-sym">,&nbsp;</span><span class="src-id">AF_UNIX</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a83"></a><span class="src-comm">//define('DPSERVER_SOCKET_TYPE',&nbsp;AF_INET);</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a84"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a85"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a86"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;file&nbsp;used&nbsp;for&nbsp;socket&nbsp;connections</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a87"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a88"></a><span class="src-doc">&nbsp;*&nbsp;This&nbsp;file&nbsp;socket&nbsp;is&nbsp;used&nbsp;beween&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;dpserver.php}</span><span class="src-doc">&nbsp;and&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;dpclient.php}</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a89"></a><span class="src-doc">&nbsp;*&nbsp;for&nbsp;AF_UNIX&nbsp;type.&nbsp;Reads&nbsp;and&nbsp;writes&nbsp;to&nbsp;this&nbsp;open&nbsp;file&nbsp;to&nbsp;communicate.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a90"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a91"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_TYPE,&nbsp;DPSERVER_SOCKET_ADDRESS,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a92"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_PORT,&nbsp;DPSERVER_MAX_SOCKET_BACKLOG,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a93"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKERR_MSG</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a94"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a95"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_SOCKET_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'/tmp/dutchpipe.sock'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a96"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a97"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a98"></a><span class="src-doc">&nbsp;*&nbsp;IP&nbsp;address&nbsp;for&nbsp;AF_INET&nbsp;type</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a99"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a100"></a><span class="src-doc">&nbsp;*&nbsp;If&nbsp;you&nbsp;run&nbsp;DutchPIPE&nbsp;on&nbsp;Windows,&nbsp;this&nbsp;value&nbsp;will&nbsp;always&nbsp;be&nbsp;used&nbsp;in</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a101"></a><span class="src-doc">&nbsp;*&nbsp;combination&nbsp;with&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_SOCKET_PORT}</span><span class="src-doc">.&nbsp;The&nbsp;DutchPIPE&nbsp;server&nbsp;will&nbsp;run</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a102"></a><span class="src-doc">&nbsp;*&nbsp;on&nbsp;your&nbsp;machine&nbsp;using&nbsp;the&nbsp;address&nbsp;and&nbsp;port&nbsp;number&nbsp;provided.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a103"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a104"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_TYPE,&nbsp;DPSERVER_SOCKET_PATH,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a105"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_PORT,&nbsp;DPSERVER_MAX_SOCKET_BACKLOG,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a106"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKERR_MSG</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a107"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a108"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_SOCKET_ADDRESS'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'127.0.0.1'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a109"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a110"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a111"></a><span class="src-doc">&nbsp;*&nbsp;Port&nbsp;number&nbsp;for&nbsp;AF_INET&nbsp;type</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a112"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a113"></a><span class="src-doc">&nbsp;*&nbsp;If&nbsp;you&nbsp;run&nbsp;DutchPIPE&nbsp;on&nbsp;Windows,&nbsp;this&nbsp;value&nbsp;will&nbsp;always&nbsp;be&nbsp;used&nbsp;in</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a114"></a><span class="src-doc">&nbsp;*&nbsp;combination&nbsp;with&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_SOCKET_ADDRESS}</span><span class="src-doc">.&nbsp;The&nbsp;DutchPIPE&nbsp;server&nbsp;will</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a115"></a><span class="src-doc">&nbsp;*&nbsp;run&nbsp;on&nbsp;your&nbsp;machine&nbsp;using&nbsp;the&nbsp;address&nbsp;and&nbsp;port&nbsp;number&nbsp;provided.&nbsp;You&nbsp;should</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a116"></a><span class="src-doc">&nbsp;*&nbsp;check&nbsp;if&nbsp;the&nbsp;port&nbsp;number&nbsp;is&nbsp;not&nbsp;in&nbsp;use&nbsp;by&nbsp;another&nbsp;application.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a117"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a118"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_TYPE,&nbsp;DPSERVER_SOCKET_PATH,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a119"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_ADDRESS,&nbsp;DPSERVER_MAX_SOCKET_BACKLOG,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a120"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKERR_MSG</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a121"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a122"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_SOCKET_PORT'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'3333'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a123"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a124"></a><span class="src-comm">/*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a125"></a><span class="src-comm">&nbsp;*&nbsp;If&nbsp;you&nbsp;just&nbsp;installed&nbsp;DutchPIPE,&nbsp;haven't&nbsp;changed&nbsp;the&nbsp;directory&nbsp;structure</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a126"></a><span class="src-comm">&nbsp;*&nbsp;and&nbsp;just&nbsp;want&nbsp;it&nbsp;up&nbsp;and&nbsp;running,&nbsp;you're&nbsp;done&nbsp;here.&nbsp;Now&nbsp;adjust</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a127"></a><span class="src-comm">&nbsp;*&nbsp;{@link&nbsp;dpuniverse-ini.php}.&nbsp;If&nbsp;you&nbsp;want&nbsp;multilingual&nbsp;support,&nbsp;see&nbsp;further</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a128"></a><span class="src-comm">&nbsp;*&nbsp;below.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a129"></a><span class="src-comm">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a130"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a131"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a132"></a><span class="src-doc">&nbsp;*&nbsp;The&nbsp;maximum&nbsp;of&nbsp;backlog&nbsp;incoming&nbsp;connections&nbsp;queued&nbsp;for&nbsp;processing</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a133"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a134"></a><span class="src-doc">&nbsp;*&nbsp;Used&nbsp;by&nbsp;socket_listen&nbsp;in&nbsp;dpserver.php.&nbsp;See</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a135"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;http://www.php.net/socket_listen}</span><span class="src-doc">&nbsp;for&nbsp;more&nbsp;information.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a49"></a><span class="src-key">if&nbsp;</span><span class="src-sym">(</span><span class="src-sym">!</span><a href="http://www.php.net/defined">defined</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_CLIENT_FILENAME'</span><span class="src-sym">))&nbsp;</span><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a50"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a51"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;The&nbsp;rest&nbsp;of&nbsp;the&nbsp;URL&nbsp;for&nbsp;the&nbsp;client&nbsp;PHP&nbsp;script,&nbsp;/dpclient.php&nbsp;by&nbsp;default</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a52"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a53"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_HOST_URL,&nbsp;DPSERVER_CLIENTJS_URL</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a54"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a55"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_CLIENT_FILENAME'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'dpclient.php'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a56"></a><span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a57"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a58"></a><span class="src-key">if&nbsp;</span><span class="src-sym">(</span><span class="src-sym">!</span><a href="http://www.php.net/defined">defined</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_CLIENT_URL'</span><span class="src-sym">))&nbsp;</span><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a59"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a60"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;The&nbsp;rest&nbsp;of&nbsp;the&nbsp;URL&nbsp;for&nbsp;the&nbsp;client&nbsp;PHP&nbsp;script,&nbsp;/dpclient.php&nbsp;by&nbsp;default</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a61"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a62"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_HOST_URL,&nbsp;DPSERVER_CLIENTJS_URL</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a63"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a64"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_CLIENT_URL'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_CLIENT_DIR&nbsp;</span>.</div></li>
+<li class="src-li"><div class="src-line"><a name="a65"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-id">DPSERVER_CLIENT_FILENAME</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a66"></a><span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a67"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a68"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a69"></a><span class="src-doc">&nbsp;*&nbsp;The&nbsp;rest&nbsp;of&nbsp;the&nbsp;URL&nbsp;for&nbsp;the&nbsp;client&nbsp;Javascript,&nbsp;/dpclient-js.php&nbsp;by&nbsp;default</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a70"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a71"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_HOST_URL,&nbsp;DPSERVER_CLIENTJS_URL</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a72"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a73"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_CLIENTJS_URL'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_CLIENT_DIR&nbsp;</span>.&nbsp;<span class="src-str">'dpclient-js.php'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a74"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a75"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a76"></a><span class="src-doc">&nbsp;*&nbsp;The&nbsp;name&nbsp;of&nbsp;the&nbsp;cookie&nbsp;DutchPIPE&nbsp;uses&nbsp;to&nbsp;store&nbsp;user&nbsp;information</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a77"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a78"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_COOKIE_NAME'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'dutchpipe'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a79"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a80"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a81"></a><span class="src-doc">&nbsp;*&nbsp;The&nbsp;timezone&nbsp;for&nbsp;the&nbsp;DutchPIPE&nbsp;site</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a82"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a83"></a><span class="src-doc">&nbsp;*&nbsp;Use&nbsp;an&nbsp;identifier&nbsp;as&nbsp;definied&nbsp;by</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a84"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;http://www.php.net/manual/en/timezones.php}</span><span class="src-doc">.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a85"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a86"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_TIMEZONE'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'Europe/Amsterdam'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a87"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a88"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a89"></a><span class="src-doc">&nbsp;*&nbsp;Type&nbsp;of&nbsp;socket&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;dpserver.php}</span><span class="src-doc">&nbsp;and&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;dpclient.php}</span><span class="src-doc">&nbsp;use&nbsp;to</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a90"></a><span class="src-doc">&nbsp;*&nbsp;communicate</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a91"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a92"></a><span class="src-doc">&nbsp;*&nbsp;See&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;http://www.php.net/socket_create}</span><span class="src-doc">&nbsp;for&nbsp;more&nbsp;information.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a93"></a><span class="src-doc">&nbsp;*&nbsp;For&nbsp;*NIX,&nbsp;use&nbsp;AF_UNIX,&nbsp;for&nbsp;Windows,&nbsp;use&nbsp;AF_INET.&nbsp;AF_UNIX&nbsp;is&nbsp;a&nbsp;file&nbsp;based</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a94"></a><span class="src-doc">&nbsp;*&nbsp;socket,&nbsp;AF_INET&nbsp;uses&nbsp;a&nbsp;local&nbsp;connection&nbsp;(can&nbsp;be&nbsp;remote&nbsp;but&nbsp;that&nbsp;is&nbsp;untested).</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a95"></a><span class="src-doc">&nbsp;*&nbsp;AF_UNIX&nbsp;is&nbsp;much&nbsp;faster&nbsp;but&nbsp;isn't&nbsp;supported&nbsp;on&nbsp;Windows.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a96"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a97"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_PATH,&nbsp;DPSERVER_SOCKET_ADDRESS,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a98"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_PORT,&nbsp;DPSERVER_MAX_SOCKET_BACKLOG,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a99"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKERR_MSG</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a100"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a101"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_SOCKET_TYPE'</span><span class="src-sym">,&nbsp;</span><span class="src-id">AF_INET</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a102"></a><span class="src-comm">//define('DPSERVER_SOCKET_TYPE',&nbsp;AF_UNIX);</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a103"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a104"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a105"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;file&nbsp;used&nbsp;for&nbsp;socket&nbsp;connections</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a106"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a107"></a><span class="src-doc">&nbsp;*&nbsp;This&nbsp;file&nbsp;socket&nbsp;is&nbsp;used&nbsp;beween&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;dpserver.php}</span><span class="src-doc">&nbsp;and&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;dpclient.php}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a108"></a><span class="src-doc">&nbsp;*&nbsp;for&nbsp;AF_UNIX&nbsp;type.&nbsp;Reads&nbsp;and&nbsp;writes&nbsp;to&nbsp;this&nbsp;open&nbsp;file&nbsp;to&nbsp;communicate.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a109"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a110"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_TYPE,&nbsp;DPSERVER_SOCKET_ADDRESS,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a111"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_PORT,&nbsp;DPSERVER_MAX_SOCKET_BACKLOG,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a112"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKERR_MSG</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a113"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a114"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_SOCKET_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'/tmp/dutchpipe.sock'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a115"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a116"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a117"></a><span class="src-doc">&nbsp;*&nbsp;IP&nbsp;address&nbsp;for&nbsp;AF_INET&nbsp;type</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a118"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a119"></a><span class="src-doc">&nbsp;*&nbsp;If&nbsp;you&nbsp;run&nbsp;DutchPIPE&nbsp;on&nbsp;Windows,&nbsp;this&nbsp;value&nbsp;will&nbsp;always&nbsp;be&nbsp;used&nbsp;in</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a120"></a><span class="src-doc">&nbsp;*&nbsp;combination&nbsp;with&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_SOCKET_PORT}</span><span class="src-doc">.&nbsp;The&nbsp;DutchPIPE&nbsp;server&nbsp;will&nbsp;run</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a121"></a><span class="src-doc">&nbsp;*&nbsp;on&nbsp;your&nbsp;machine&nbsp;using&nbsp;the&nbsp;address&nbsp;and&nbsp;port&nbsp;number&nbsp;provided.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a122"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a123"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_TYPE,&nbsp;DPSERVER_SOCKET_PATH,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a124"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_PORT,&nbsp;DPSERVER_MAX_SOCKET_BACKLOG,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a125"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKERR_MSG</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a126"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a127"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_SOCKET_ADDRESS'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'127.0.0.1'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a128"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a129"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a130"></a><span class="src-doc">&nbsp;*&nbsp;Port&nbsp;number&nbsp;for&nbsp;AF_INET&nbsp;type</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a131"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a132"></a><span class="src-doc">&nbsp;*&nbsp;If&nbsp;you&nbsp;run&nbsp;DutchPIPE&nbsp;on&nbsp;Windows,&nbsp;this&nbsp;value&nbsp;will&nbsp;always&nbsp;be&nbsp;used&nbsp;in</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a133"></a><span class="src-doc">&nbsp;*&nbsp;combination&nbsp;with&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_SOCKET_ADDRESS}</span><span class="src-doc">.&nbsp;The&nbsp;DutchPIPE&nbsp;server&nbsp;will</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a134"></a><span class="src-doc">&nbsp;*&nbsp;run&nbsp;on&nbsp;your&nbsp;machine&nbsp;using&nbsp;the&nbsp;address&nbsp;and&nbsp;port&nbsp;number&nbsp;provided.&nbsp;You&nbsp;should</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a135"></a><span class="src-doc">&nbsp;*&nbsp;check&nbsp;if&nbsp;the&nbsp;port&nbsp;number&nbsp;is&nbsp;not&nbsp;in&nbsp;use&nbsp;by&nbsp;another&nbsp;application.</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a136"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a137"></a><span class="src-doc">&nbsp;*&nbsp;You&nbsp;should&nbsp;probably&nbsp;leave&nbsp;this&nbsp;untouched.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a138"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a139"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_TYPE,&nbsp;DPSERVER_SOCKET_PATH,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a140"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_ADDRESS,&nbsp;DPSERVER_SOCKET_PORT</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a141"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a142"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_MAX_SOCKET_BACKLOG'</span><span class="src-sym">,&nbsp;</span><span class="src-num">5</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a143"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a144"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a145"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;root&nbsp;of&nbsp;the&nbsp;DutchPIPE&nbsp;installation</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a146"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a147"></a><span class="src-doc">&nbsp;*&nbsp;Defaults&nbsp;to&nbsp;the&nbsp;mother&nbsp;directory&nbsp;of&nbsp;the&nbsp;directory&nbsp;this&nbsp;file&nbsp;is&nbsp;in.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a148"></a><span class="src-doc">&nbsp;*&nbsp;Leave&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a149"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a150"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_ROOT_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">dirname</span><span class="src-sym">(</span><span class="src-id">realpath</span><span class="src-sym">(</span>__FILE__&nbsp;.&nbsp;<span class="src-str">'/..'</span><span class="src-sym">))&nbsp;</span>.&nbsp;<span class="src-str">'/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a151"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a152"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a153"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;root&nbsp;of&nbsp;the&nbsp;DutchPIPE&nbsp;universe</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a154"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a155"></a><span class="src-doc">&nbsp;*&nbsp;Leave&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a156"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a157"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_DPUNIVERSE_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_ROOT_PATH&nbsp;</span>.&nbsp;<span class="src-str">'dpuniverse/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a158"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a159"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a160"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;directory&nbsp;with&nbsp;server&nbsp;and&nbsp;universe&nbsp;settings</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a161"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a162"></a><span class="src-doc">&nbsp;*&nbsp;Leave&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a163"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a164"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_DPUNIVERSE_CONFIG_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_ROOT_PATH&nbsp;</span>.&nbsp;<span class="src-str">'config/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a165"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a166"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a167"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;library&nbsp;directory</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a168"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a169"></a><span class="src-doc">&nbsp;*&nbsp;Leave&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a170"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a171"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_LIB_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_ROOT_PATH&nbsp;</span>.&nbsp;<span class="src-str">'lib/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a172"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a173"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a174"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;file&nbsp;with&nbsp;the&nbsp;DutchPIPE&nbsp;Server&nbsp;class</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a175"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a176"></a><span class="src-doc">&nbsp;*&nbsp;Leave&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a177"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a178"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_DPSERVERCLASS_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_LIB_PATH&nbsp;</span>.&nbsp;<span class="src-str">'dpserver.php'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a179"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a180"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a181"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;file&nbsp;with&nbsp;the&nbsp;DutchPIPE&nbsp;Universe&nbsp;class</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a182"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a183"></a><span class="src-doc">&nbsp;*&nbsp;Leave&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a184"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a185"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_DPUNIVERSECLASS_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_LIB_PATH&nbsp;</span>.&nbsp;<span class="src-str">'dpuniverse.php'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a186"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a187"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a188"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;directory&nbsp;with&nbsp;HTML&nbsp;templates</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a189"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a190"></a><span class="src-doc">&nbsp;*&nbsp;Leave&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a191"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a192"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_TEMPLATE_FILE</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a193"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a194"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_TEMPLATE_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_ROOT_PATH&nbsp;</span>.&nbsp;<span class="src-str">'template/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a195"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a196"></a><span class="src-key">if&nbsp;</span><span class="src-sym">(</span><span class="src-sym">!</span><a href="http://www.php.net/defined">defined</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_TEMPLATE_FILE'</span><span class="src-sym">))&nbsp;</span><span class="src-sym">{</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a197"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a198"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;Filename&nbsp;of&nbsp;the&nbsp;default&nbsp;template&nbsp;in&nbsp;the&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_TEMPLATE_PATH}</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a199"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;directory</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a200"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a201"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_TEMPLATE_PATH</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a202"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a203"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_TEMPLATE_FILE'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'dpdefault.tpl'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a204"></a><span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a137"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_TYPE,&nbsp;DPSERVER_SOCKET_PATH,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a138"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_ADDRESS,&nbsp;DPSERVER_MAX_SOCKET_BACKLOG,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a139"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKERR_MSG</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a140"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a141"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_SOCKET_PORT'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'3333'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a142"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a143"></a><span class="src-comm">/*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a144"></a><span class="src-comm">&nbsp;*&nbsp;If&nbsp;you&nbsp;just&nbsp;installed&nbsp;DutchPIPE,&nbsp;haven't&nbsp;changed&nbsp;the&nbsp;directory&nbsp;structure</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a145"></a><span class="src-comm">&nbsp;*&nbsp;and&nbsp;just&nbsp;want&nbsp;it&nbsp;up&nbsp;and&nbsp;running,&nbsp;you're&nbsp;done&nbsp;here.&nbsp;Now&nbsp;adjust</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a146"></a><span class="src-comm">&nbsp;*&nbsp;{@link&nbsp;dpuniverse-ini.php}.&nbsp;If&nbsp;you&nbsp;want&nbsp;multilingual&nbsp;support,&nbsp;see&nbsp;further</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a147"></a><span class="src-comm">&nbsp;*&nbsp;below.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a148"></a><span class="src-comm">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a149"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a150"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a151"></a><span class="src-doc">&nbsp;*&nbsp;The&nbsp;maximum&nbsp;of&nbsp;backlog&nbsp;incoming&nbsp;connections&nbsp;queued&nbsp;for&nbsp;processing</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a152"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a153"></a><span class="src-doc">&nbsp;*&nbsp;Used&nbsp;by&nbsp;socket_listen&nbsp;in&nbsp;dpserver.php.&nbsp;See</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a154"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;http://www.php.net/socket_listen}</span><span class="src-doc">&nbsp;for&nbsp;more&nbsp;information.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a155"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a156"></a><span class="src-doc">&nbsp;*&nbsp;You&nbsp;should&nbsp;probably&nbsp;leave&nbsp;this&nbsp;untouched.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a157"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a158"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_TYPE,&nbsp;DPSERVER_SOCKET_PATH,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a159"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_ADDRESS,&nbsp;DPSERVER_SOCKET_PORT</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a160"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a161"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_MAX_SOCKET_BACKLOG'</span><span class="src-sym">,&nbsp;</span><span class="src-num">5</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a162"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a163"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a164"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;root&nbsp;of&nbsp;the&nbsp;DutchPIPE&nbsp;installation</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a165"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a166"></a><span class="src-doc">&nbsp;*&nbsp;Defaults&nbsp;to&nbsp;the&nbsp;mother&nbsp;directory&nbsp;of&nbsp;the&nbsp;directory&nbsp;this&nbsp;file&nbsp;is&nbsp;in.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a167"></a><span class="src-doc">&nbsp;*&nbsp;Leave&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a168"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a169"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_ROOT_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">realpath</span><span class="src-sym">(</span><span class="src-id">dirname</span><span class="src-sym">(</span>__FILE__<span class="src-sym">)&nbsp;</span>.&nbsp;<span class="src-str">'/..'</span><span class="src-sym">)&nbsp;</span>.&nbsp;<span class="src-str">'/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a170"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a171"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a172"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;root&nbsp;of&nbsp;the&nbsp;DutchPIPE&nbsp;universe</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a173"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a174"></a><span class="src-doc">&nbsp;*&nbsp;Leave&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a175"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a176"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_DPUNIVERSE_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_ROOT_PATH&nbsp;</span>.&nbsp;<span class="src-str">'dpuniverse/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a177"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a178"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a179"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;directory&nbsp;with&nbsp;server&nbsp;and&nbsp;universe&nbsp;settings</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a180"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a181"></a><span class="src-doc">&nbsp;*&nbsp;Leave&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a182"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a183"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_DPUNIVERSE_CONFIG_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_ROOT_PATH&nbsp;</span>.&nbsp;<span class="src-str">'config/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a184"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a185"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a186"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;library&nbsp;directory</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a187"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a188"></a><span class="src-doc">&nbsp;*&nbsp;Leave&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a189"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a190"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_LIB_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_ROOT_PATH&nbsp;</span>.&nbsp;<span class="src-str">'lib/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a191"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a192"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a193"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;file&nbsp;with&nbsp;the&nbsp;DutchPIPE&nbsp;Server&nbsp;class</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a194"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a195"></a><span class="src-doc">&nbsp;*&nbsp;Leave&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a196"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a197"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_DPSERVERCLASS_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_LIB_PATH&nbsp;</span>.&nbsp;<span class="src-str">'dpserver.php'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a198"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a199"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a200"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;file&nbsp;with&nbsp;the&nbsp;DutchPIPE&nbsp;Universe&nbsp;class</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a201"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a202"></a><span class="src-doc">&nbsp;*&nbsp;Leave&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a203"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a204"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_DPUNIVERSECLASS_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_LIB_PATH&nbsp;</span>.&nbsp;<span class="src-str">'dpuniverse.php'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a205"></a>&nbsp;</div></li>
 <li class="src-li"><div class="src-line"><a name="a206"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a207"></a><span class="src-doc">&nbsp;*&nbsp;Enable&nbsp;internationalization/localization&nbsp;support&nbsp;with&nbsp;dynamic&nbsp;gettext?</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a207"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;directory&nbsp;with&nbsp;HTML&nbsp;templates</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a208"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a209"></a><span class="src-doc">&nbsp;*&nbsp;This&nbsp;has&nbsp;a&nbsp;speed&nbsp;penalty.&nbsp;Set&nbsp;to&nbsp;TRUE&nbsp;to&nbsp;enable&nbsp;or&nbsp;FALSE&nbsp;to&nbsp;disable.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a209"></a><span class="src-doc">&nbsp;*&nbsp;Leave&nbsp;this&nbsp;untouched&nbsp;if&nbsp;the&nbsp;DutchPIPE&nbsp;directory&nbsp;structure&nbsp;wasn't&nbsp;changed.</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a210"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a211"></a><span class="src-doc">&nbsp;*&nbsp;Different&nbsp;languages&nbsp;are&nbsp;supported&nbsp;using&nbsp;GNU&nbsp;gettext,&nbsp;see</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a212"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;http://www.php.net/gettext}</span><span class="src-doc">.&nbsp;Because&nbsp;PHP&nbsp;is&nbsp;an&nbsp;interpreted&nbsp;language,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a213"></a><span class="src-doc">&nbsp;*&nbsp;gettext&nbsp;slows&nbsp;things&nbsp;down&nbsp;as&nbsp;calls&nbsp;are&nbsp;dynamic&nbsp;(although&nbsp;it's&nbsp;quite&nbsp;fast).</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a214"></a><span class="src-doc">&nbsp;*&nbsp;There&nbsp;are&nbsp;some&nbsp;tools&nbsp;around&nbsp;to&nbsp;make&nbsp;static&nbsp;PHP&nbsp;translations,&nbsp;but&nbsp;this&nbsp;has&nbsp;not</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a215"></a><span class="src-doc">&nbsp;*&nbsp;been&nbsp;explored&nbsp;yet.&nbsp;Also,&nbsp;it&nbsp;is&nbsp;not&nbsp;yet&nbsp;possible&nbsp;to&nbsp;have&nbsp;multiple&nbsp;users&nbsp;use</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a216"></a><span class="src-doc">&nbsp;*&nbsp;different&nbsp;languages&nbsp;on&nbsp;one&nbsp;site.&nbsp;It's&nbsp;in&nbsp;one&nbsp;language.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a217"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a218"></a><span class="src-doc">&nbsp;*&nbsp;Currently,&nbsp;standard&nbsp;English&nbsp;(&quot;en&quot;)&nbsp;and&nbsp;Dutch&nbsp;(&quot;nl_NL&quot;)&nbsp;&nbsp;are&nbsp;part&nbsp;of&nbsp;the</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a219"></a><span class="src-doc">&nbsp;*&nbsp;standard&nbsp;distribution.&nbsp;Also,&nbsp;all&nbsp;texts&nbsp;to&nbsp;translate&nbsp;are&nbsp;in&nbsp;only&nbsp;one&nbsp;file</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a220"></a><span class="src-doc">&nbsp;*&nbsp;called&nbsp;messages.po&nbsp;(this&nbsp;will&nbsp;change&nbsp;in&nbsp;the&nbsp;future).</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a221"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a222"></a><span class="src-doc">&nbsp;*&nbsp;If&nbsp;you'd&nbsp;like&nbsp;to&nbsp;translate&nbsp;for&nbsp;DutchPIPE,&nbsp;base&nbsp;your&nbsp;translation&nbsp;on</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a223"></a><span class="src-doc">&nbsp;*&nbsp;locale/en/LC_MESSAGES/messages.po&nbsp;and&nbsp;please&nbsp;mail&nbsp;your&nbsp;results&nbsp;to</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a224"></a><span class="src-doc">&nbsp;*&nbsp;contributors@dutchpipe.org.&nbsp;As&nbsp;I&nbsp;did&nbsp;with&nbsp;the&nbsp;Dutch&nbsp;translation,&nbsp;you'll</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a225"></a><span class="src-doc">&nbsp;*&nbsp;probably&nbsp;run&nbsp;into&nbsp;a&nbsp;couple&nbsp;of&nbsp;problems&nbsp;getting&nbsp;it&nbsp;exactly&nbsp;right,&nbsp;because</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a226"></a><span class="src-doc">&nbsp;*&nbsp;of&nbsp;presumptions&nbsp;made&nbsp;by&nbsp;the&nbsp;English&nbsp;language&nbsp;system.&nbsp;Please&nbsp;let&nbsp;us&nbsp;know</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a227"></a><span class="src-doc">&nbsp;*&nbsp;so&nbsp;this&nbsp;can&nbsp;be&nbsp;fixed.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a228"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a229"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_LOCALE_PATH,&nbsp;DPSERVER_GETTEXT_DOMAIN,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a230"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_ENCODING,&nbsp;DPSERVER_LOCALE,&nbsp;DPSERVER_LOCALE_FULL</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a231"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a232"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_GETTEXT_ENABLED'</span><span class="src-sym">,&nbsp;</span><span class="src-id">FALSE</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a233"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a234"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a235"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;directory&nbsp;with&nbsp;translations</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a211"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_TEMPLATE_FILE</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a212"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a213"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_TEMPLATE_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_ROOT_PATH&nbsp;</span>.&nbsp;<span class="src-str">'template/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a214"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a215"></a><span class="src-key">if&nbsp;</span><span class="src-sym">(</span><span class="src-sym">!</span><a href="http://www.php.net/defined">defined</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_TEMPLATE_FILE'</span><span class="src-sym">))&nbsp;</span><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a216"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a217"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;Filename&nbsp;of&nbsp;the&nbsp;default&nbsp;template&nbsp;in&nbsp;the&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_TEMPLATE_PATH}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a218"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;directory</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a219"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a220"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_TEMPLATE_PATH</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a221"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a222"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_TEMPLATE_FILE'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'dpdefault.tpl'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a223"></a><span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a224"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a225"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a226"></a><span class="src-doc">&nbsp;*&nbsp;Enable&nbsp;internationalization/localization&nbsp;support&nbsp;with&nbsp;dynamic&nbsp;gettext?</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a227"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a228"></a><span class="src-doc">&nbsp;*&nbsp;This&nbsp;has&nbsp;a&nbsp;speed&nbsp;penalty.&nbsp;Set&nbsp;to&nbsp;TRUE&nbsp;to&nbsp;enable&nbsp;or&nbsp;FALSE&nbsp;to&nbsp;disable.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a229"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a230"></a><span class="src-doc">&nbsp;*&nbsp;Different&nbsp;languages&nbsp;are&nbsp;supported&nbsp;using&nbsp;GNU&nbsp;gettext,&nbsp;see</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a231"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;http://www.php.net/gettext}</span><span class="src-doc">.&nbsp;Because&nbsp;PHP&nbsp;is&nbsp;an&nbsp;interpreted&nbsp;language,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a232"></a><span class="src-doc">&nbsp;*&nbsp;gettext&nbsp;slows&nbsp;things&nbsp;down&nbsp;as&nbsp;calls&nbsp;are&nbsp;dynamic&nbsp;(although&nbsp;it's&nbsp;quite&nbsp;fast).</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a233"></a><span class="src-doc">&nbsp;*&nbsp;There&nbsp;are&nbsp;some&nbsp;tools&nbsp;around&nbsp;to&nbsp;make&nbsp;static&nbsp;PHP&nbsp;translations,&nbsp;but&nbsp;this&nbsp;has&nbsp;not</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a234"></a><span class="src-doc">&nbsp;*&nbsp;been&nbsp;explored&nbsp;yet.&nbsp;Also,&nbsp;it&nbsp;is&nbsp;not&nbsp;yet&nbsp;possible&nbsp;to&nbsp;have&nbsp;multiple&nbsp;users&nbsp;use</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a235"></a><span class="src-doc">&nbsp;*&nbsp;different&nbsp;languages&nbsp;on&nbsp;one&nbsp;site.&nbsp;It's&nbsp;in&nbsp;one&nbsp;language.</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a236"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a237"></a><span class="src-doc">&nbsp;*&nbsp;Used&nbsp;when&nbsp;gettext&nbsp;is&nbsp;enabled.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a238"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a239"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_ENABLED,&nbsp;DPSERVER_GETTEXT_DOMAIN,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a240"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_ENCODING,&nbsp;DPSERVER_LOCALE,&nbsp;DPSERVER_LOCALE_FULL</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a241"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a242"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_GETTEXT_LOCALE_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_ROOT_PATH&nbsp;</span>.&nbsp;<span class="src-str">'locale/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a243"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a244"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a245"></a><span class="src-doc">&nbsp;*&nbsp;Name&nbsp;of&nbsp;translation&nbsp;table&nbsp;(the&nbsp;&quot;domain&quot;&nbsp;in&nbsp;GNU&nbsp;gettext&nbsp;jargon)</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a246"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a247"></a><span class="src-doc">&nbsp;*&nbsp;Used&nbsp;when&nbsp;gettext&nbsp;is&nbsp;enabled.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a248"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a249"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_ENABLED,&nbsp;DPSERVER_GETTEXT_LOCALE_PATH,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a250"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_ENCODING,&nbsp;DPSERVER_LOCALE,&nbsp;DPSERVER_LOCALE_FULL</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a251"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a252"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_GETTEXT_DOMAIN'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'messages'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a253"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a254"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a255"></a><span class="src-doc">&nbsp;*&nbsp;Gettext&nbsp;character&nbsp;encoding</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a256"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a257"></a><span class="src-doc">&nbsp;*&nbsp;Used&nbsp;when&nbsp;gettext&nbsp;is&nbsp;enabled.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a258"></a><span class="src-doc">&nbsp;*&nbsp;DutchPIPE&nbsp;uses&nbsp;UTF-8&nbsp;but&nbsp;I'm&nbsp;not&nbsp;sure&nbsp;how&nbsp;this&nbsp;works&nbsp;for&nbsp;other&nbsp;languages</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a259"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a260"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_ENABLED,&nbsp;DPSERVER_GETTEXT_LOCALE_PATH,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a261"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_DOMAIN,&nbsp;DPSERVER_LOCALE,&nbsp;DPSERVER_LOCALE_FULL</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a262"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a263"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_GETTEXT_ENCODING'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'UTF-8'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a264"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a265"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a266"></a><span class="src-doc">&nbsp;*&nbsp;Used&nbsp;when&nbsp;gettext&nbsp;is&nbsp;enabled,&nbsp;defines&nbsp;a&nbsp;&quot;locale&quot;&nbsp;supported&nbsp;by&nbsp;DutchPIPE</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a237"></a><span class="src-doc">&nbsp;*&nbsp;Currently,&nbsp;standard&nbsp;English&nbsp;(&quot;en&quot;)&nbsp;and&nbsp;Dutch&nbsp;(&quot;nl_NL&quot;)&nbsp;&nbsp;are&nbsp;part&nbsp;of&nbsp;the</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a238"></a><span class="src-doc">&nbsp;*&nbsp;standard&nbsp;distribution.&nbsp;Also,&nbsp;all&nbsp;texts&nbsp;to&nbsp;translate&nbsp;are&nbsp;in&nbsp;only&nbsp;one&nbsp;file</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a239"></a><span class="src-doc">&nbsp;*&nbsp;called&nbsp;messages.po&nbsp;(this&nbsp;will&nbsp;change&nbsp;in&nbsp;the&nbsp;future).</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a240"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a241"></a><span class="src-doc">&nbsp;*&nbsp;If&nbsp;you'd&nbsp;like&nbsp;to&nbsp;translate&nbsp;for&nbsp;DutchPIPE,&nbsp;base&nbsp;your&nbsp;translation&nbsp;on</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a242"></a><span class="src-doc">&nbsp;*&nbsp;locale/en/LC_MESSAGES/messages.po&nbsp;and&nbsp;please&nbsp;mail&nbsp;your&nbsp;results&nbsp;to</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a243"></a><span class="src-doc">&nbsp;*&nbsp;contributors@dutchpipe.org.&nbsp;As&nbsp;I&nbsp;did&nbsp;with&nbsp;the&nbsp;Dutch&nbsp;translation,&nbsp;you'll</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a244"></a><span class="src-doc">&nbsp;*&nbsp;probably&nbsp;run&nbsp;into&nbsp;a&nbsp;couple&nbsp;of&nbsp;problems&nbsp;getting&nbsp;it&nbsp;exactly&nbsp;right,&nbsp;because</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a245"></a><span class="src-doc">&nbsp;*&nbsp;of&nbsp;presumptions&nbsp;made&nbsp;by&nbsp;the&nbsp;English&nbsp;language&nbsp;system.&nbsp;Please&nbsp;let&nbsp;us&nbsp;know</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a246"></a><span class="src-doc">&nbsp;*&nbsp;so&nbsp;this&nbsp;can&nbsp;be&nbsp;fixed.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a247"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a248"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_LOCALE_PATH,&nbsp;DPSERVER_GETTEXT_DOMAIN,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a249"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_ENCODING,&nbsp;DPSERVER_LOCALE,&nbsp;DPSERVER_LOCALE_FULL</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a250"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a251"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_GETTEXT_ENABLED'</span><span class="src-sym">,&nbsp;</span><span class="src-id">FALSE</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a252"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a253"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a254"></a><span class="src-doc">&nbsp;*&nbsp;Path&nbsp;to&nbsp;the&nbsp;directory&nbsp;with&nbsp;translations</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a255"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a256"></a><span class="src-doc">&nbsp;*&nbsp;Used&nbsp;when&nbsp;gettext&nbsp;is&nbsp;enabled.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a257"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a258"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_ENABLED,&nbsp;DPSERVER_GETTEXT_DOMAIN,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a259"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_ENCODING,&nbsp;DPSERVER_LOCALE,&nbsp;DPSERVER_LOCALE_FULL</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a260"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a261"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_GETTEXT_LOCALE_PATH'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_ROOT_PATH&nbsp;</span>.&nbsp;<span class="src-str">'locale/'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a262"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a263"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a264"></a><span class="src-doc">&nbsp;*&nbsp;Name&nbsp;of&nbsp;translation&nbsp;table&nbsp;(the&nbsp;&quot;domain&quot;&nbsp;in&nbsp;GNU&nbsp;gettext&nbsp;jargon)</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a265"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a266"></a><span class="src-doc">&nbsp;*&nbsp;Used&nbsp;when&nbsp;gettext&nbsp;is&nbsp;enabled.</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a267"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a268"></a><span class="src-doc">&nbsp;*&nbsp;Different&nbsp;systems&nbsp;have&nbsp;different&nbsp;naming&nbsp;schemes&nbsp;for&nbsp;locales,&nbsp;see</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a269"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;setlocale}</span><span class="src-doc">.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a270"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a271"></a><span class="src-doc">&nbsp;*&nbsp;Use&nbsp;the&nbsp;'0'&nbsp;string&nbsp;to&nbsp;leave&nbsp;the&nbsp;locale&nbsp;settings&nbsp;untouched&nbsp;and&nbsp;use&nbsp;the</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a272"></a><span class="src-doc">&nbsp;*&nbsp;default&nbsp;language&nbsp;(English&nbsp;in&nbsp;the&nbsp;standard&nbsp;distribution&nbsp;of&nbsp;DutchPIPE).</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a273"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a274"></a><span class="src-doc">&nbsp;*&nbsp;To&nbsp;use&nbsp;one&nbsp;of&nbsp;the&nbsp;translations&nbsp;included&nbsp;in&nbsp;the&nbsp;standard&nbsp;DutchPIPE</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a275"></a><span class="src-doc">&nbsp;*&nbsp;distribution,&nbsp;outcomment&nbsp;the&nbsp;first&nbsp;define&nbsp;which&nbsp;sets&nbsp;DPSERVER_LOCALE&nbsp;to&nbsp;'0',</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a276"></a><span class="src-doc">&nbsp;*&nbsp;and&nbsp;remove&nbsp;comment&nbsp;characters&nbsp;from&nbsp;the&nbsp;language&nbsp;in&nbsp;the&nbsp;list&nbsp;below.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a277"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a278"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_ENABLED,&nbsp;DPSERVER_GETTEXT_LOCALE_PATH,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a279"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_DOMAIN,&nbsp;DPSERVER_GETTEXT_ENCODING,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a280"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_LOCALE_FULL</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a268"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_ENABLED,&nbsp;DPSERVER_GETTEXT_LOCALE_PATH,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a269"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_ENCODING,&nbsp;DPSERVER_LOCALE,&nbsp;DPSERVER_LOCALE_FULL</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a270"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a271"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_GETTEXT_DOMAIN'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'messages'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a272"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a273"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a274"></a><span class="src-doc">&nbsp;*&nbsp;Gettext&nbsp;character&nbsp;encoding</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a275"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a276"></a><span class="src-doc">&nbsp;*&nbsp;Used&nbsp;when&nbsp;gettext&nbsp;is&nbsp;enabled.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a277"></a><span class="src-doc">&nbsp;*&nbsp;DutchPIPE&nbsp;uses&nbsp;UTF-8&nbsp;but&nbsp;I'm&nbsp;not&nbsp;sure&nbsp;how&nbsp;this&nbsp;works&nbsp;for&nbsp;other&nbsp;languages</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a278"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a279"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_ENABLED,&nbsp;DPSERVER_GETTEXT_LOCALE_PATH,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a280"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_DOMAIN,&nbsp;DPSERVER_LOCALE,&nbsp;DPSERVER_LOCALE_FULL</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a281"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a282"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_LOCALE'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'0'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a283"></a><span class="src-comm">//define('DPSERVER_LOCALE',&nbsp;'nl_NL');</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a284"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a285"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a286"></a><span class="src-doc">&nbsp;*&nbsp;You&nbsp;probably&nbsp;don't&nbsp;need&nbsp;to&nbsp;touch&nbsp;this</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a287"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a288"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_ENABLED,&nbsp;DPSERVER_GETTEXT_LOCALE_PATH,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a289"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_DOMAIN,&nbsp;DPSERVER_GETTEXT_ENCODING,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a290"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_LOCALE</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a291"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a292"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_LOCALE_FULL'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_LOCALE&nbsp;</span>==&nbsp;<span class="src-str">'0'</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a293"></a>&nbsp;&nbsp;&nbsp;&nbsp;?&nbsp;<span class="src-str">'0'&nbsp;</span>:&nbsp;<span class="src-id">DPSERVER_LOCALE&nbsp;</span>.&nbsp;<span class="src-str">'.'&nbsp;</span>.&nbsp;<span class="src-id">DPSERVER_GETTEXT_ENCODING</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a294"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a295"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a296"></a><span class="src-doc">&nbsp;*&nbsp;Don't&nbsp;touch&nbsp;this</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a297"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a298"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@access</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a299"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a300"></a><span class="src-inc">require_once</span><span class="src-sym">(</span><span class="src-id">DPSERVER_LIB_PATH&nbsp;</span>.&nbsp;<span class="src-str">'dptext.php'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a301"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a302"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a303"></a><span class="src-doc">&nbsp;*&nbsp;The&nbsp;maximum&nbsp;number&nbsp;of&nbsp;seconds&nbsp;the&nbsp;server&nbsp;can&nbsp;stay&nbsp;up,&nbsp;0&nbsp;for&nbsp;no&nbsp;limit</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a304"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a305"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_MAXUPTIME'</span><span class="src-sym">,&nbsp;</span><span class="src-num">0</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a306"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a307"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a308"></a><span class="src-doc">&nbsp;*&nbsp;The&nbsp;message&nbsp;shown&nbsp;in&nbsp;case&nbsp;of&nbsp;a&nbsp;socket&nbsp;error</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a309"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a310"></a><span class="src-doc">&nbsp;*&nbsp;This&nbsp;usually&nbsp;means&nbsp;the&nbsp;server&nbsp;is&nbsp;down.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a311"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a312"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_TYPE,&nbsp;DPSERVER_SOCKET_PATH,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a313"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_ADDRESS,&nbsp;DPSERVER_SOCKET_PORT,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a314"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_MAX_SOCKET_BACKLOG</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a315"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a316"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_SOCKERR_MSG'</span><span class="src-sym">,&nbsp;</span><span class="src-id">dptext</span><span class="src-sym">(</span><span class="src-str">'The&nbsp;DutchPIPE&nbsp;server&nbsp;is&nbsp;down'</span><span class="src-sym">))</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a317"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a318"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a319"></a><span class="src-doc">&nbsp;*&nbsp;Error&nbsp;reporting&nbsp;level</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a320"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a321"></a><span class="src-doc">&nbsp;*&nbsp;Which&nbsp;PHP&nbsp;errors&nbsp;to&nbsp;report,&nbsp;according&nbsp;to</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a322"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;http://www.php.net/manual/en/ref.errorfunc.php#errorfunc.constants}</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a323"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a324"></a><span class="src-doc">&nbsp;*&nbsp;By&nbsp;default&nbsp;all&nbsp;messages&nbsp;including&nbsp;&quot;strict&quot;&nbsp;messages&nbsp;are&nbsp;shown.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a325"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a326"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a327"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a328"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_ERROR_REPORTING'</span><span class="src-sym">,&nbsp;</span><span class="src-id">E_ALL&nbsp;</span>|&nbsp;<span class="src-id">E_STRICT</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a329"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a330"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a331"></a><span class="src-doc">&nbsp;*&nbsp;Debug&nbsp;information&nbsp;modifier&nbsp;-&nbsp;don't&nbsp;show&nbsp;debug&nbsp;information</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a332"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a333"></a><span class="src-doc">&nbsp;*&nbsp;Used&nbsp;by&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_DEBUG_TYPE}</span><span class="src-doc">.&nbsp;Don't&nbsp;change&nbsp;this.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a334"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a335"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE,&nbsp;DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a336"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE_GETRUSAGE</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a337"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a338"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_DEBUG_TYPE_NONE'</span><span class="src-sym">,&nbsp;</span><span class="src-num">1</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a339"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a340"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a341"></a><span class="src-doc">&nbsp;*&nbsp;Debug&nbsp;information&nbsp;modifier&nbsp;-&nbsp;show&nbsp;info&nbsp;line&nbsp;with&nbsp;memory&nbsp;and&nbsp;object&nbsp;counters</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a282"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_GETTEXT_ENCODING'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'UTF-8'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a283"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a284"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a285"></a><span class="src-doc">&nbsp;*&nbsp;Used&nbsp;when&nbsp;gettext&nbsp;is&nbsp;enabled,&nbsp;defines&nbsp;a&nbsp;&quot;locale&quot;&nbsp;supported&nbsp;by&nbsp;DutchPIPE</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a286"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a287"></a><span class="src-doc">&nbsp;*&nbsp;Different&nbsp;systems&nbsp;have&nbsp;different&nbsp;naming&nbsp;schemes&nbsp;for&nbsp;locales,&nbsp;see</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a288"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;setlocale}</span><span class="src-doc">.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a289"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a290"></a><span class="src-doc">&nbsp;*&nbsp;Use&nbsp;the&nbsp;'0'&nbsp;string&nbsp;to&nbsp;leave&nbsp;the&nbsp;locale&nbsp;settings&nbsp;untouched&nbsp;and&nbsp;use&nbsp;the</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a291"></a><span class="src-doc">&nbsp;*&nbsp;default&nbsp;language&nbsp;(English&nbsp;in&nbsp;the&nbsp;standard&nbsp;distribution&nbsp;of&nbsp;DutchPIPE).</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a292"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a293"></a><span class="src-doc">&nbsp;*&nbsp;To&nbsp;use&nbsp;one&nbsp;of&nbsp;the&nbsp;translations&nbsp;included&nbsp;in&nbsp;the&nbsp;standard&nbsp;DutchPIPE</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a294"></a><span class="src-doc">&nbsp;*&nbsp;distribution,&nbsp;outcomment&nbsp;the&nbsp;first&nbsp;define&nbsp;which&nbsp;sets&nbsp;DPSERVER_LOCALE&nbsp;to&nbsp;'0',</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a295"></a><span class="src-doc">&nbsp;*&nbsp;and&nbsp;remove&nbsp;comment&nbsp;characters&nbsp;from&nbsp;the&nbsp;language&nbsp;in&nbsp;the&nbsp;list&nbsp;below.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a296"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a297"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_ENABLED,&nbsp;DPSERVER_GETTEXT_LOCALE_PATH,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a298"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_DOMAIN,&nbsp;DPSERVER_GETTEXT_ENCODING,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a299"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_LOCALE_FULL</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a300"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a301"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_LOCALE'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'0'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a302"></a><span class="src-comm">//define('DPSERVER_LOCALE',&nbsp;'nl_NL');</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a303"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a304"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a305"></a><span class="src-doc">&nbsp;*&nbsp;You&nbsp;probably&nbsp;don't&nbsp;need&nbsp;to&nbsp;touch&nbsp;this</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a306"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a307"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_ENABLED,&nbsp;DPSERVER_GETTEXT_LOCALE_PATH,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a308"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_GETTEXT_DOMAIN,&nbsp;DPSERVER_GETTEXT_ENCODING,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a309"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_LOCALE</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a310"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a311"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_LOCALE_FULL'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_LOCALE&nbsp;</span>==&nbsp;<span class="src-str">'0'</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a312"></a>&nbsp;&nbsp;&nbsp;&nbsp;?&nbsp;<span class="src-str">'0'&nbsp;</span>:&nbsp;<span class="src-id">DPSERVER_LOCALE&nbsp;</span>.&nbsp;<span class="src-str">'.'&nbsp;</span>.&nbsp;<span class="src-id">DPSERVER_GETTEXT_ENCODING</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a313"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a314"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a315"></a><span class="src-doc">&nbsp;*&nbsp;Don't&nbsp;touch&nbsp;this</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a316"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a317"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@access</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a318"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a319"></a><span class="src-inc">require_once</span><span class="src-sym">(</span><span class="src-id">DPSERVER_LIB_PATH&nbsp;</span>.&nbsp;<span class="src-str">'dptext.php'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a320"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a321"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a322"></a><span class="src-doc">&nbsp;*&nbsp;The&nbsp;maximum&nbsp;number&nbsp;of&nbsp;seconds&nbsp;the&nbsp;server&nbsp;can&nbsp;stay&nbsp;up,&nbsp;0&nbsp;for&nbsp;no&nbsp;limit</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a323"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a324"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_MAXUPTIME'</span><span class="src-sym">,&nbsp;</span><span class="src-num">0</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a325"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a326"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a327"></a><span class="src-doc">&nbsp;*&nbsp;The&nbsp;message&nbsp;shown&nbsp;in&nbsp;case&nbsp;of&nbsp;a&nbsp;socket&nbsp;error</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a328"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a329"></a><span class="src-doc">&nbsp;*&nbsp;This&nbsp;usually&nbsp;means&nbsp;the&nbsp;server&nbsp;is&nbsp;down.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a330"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a331"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_TYPE,&nbsp;DPSERVER_SOCKET_PATH,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a332"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SOCKET_ADDRESS,&nbsp;DPSERVER_SOCKET_PORT,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a333"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_MAX_SOCKET_BACKLOG</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a334"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a335"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_SOCKERR_MSG'</span><span class="src-sym">,&nbsp;</span><span class="src-id">dptext</span><span class="src-sym">(</span><span class="src-str">'The&nbsp;DutchPIPE&nbsp;server&nbsp;is&nbsp;down'</span><span class="src-sym">))</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a336"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a337"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a338"></a><span class="src-doc">&nbsp;*&nbsp;Error&nbsp;reporting&nbsp;level</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a339"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a340"></a><span class="src-doc">&nbsp;*&nbsp;Which&nbsp;PHP&nbsp;errors&nbsp;to&nbsp;report,&nbsp;according&nbsp;to</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a341"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;http://www.php.net/manual/en/ref.errorfunc.php#errorfunc.constants}</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a342"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a343"></a><span class="src-doc">&nbsp;*&nbsp;*NIX&nbsp;only,&nbsp;doesn't&nbsp;work&nbsp;under&nbsp;Windows.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a344"></a><span class="src-doc">&nbsp;*&nbsp;Used&nbsp;by&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_DEBUG_TYPE}</span><span class="src-doc">.&nbsp;Don't&nbsp;change&nbsp;this.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a345"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a346"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE,&nbsp;DPSERVER_DEBUG_TYPE_NONE,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a347"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE_GETRUSAGE</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a348"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a349"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE'</span><span class="src-sym">,&nbsp;</span><span class="src-num">2</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a350"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a351"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a352"></a><span class="src-doc">&nbsp;*&nbsp;Debug&nbsp;information&nbsp;modifier&nbsp;-&nbsp;show&nbsp;info&nbsp;based&nbsp;on&nbsp;*nix&nbsp;getrusage</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a343"></a><span class="src-doc">&nbsp;*&nbsp;By&nbsp;default&nbsp;all&nbsp;messages&nbsp;including&nbsp;&quot;strict&quot;&nbsp;messages&nbsp;are&nbsp;shown.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a344"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a345"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a346"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a347"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_ERROR_REPORTING'</span><span class="src-sym">,&nbsp;</span><span class="src-id">E_ALL&nbsp;</span>|&nbsp;<span class="src-id">E_STRICT</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a348"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a349"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a350"></a><span class="src-doc">&nbsp;*&nbsp;Debug&nbsp;information&nbsp;modifier&nbsp;-&nbsp;don't&nbsp;show&nbsp;debug&nbsp;information</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a351"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a352"></a><span class="src-doc">&nbsp;*&nbsp;Used&nbsp;by&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_DEBUG_TYPE}</span><span class="src-doc">.&nbsp;Don't&nbsp;change&nbsp;this.</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a353"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a354"></a><span class="src-doc">&nbsp;*&nbsp;*NIX&nbsp;only,&nbsp;doesn't&nbsp;work&nbsp;under&nbsp;Windows.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a355"></a><span class="src-doc">&nbsp;*&nbsp;Used&nbsp;by&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_DEBUG_TYPE}</span><span class="src-doc">.&nbsp;Don't&nbsp;change&nbsp;this.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a356"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a357"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE,&nbsp;DPSERVER_DEBUG_TYPE_NONE,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a358"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a359"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a360"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_DEBUG_TYPE_GETRUSAGE'</span><span class="src-sym">,&nbsp;</span><span class="src-num">3</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a361"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a362"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a363"></a><span class="src-doc">&nbsp;*&nbsp;Debug&nbsp;information&nbsp;settings</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a354"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE,&nbsp;DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a355"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE_GETRUSAGE</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a356"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a357"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_DEBUG_TYPE_NONE'</span><span class="src-sym">,&nbsp;</span><span class="src-num">1</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a358"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a359"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a360"></a><span class="src-doc">&nbsp;*&nbsp;Debug&nbsp;information&nbsp;modifier&nbsp;-&nbsp;show&nbsp;info&nbsp;line&nbsp;with&nbsp;memory&nbsp;and&nbsp;object&nbsp;counters</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a361"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a362"></a><span class="src-doc">&nbsp;*&nbsp;*NIX&nbsp;only,&nbsp;doesn't&nbsp;work&nbsp;under&nbsp;Windows.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a363"></a><span class="src-doc">&nbsp;*&nbsp;Used&nbsp;by&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_DEBUG_TYPE}</span><span class="src-doc">.&nbsp;Don't&nbsp;change&nbsp;this.</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a364"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a365"></a><span class="src-doc">&nbsp;*&nbsp;What&nbsp;kind&nbsp;of&nbsp;debug&nbsp;information&nbsp;should&nbsp;the&nbsp;server&nbsp;echo&nbsp;to&nbsp;the&nbsp;CLI/shell&nbsp;when</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a366"></a><span class="src-doc">&nbsp;*&nbsp;running?&nbsp;The&nbsp;DPSERVER_DEBUG_TYPE&nbsp;must&nbsp;be&nbsp;one&nbsp;of:</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a367"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a368"></a><span class="src-doc">&nbsp;*&nbsp;-&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_DEBUG_TYPE_NONE}</span><span class="src-doc">&lt;br&gt;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a369"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;Don't&nbsp;show&nbsp;debug&nbsp;information.&nbsp;You&nbsp;must&nbsp;use&nbsp;this&nbsp;under&nbsp;Windows.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a370"></a><span class="src-doc">&nbsp;*&nbsp;-&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE}</span><span class="src-doc">&lt;br&gt;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a371"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;Show&nbsp;info&nbsp;line&nbsp;with&nbsp;memory&nbsp;and&nbsp;object&nbsp;counters.&nbsp;*NIX&nbsp;only,&nbsp;doesn't&nbsp;work</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a372"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;under&nbsp;Windows.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a373"></a><span class="src-doc">&nbsp;*&nbsp;-&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_DEBUG_TYPE_GETRUSAGE}</span><span class="src-doc">&lt;br&gt;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a374"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;Show&nbsp;info&nbsp;based&nbsp;on&nbsp;*nix&nbsp;getrusage.&nbsp;*NIX&nbsp;only,&nbsp;doesn't&nbsp;work&nbsp;under&nbsp;Windows.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a365"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE,&nbsp;DPSERVER_DEBUG_TYPE_NONE,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a366"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE_GETRUSAGE</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a367"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a368"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE'</span><span class="src-sym">,&nbsp;</span><span class="src-num">2</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a369"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a370"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a371"></a><span class="src-doc">&nbsp;*&nbsp;Debug&nbsp;information&nbsp;modifier&nbsp;-&nbsp;show&nbsp;info&nbsp;based&nbsp;on&nbsp;*nix&nbsp;getrusage</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a372"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a373"></a><span class="src-doc">&nbsp;*&nbsp;*NIX&nbsp;only,&nbsp;doesn't&nbsp;work&nbsp;under&nbsp;Windows.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a374"></a><span class="src-doc">&nbsp;*&nbsp;Used&nbsp;by&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_DEBUG_TYPE}</span><span class="src-doc">.&nbsp;Don't&nbsp;change&nbsp;this.</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a375"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a376"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE_NONE,&nbsp;DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE,</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a377"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE_GETRUSAGE,&nbsp;DPSERVER_ERROR_REPORTING</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a376"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE,&nbsp;DPSERVER_DEBUG_TYPE_NONE,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a377"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a378"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a379"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_DEBUG_TYPE'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_DEBUG_TYPE_NONE</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a379"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_DEBUG_TYPE_GETRUSAGE'</span><span class="src-sym">,&nbsp;</span><span class="src-num">3</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a380"></a>&nbsp;</div></li>
 <li class="src-li"><div class="src-line"><a name="a381"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a382"></a><span class="src-doc">&nbsp;*&nbsp;Use&nbsp;base64_encode/decode&nbsp;on&nbsp;dpclient&nbsp;-&gt;&nbsp;dpserver&nbsp;communication?</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a382"></a><span class="src-doc">&nbsp;*&nbsp;Debug&nbsp;information&nbsp;settings</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a383"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a384"></a><span class="src-doc">&nbsp;*&nbsp;If&nbsp;you&nbsp;are&nbsp;getting&nbsp;&quot;unserialize&quot;&nbsp;errors,&nbsp;set&nbsp;to&nbsp;TRUE.&nbsp;This&nbsp;has&nbsp;a&nbsp;small&nbsp;speed</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a385"></a><span class="src-doc">&nbsp;*&nbsp;penalty.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a384"></a><span class="src-doc">&nbsp;*&nbsp;What&nbsp;kind&nbsp;of&nbsp;debug&nbsp;information&nbsp;should&nbsp;the&nbsp;server&nbsp;echo&nbsp;to&nbsp;the&nbsp;CLI/shell&nbsp;when</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a385"></a><span class="src-doc">&nbsp;*&nbsp;running?&nbsp;The&nbsp;DPSERVER_DEBUG_TYPE&nbsp;must&nbsp;be&nbsp;one&nbsp;of:</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a386"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a387"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_BASE64_SERVER2CLIENT</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a388"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a389"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_BASE64_CLIENT2SERVER'</span><span class="src-sym">,&nbsp;</span><span class="src-id">TRUE</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a390"></a>&nbsp;</div></li>
-<li class="src-li"><div class="src-line"><a name="a391"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a392"></a><span class="src-doc">&nbsp;*&nbsp;Use&nbsp;base64_encode/decode&nbsp;on&nbsp;dpserver&nbsp;-&gt;&nbsp;dpclient&nbsp;communication?</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a393"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a394"></a><span class="src-doc">&nbsp;*&nbsp;This&nbsp;has&nbsp;a&nbsp;small&nbsp;speed&nbsp;penalty.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a395"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a396"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_BASE64_CLIENT2SERVER</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a387"></a><span class="src-doc">&nbsp;*&nbsp;-&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_DEBUG_TYPE_NONE}</span><span class="src-doc">&lt;br&gt;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a388"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;Don't&nbsp;show&nbsp;debug&nbsp;information.&nbsp;You&nbsp;must&nbsp;use&nbsp;this&nbsp;under&nbsp;Windows.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a389"></a><span class="src-doc">&nbsp;*&nbsp;-&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE}</span><span class="src-doc">&lt;br&gt;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a390"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;Show&nbsp;info&nbsp;line&nbsp;with&nbsp;memory&nbsp;and&nbsp;object&nbsp;counters.&nbsp;*NIX&nbsp;only,&nbsp;doesn't&nbsp;work</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a391"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;under&nbsp;Windows.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a392"></a><span class="src-doc">&nbsp;*&nbsp;-&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;DPSERVER_DEBUG_TYPE_GETRUSAGE}</span><span class="src-doc">&lt;br&gt;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a393"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;Show&nbsp;info&nbsp;based&nbsp;on&nbsp;*nix&nbsp;getrusage.&nbsp;*NIX&nbsp;only,&nbsp;doesn't&nbsp;work&nbsp;under&nbsp;Windows.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a394"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a395"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE_NONE,&nbsp;DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a396"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_DEBUG_TYPE_GETRUSAGE,&nbsp;DPSERVER_ERROR_REPORTING</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a397"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a398"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_BASE64_SERVER2CLIENT'</span><span class="src-sym">,&nbsp;</span><span class="src-id">TRUE</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a398"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_DEBUG_TYPE'</span><span class="src-sym">,&nbsp;</span><span class="src-id">DPSERVER_DEBUG_TYPE_NONE</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a399"></a>&nbsp;</div></li>
 <li class="src-li"><div class="src-line"><a name="a400"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a401"></a><span class="src-doc">&nbsp;*&nbsp;Maximum&nbsp;number&nbsp;of&nbsp;bytes&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;dpclient.php}</span><span class="src-doc">&nbsp;can&nbsp;read&nbsp;from</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a402"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;dpserver.php}</span><span class="src-doc">&nbsp;per&nbsp;chunk</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a403"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a404"></a><span class="src-doc">&nbsp;*&nbsp;You&nbsp;should&nbsp;probably&nbsp;leave&nbsp;this&nbsp;untouched.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a401"></a><span class="src-doc">&nbsp;*&nbsp;Use&nbsp;base64_encode/decode&nbsp;on&nbsp;dpclient&nbsp;-&gt;&nbsp;dpserver&nbsp;communication?</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a402"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a403"></a><span class="src-doc">&nbsp;*&nbsp;If&nbsp;you&nbsp;are&nbsp;getting&nbsp;&quot;unserialize&quot;&nbsp;errors,&nbsp;set&nbsp;to&nbsp;TRUE.&nbsp;This&nbsp;has&nbsp;a&nbsp;small&nbsp;speed</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a404"></a><span class="src-doc">&nbsp;*&nbsp;penalty.</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a405"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a406"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SERVER_CHUNK</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a406"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_BASE64_SERVER2CLIENT</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a407"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a408"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_CLIENT_CHUNK'</span><span class="src-sym">,&nbsp;</span><span class="src-num">2048</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a408"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_BASE64_CLIENT2SERVER'</span><span class="src-sym">,&nbsp;</span><span class="src-id">TRUE</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
 <li class="src-li"><div class="src-line"><a name="a409"></a>&nbsp;</div></li>
 <li class="src-li"><div class="src-line"><a name="a410"></a><span class="src-doc">/**</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a411"></a><span class="src-doc">&nbsp;*&nbsp;Maximum&nbsp;number&nbsp;of&nbsp;bytes&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;dpserver.php}</span><span class="src-doc">&nbsp;can&nbsp;read&nbsp;from</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a412"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;dpclient.php}</span><span class="src-doc">&nbsp;per&nbsp;chunk</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a413"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a414"></a><span class="src-doc">&nbsp;*&nbsp;You&nbsp;should&nbsp;probably&nbsp;leave&nbsp;this&nbsp;untouched.</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a415"></a><span class="src-doc">&nbsp;*</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a416"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_CLIENT_CHUNK</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a417"></a><span class="src-doc">&nbsp;*/</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a418"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_SERVER_CHUNK'</span><span class="src-sym">,&nbsp;</span><span class="src-num">2048</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
-<li class="src-li"><div class="src-line"><a name="a419"></a><span class="src-php">?&gt;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a411"></a><span class="src-doc">&nbsp;*&nbsp;Use&nbsp;base64_encode/decode&nbsp;on&nbsp;dpserver&nbsp;-&gt;&nbsp;dpclient&nbsp;communication?</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a412"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a413"></a><span class="src-doc">&nbsp;*&nbsp;This&nbsp;has&nbsp;a&nbsp;small&nbsp;speed&nbsp;penalty.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a414"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a415"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_BASE64_CLIENT2SERVER</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a416"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a417"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_BASE64_SERVER2CLIENT'</span><span class="src-sym">,&nbsp;</span><span class="src-id">TRUE</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a418"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a419"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a420"></a><span class="src-doc">&nbsp;*&nbsp;Maximum&nbsp;number&nbsp;of&nbsp;bytes&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;dpclient.php}</span><span class="src-doc">&nbsp;can&nbsp;read&nbsp;from</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a421"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;dpserver.php}</span><span class="src-doc">&nbsp;per&nbsp;chunk</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a422"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a423"></a><span class="src-doc">&nbsp;*&nbsp;You&nbsp;should&nbsp;probably&nbsp;leave&nbsp;this&nbsp;untouched.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a424"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a425"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_SERVER_CHUNK</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a426"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a427"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_CLIENT_CHUNK'</span><span class="src-sym">,&nbsp;</span><span class="src-num">2048</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a428"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a429"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a430"></a><span class="src-doc">&nbsp;*&nbsp;Maximum&nbsp;number&nbsp;of&nbsp;bytes&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;dpserver.php}</span><span class="src-doc">&nbsp;can&nbsp;read&nbsp;from</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a431"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-inlinetag">{@link&nbsp;dpclient.php}</span><span class="src-doc">&nbsp;per&nbsp;chunk</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a432"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a433"></a><span class="src-doc">&nbsp;*&nbsp;You&nbsp;should&nbsp;probably&nbsp;leave&nbsp;this&nbsp;untouched.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a434"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a435"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DPSERVER_CLIENT_CHUNK</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a436"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a437"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_SERVER_CHUNK'</span><span class="src-sym">,&nbsp;</span><span class="src-num">2048</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a438"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a439"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a440"></a><span class="src-doc">&nbsp;*&nbsp;Maximum&nbsp;memory&nbsp;usage</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a441"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a442"></a><span class="src-doc">&nbsp;*&nbsp;Memory&nbsp;limit&nbsp;in&nbsp;bytes&nbsp;that&nbsp;the&nbsp;server&nbsp;may&nbsp;allocate.&nbsp;Use&nbsp;-1&nbsp;for&nbsp;unlimited.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a443"></a><span class="src-doc">&nbsp;*&nbsp;When&nbsp;an&nbsp;integer&nbsp;is&nbsp;used,&nbsp;the&nbsp;value&nbsp;is&nbsp;measured&nbsp;in&nbsp;bytes.&nbsp;You&nbsp;may&nbsp;also&nbsp;use</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a444"></a><span class="src-doc">&nbsp;*&nbsp;shorthand&nbsp;notation&nbsp;as&nbsp;described&nbsp;in&nbsp;this&nbsp;FAQ:</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a445"></a><span class="src-doc">&nbsp;*&nbsp;http://www.php.net/manual/en/faq.using.php#faq.using.shorthandbytes</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a446"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a447"></a><span class="src-doc">&nbsp;*&nbsp;See&nbsp;also:&nbsp;http://www.php.net/manual/en/ini.core.php#ini.memory-limit</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a448"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a449"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'DPSERVER_MEMORY_LIMIT'</span><span class="src-sym">,&nbsp;</span><span class="src-str">'32M'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a450"></a><span class="src-php">?&gt;</span></div></li>
 </ol>
 </span></div>
         <div class="credit">
 		    <hr class="separator" />
-		    Documentation generated on Sun, 13 Aug 2006 20:43:26 +0200 by <a href="http://www.phpdoc.org">phpDocumentor 1.3.0RC6</a>
+		    Documentation generated on Mon, 11 Jun 2007 15:27:29 +0200 by <a href="http://www.phpdoc.org">phpDocumentor 1.3.0RC6</a>
 	      </div>
       </td></tr></table>
     </td>

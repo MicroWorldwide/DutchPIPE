@@ -8,20 +8,21 @@ body, td, th, input { font-family: arial,verdana,'Bitstream Vera Sans',helvetica
 #dpobinv { width: 100%; text-align: left; padding: 0px }
 #dpobinv_inner1 { width: 100%; float: left }
 .dpobinv_inner2 { position: relative }
-#titlebar { height: 19px; background-color: #555585; background-image: url(/images/topbarm.gif); color: white; font-weight: bold }
-#titlebarleft { height: 18px; padding-top: 1px; padding-left: 10px; position: relative; float: left; background-image: url(/images/topbarl.gif); background-repeat: no-repeat; background-position: top left }
-#titlebarright { height: 18px; padding-top: 1px; padding-right: 9px; position: relative; float: right; background-image: url(/images/topbarr.gif); background-repeat: no-repeat; background-position:  top right }
+#titlebar { height: 19px; background-color: #555585; background-image: url(images/topbarm.gif); color: white; font-weight: bold }
+#titlebarleft { height: 18px; padding-top: 1px; padding-left: 10px; position: relative; float: left; background-image: url(images/topbarl.gif); background-repeat: no-repeat; background-position: top left }
+#titlebarright { height: 18px; padding-top: 1px; padding-right: 9px; position: relative; float: right; background-image: url(images/topbarr.gif); background-repeat: no-repeat; background-position:  top right }
 #titlebarright a:link { color: #fff; font-weight: normal }
 #titlebarright a:hover { color: #fff; font-weight: normal }
 #titlebarright a:visited { color: #fff; font-weight: normal }
 #titlebarright a:active { color: #fff; font-weight: normal }
 .dpobject { background-color: #ffe0e0; width: 190px; padding: 10px; margin-top: 10px; margin-right: 10px; margin-bottom: 0px; float: left }
-.title_img, .title_img_me { text-align: center; width: 100px; height: 126px; font-size: 10px; font-family: verdana,arial,helvetica; margin-top: 1px; margin-right: 10px; margin-bottom: 0px; float: left }
+.dpobject2 { background-color: #e0ffe0; width: 72px; padding: 5px; margin-top: 10px; margin-right: 10px; float: left }
+.title_img, .title_img_me { position: relative; text-align: center; width: 100px; height: 126px; font-size: 10px; font-family: verdana,arial,helvetica; margin-top: 1px; margin-right: 10px; margin-bottom: 0px; float: left }
 .title_img_me { font-weight: bold }
 .imgtxt { font-size: 10px; font-family: verdana,arial,helvetica }
-.dpobject2 { background-color: #e0ffe0; width: 72px; padding: 5px; margin-top: 10px; margin-right: 10px; float: left }
 #navigation { }
 #messages { float: left; margin-top: 0px; margin-bottom: 0px }
+#dploginout { display: inline; margin: 0px; padding: 0px }
 #dpmessagearea { width: 100%; text-align: center; background-color: #ffffff; padding: 0px; border-bottom: solid 1px #8080b0; border-right: solid 1px #bebec8; border-left: solid 1px #bebec8 }
 #dpmessagearea_inner { margin-left: 15px; margin-right: 11px; margin-top: 0px; margin-bottom: 0px; text-align: left; }
 #box, #helpbox { border: solid 1px #000066; padding: 10px }
@@ -41,7 +42,8 @@ a:visited { color: #000066 }
 a.menu { font-weight: bold }
 a.navtrail:link { color: #ffffff }
 a.navtrail:visited { color: #ffffff }
-a.dpsmall { font-size: 10px; font-family: verdana,arial,helvetica }
+a.dpsmall { font-size: 11px; font-family: verdana,arial,helvetica }
+.col2 { color: #666666; }
 .dph, .boxh { color: #8B4513; font-size: 22px; font-weight: normal; margin-bottom: 4px }
 .boxh { margin-bottom: 4px }
 .arr,.arrr,.arr2 { margin-top: 2px }
@@ -66,6 +68,8 @@ a.dpsmall { font-size: 10px; font-family: verdana,arial,helvetica }
 #dltable td { background-color: #e0e0e0 }
 #dlreq { margin-top: 0px; margin-bottom: 0px; padding-left: 0px; margin-left: 2em }
 #dlreq li { margin-top: 5px }
+.dpimage { cursor: pointer }
+.dpimage_move { cursor: move }
 .actionwindow
 {
     display: none;
@@ -81,12 +85,11 @@ a.dpsmall { font-size: 10px; font-family: verdana,arial,helvetica }
     padding-top: 3px;
     padding-bottom: 3px;
     display: block;
-    filter: alpha(opacity=95);
     opacity: 0.95;
     -moz-opacity: 0.95;
     z-index: 5;
 }
-.action_menu_selected, .action_menu { padding-left: 4px; padding-right: 4px; font-size: 11px; font-family: arial,helvetica }
+.action_menu_selected, .action_menu { padding-left: 4px; padding-right: 4px; font-size: 11px; font-family: arial,verdana,'Bitstream Vera Sans',helvetica,sans-serif }
 .action_menu_selected { background-color: #000066; color: #fff }
 .action_menu { background-color: transparent; color: #000066 }
 .dpwindow_default, .dpwindow_drink, .dpwindow_error, .dpwindow_todo, .dpwindow_src
@@ -104,7 +107,6 @@ a.dpsmall { font-size: 10px; font-family: verdana,arial,helvetica }
     border: solid 1px black;
     padding: 15px;
     display: block;
-    filter: alpha(opacity=95);
     opacity: 0.95;
     -moz-opacity: 0.95;
     z-index: 5;
@@ -117,7 +119,6 @@ a.dpsmall { font-size: 10px; font-family: verdana,arial,helvetica }
     border: solid 1px black;
     padding: 15px;
     display: block;
-    filter: alpha(opacity=90);
     opacity: 0.90;
     -moz-opacity: 0.90;
     z-index: 5;
@@ -130,7 +131,6 @@ a.dpsmall { font-size: 10px; font-family: verdana,arial,helvetica }
     border: solid 1px black;
     padding: 15px;
     display: block;
-    filter: alpha(opacity=97);
     opacity: 0.97;
     -moz-opacity: 0.97;
     z-index: 5;
@@ -143,7 +143,6 @@ a.dpsmall { font-size: 10px; font-family: verdana,arial,helvetica }
     border: solid 1px black;
     padding: 15px;
     display: block;
-    filter: alpha(opacity=94);
     opacity: 0.94;
     -moz-opacity: 0.94;
     z-index: 5;
@@ -156,7 +155,6 @@ a.dpsmall { font-size: 10px; font-family: verdana,arial,helvetica }
     border: solid 1px black;
     padding: 15px;
     display: block;
-    filter: alpha(opacity=97);
     opacity: 0.97;
     -moz-opacity: 0.97;
     z-index: 5;

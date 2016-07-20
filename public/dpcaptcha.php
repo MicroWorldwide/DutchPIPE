@@ -12,11 +12,11 @@
  * @package    DutchPIPE
  * @subpackage public
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpcaptcha.php 67 2006-06-30 22:43:03Z ls $
+ * @version    Subversion: $Id: dpcaptcha.php 185 2007-06-09 21:53:43Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
- * @see         dpclient.php
+ * @see        dpclient.php
  */
 
 $config_dir = realpath(dirname(isset($_SERVER['SCRIPT_FILENAME'])

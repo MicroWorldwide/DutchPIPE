@@ -15,9 +15,9 @@
  * @package    DutchPIPE
  * @subpackage dpuniverse_include
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: actions.php 45 2006-06-20 12:38:26Z ls $
+ * @version    Subversion: $Id: actions.php 170 2007-06-08 21:26:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject::addAction(), DpObject::getActions()
  */
@@ -103,6 +103,13 @@ define('DP_ACTION_TARGET_OBJENV', 8);
  * @ignore
  */
 define('DP_ACTION_TARGET_METHOD', 16);
+
+/**
+ * Action doesn't appear on any action menu
+ *
+ * @ignore
+ */
+define('DP_ACTION_TARGET_NONE', 32);
 
 /**
  * The action is restricted to guests only

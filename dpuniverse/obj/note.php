@@ -12,9 +12,9 @@
  * @package    DutchPIPE
  * @subpackage dpuniverse_obj
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: note.php 45 2006-06-20 12:38:26Z ls $
+ * @version    Subversion: $Id: note.php 185 2007-06-09 21:53:43Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -30,9 +30,9 @@ inherit(DPUNIVERSE_STD_PATH . 'DpObject.php');
  * @package    DutchPIPE
  * @subpackage dpuniverse_obj
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: @package_version@
+ * @version    Release: 0.2.0
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -43,14 +43,37 @@ final class Note extends DpObject
      */
     public function createDpObject()
     {
-        $this->setTitle(dptext('small note'));
-        $this->setTitleDefinite(dptext('the small note'));
-        $this->setTitleIndefinite(dptext('a small note'));
-        $this->setTitleImg(DPUNIVERSE_IMAGE_URL . 'smallnote.gif');
+        $this->title = dptext('small note');
+        $this->titleDefinite = dptext('the small note');
+        $this->titleIndefinite = dptext('a small note');
+        $this->titleImg = DPUNIVERSE_IMAGE_URL . 'smallnote.gif';
         $this->addId(explode('#',
             dptext('note#paper note#small note#small paper note#small, paper note#a small note')));
-        $this->setBody(
-            dptext('This is a small paper note. You can read it.<br />'));
+        $this->body =
+            dptext('This is a small paper note. You can read it.<br />');
+
+        $this->value = 0.99;
+
+        if (WEIGHT_TYPE_NONE !== WEIGHT_TYPE) {
+            $this->coinherit(DPUNIVERSE_STD_PATH . 'mass.php');
+            if (WEIGHT_TYPE_ABSTRACT === WEIGHT_TYPE) {
+                $this->weight = 1;
+            } elseif (WEIGHT_TYPE_METRIC === WEIGHT_TYPE) {
+                $this->weight = 3; /* Grams */
+            } elseif (WEIGHT_TYPE_USA === WEIGHT_TYPE) {
+                $this->weight = 0.1; /* Ounces */
+            }
+        }
+        if (VOLUME_TYPE_NONE !== VOLUME_TYPE) {
+            $this->coinherit(DPUNIVERSE_STD_PATH . 'mass.php');
+            if (VOLUME_TYPE_ABSTRACT === VOLUME_TYPE) {
+                $this->volume = 1;
+            } elseif (VOLUME_TYPE_METRIC === VOLUME_TYPE) {
+                $this->volume = 5;
+            } elseif (VOLUME_TYPE_USA === VOLUME_TYPE) {
+                $this->volume = 0.17;
+            }
+        }
 
         $this->addAction(dptext('read me!'), dptext('read'), 'actionRead');
     }

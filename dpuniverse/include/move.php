@@ -12,9 +12,9 @@
  * @package    DutchPIPE
  * @subpackage dpuniverse_include
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: move.php 45 2006-06-20 12:38:26Z ls $
+ * @version    Subversion: $Id: move.php 170 2007-06-08 21:26:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject.php::moveDpObject()
  */
@@ -27,50 +27,51 @@
  * @ignore
  */
 define('E_MOVEOBJECT_HEAVY', 1);
+define('E_MOVEOBJECT_VOLUME', 2);
 
 /**
  * Can't drop
  *
  * @see        DpObject.php::moveDpObject()
  */
-define('E_MOVEOBJECT_NODROP', 2);
+define('E_MOVEOBJECT_NODROP', 3);
 
 /**
- * Can take it from its container
+ * Can't take it from its container
  *
  * Not used yet.
  *
  * @ignore
  */
-define('E_MOVEOBJECT_NOFROM', 3);
+define('E_MOVEOBJECT_NOFROM', 4);
 
 /**
  * Source object can't be inserted
  *
  * @see        DpObject.php::moveDpObject()
  */
-define('E_MOVEOBJECT_NOSRCINS', 4);
+define('E_MOVEOBJECT_NOSRCINS', 5);
 
 /**
  * Can't insert in destination object
  *
  * @see        DpObject.php::moveDpObject()
  */
-define('E_MOVEOBJECT_NODSTINS', 5);
+define('E_MOVEOBJECT_NODSTINS', 6);
 
 /**
  * Can't pick the object up
  *
  * @see        DpObject.php::moveDpObject()
  */
-define('E_MOVEOBJECT_NOGET', 6);
+define('E_MOVEOBJECT_NOGET', 7);
 
 /**
  * Bad destination
  *
  * @see        DpObject.php::moveDpObject()
  */
-define('E_MOVEOBJECT_BADDEST', 7);
+define('E_MOVEOBJECT_BADDEST', 8);
 
 /**
  * We don't want to be moved
@@ -79,7 +80,7 @@ define('E_MOVEOBJECT_BADDEST', 7);
  *
  * @ignore
  */
-define('E_MOVEOBJECT_NOTSELF', 8);
+define('E_MOVEOBJECT_NOTSELF', 9);
 
 /**
  * Environment won't let us go
@@ -88,7 +89,7 @@ define('E_MOVEOBJECT_NOTSELF', 8);
  *
  * @ignore
  */
-define('E_MOVEOBJECT_NOTENV', 9);
+define('E_MOVEOBJECT_NOTENV', 10);
 
 /**
  * Destination won't accept us
@@ -97,5 +98,14 @@ define('E_MOVEOBJECT_NOTENV', 9);
  *
  * @ignore
  */
-define('E_MOVEOBJECT_NOTDEST', 10);
+define('E_MOVEOBJECT_NOTDEST', 11);
+
+/**
+ * Illegal amount was given for a heap (for instance more credits than you have)
+ *
+ * Not used yet.
+ *
+ * @ignore
+ */
+define('E_MOVEOBJECT_BADHEAP', 12);
 ?>

@@ -12,9 +12,9 @@
  * @package    DutchPIPE
  * @subpackage public
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpclient.php 45 2006-06-20 12:38:26Z ls $
+ * @version    Subversion: $Id: dpclient.php 161 2007-06-05 22:56:33Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver-ini.php, dpserver.php, dpclient.css
  */
@@ -22,5 +22,5 @@
 /**
  * Gets dpclient.php functionality
  */
-require_once(dirname(realpath(__FILE__ . '/..')) . '/lib/dpclient.php');
+require_once(realpath(dirname(__FILE__) . '/..') . '/lib/dpclient.php');
 ?>

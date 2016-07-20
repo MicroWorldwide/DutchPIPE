@@ -13,9 +13,9 @@
  * @package    DutchPIPE
  * @subpackage script
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: start_dpserver.php 45 2006-06-20 12:38:26Z ls $
+ * @version    Subversion: $Id: start_dpserver.php 162 2007-06-05 22:57:57Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver.php, dpserver-ini.php, dpuniverse.php,
  *             dpuniverse-ini.php
@@ -24,7 +24,7 @@
 /**
  * Gets constants with server settings
  */
-require_once(dirname(realpath(__FILE__ . '/..')) . '/config/dpserver-ini.php');
+require_once(realpath(dirname(__FILE__) . '/..') . '/config/dpserver-ini.php');
 
 /**
  * Gets DutchPIPE Server class

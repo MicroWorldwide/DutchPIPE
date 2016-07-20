@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.0, created on 2006-08-13 20:42:18
+<?php /* Smarty version 2.6.0, created on 2007-06-11 15:25:39
          compiled from footer.tpl */ ?>
         <div class="credit">
 		    <hr class="separator" />

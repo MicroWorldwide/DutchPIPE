@@ -12,9 +12,9 @@
  * @package    DutchPIPE
  * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpLiving.php 94 2006-08-10 22:39:29Z ls $
+ * @version    Subversion: $Id: DpLiving.php 185 2007-06-09 21:53:43Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -27,37 +27,30 @@ inherit(DPUNIVERSE_STD_PATH . 'DpObject.php');
 /**
  * An object which is "alive", common code shared between users and NPCs
  *
+ * Creates the following DutchPIPE properties:<br />
+ *
+ * - boolean <b>isLiving</b> - Set to TRUE
+ * - string <b>displayMode</b> - "graphical" or "abstract"
+ * - integer <b>sessionAge</b> - Age in seconds of this object
+ * - integer <b>weightCarry</b> - Combined weight of objects in our inventory
+ * - integer <b>maxWeightCarry</b> - Maximum weight this object can carry
+ * - integer <b>volumeCarry</b> - Combined volume of objects in our inventory
+ * - integer <b>maxVolumeCarry</b> - Maximum volume this object can carry
+ * - string <b>actionFailure</b> - Last action error message, "Read what?"
+ * - string <b>actionDefaultFailure</b> - Default action error message, "What?"
+ * - int <b>lastActionTime</b> - UNIX time stamp of last action performed
+ *
  * @package    DutchPIPE
  * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: @package_version@
+ * @version    Release: 0.2.0
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
 class DpLiving extends DpObject
 {
-    /**
-     * Message to be shown when an action fails, can be set by actions
-     *
-     * @var         string
-     * @access      private
-     * @see         setActionFailure(), getActionFailure(),
-     *              $mActionDefaultFailure
-     */
-    private $mActionFailure = DPUNIVERSE_ACTION_DEFAULT_FAILURE;
-
-    /**
-     * Default message to be shown when an action fails
-     *
-     * @var         string
-     * @access      private
-     * @see         setActionDefaultFailure(), getActionDefaultFailure(),
-     *              $mActionFailure
-     */
-    private $mActionDefaultFailure = DPUNIVERSE_ACTION_DEFAULT_FAILURE;
-
     /**
      * Creates this living object
      *
@@ -67,8 +60,6 @@ class DpLiving extends DpObject
      *
      * Calls {@link createDpLiving()} in the inheriting class.
      *
-     * Adds a "is_living" property to this object, set to TRUE.
-     *
      * Starts a "heartbeat", see {@link timeoutHeartBeat()}.
      *
      * @access     private
@@ -76,23 +67,114 @@ class DpLiving extends DpObject
      */
     final function createDpObject()
     {
-        $this->addProperty('is_living');
+        $this->isLiving = new_dp_property(TRUE);
+        $this->displayMode = new_dp_property('graphical');
+        $this->sessionAge = new_dp_property(0, FALSE);
+        $this->isDraggable = FALSE;
+
+        if (WEIGHT_TYPE_NONE !== WEIGHT_TYPE) {
+            $this->weightCarry = new_dp_property(0, FALSE);
+
+            $this->coinherit(DPUNIVERSE_STD_PATH . 'mass.php');
+            if (WEIGHT_TYPE_ABSTRACT === WEIGHT_TYPE) {
+                $this->weight = 7;
+                $this->maxWeightCarry = new_dp_property(7);
+            } elseif (WEIGHT_TYPE_METRIC === WEIGHT_TYPE) {
+                $this->weight = 70000; /* Grams */
+                $this->maxWeightCarry = new_dp_property(30000);
+            } elseif (WEIGHT_TYPE_USA === WEIGHT_TYPE) {
+                $this->weight = 2458; /* Ounces */
+                $this->maxWeightCarry = new_dp_property(1054);
+            }
+        }
+
+        if (VOLUME_TYPE_NONE !== VOLUME_TYPE) {
+            $this->volumeCarry = new_dp_property(0, FALSE);
+
+            $this->coinherit(DPUNIVERSE_STD_PATH . 'mass.php');
+            if (VOLUME_TYPE_ABSTRACT === VOLUME_TYPE) {
+                $this->volume = 7;
+                $this->maxVolumeCarry = new_dp_property(5);
+            } elseif (VOLUME_TYPE_METRIC === VOLUME_TYPE) {
+                $this->volume = 70000;
+                $this->maxVolumeCarry = new_dp_property(30000);
+            } elseif (VOLUME_TYPE_USA === VOLUME_TYPE) {
+                $this->volume = 2458;
+                $this->maxVolumeCarry = new_dp_property(1054);
+            }
+        }
+
+        /**
+         * Sets the message shown to the user when an action fails
+         *
+         * Call this method from action methods, for example actionFoo(). When the
+         * user performs an action but the action fails, there are two ways for the
+         * method implementing the action to communicate the failure to the user.
+         *
+         * <ol>
+         * <li>
+         * Call {@link DpUser:tell()} in the user and return TRUE, for
+         * example:<br><br>
+         * <code>
+         *$user->tell('Action foo failed because of bar.');
+         *return TRUE;
+         * </code>
+         * <br>
+         * The action system will stop looking for other ways to perform the
+         * action.<br><br>
+         * </li>
+         * <li>
+         * Call this setActionFailure method in the user and return FALSE. This
+         * failure setup is used when different objects can have the same actions
+         * implemented with addAction - if one fails, another might still
+         * succeed. Example:<br><br>
+         * <code>
+         *$user->setActionFailure('Action foo failed because of bar.');
+         *return FALSE;
+         * </code>
+         * <br>
+         * The action system will continue looking for other ways to perform
+         * the action. If it doesn't find any, the previously set failure message
+         * is communicated to the user. Otherwise, the next method implementing
+         * the action takes over. The action system will continue looking for
+         * object/methods implementing the action, until TRUE is returned or no
+         * more implementations are found. In that case, the last set action
+         * failure is returned. If no action failure was set, the default failure
+         * message is shown, see {@link setActionDefaultFailure()}.
+         * </li>
+         * </ol>
+         *
+         * @param   string  $actionFailure message to be shown when an action fails
+         * @example /websites/dutchpipe.org/dpuniverse/obj/note.php A readable note
+         * @see     getActionFailure(), setActionDefaultFailure(),
+         *          getActionDefaultFailure()
+         */
+        $this->actionFailure = new_dp_property(DPUNIVERSE_ACTION_DEFAULT_FAILURE);
+
+
+        /**
+         * Sets the default message shown to the user when an action fails
+         *
+         * Used when no message was set with setActionFailure, for example "What?".
+         *
+         * @param   string  $actionDefaultFailure default message to be shown when
+         *                                        an action fails
+         * @see     setActionFailure(), getActionFailure(),
+         *          getActionDefaultFailure()
+         */
+        $this->actionDefaultFailure = new_dp_property(DPUNIVERSE_ACTION_DEFAULT_FAILURE);
+
         $this->setBody(dptext("This description hasn't been set yet.<br />"));
 
-        /* Actions for everybody */
+        /* Actions for both NPCs and users */
         $this->addAction(dptext('inventory'), explode('#', dptext('inventory#inv#i')), 'actionInventory', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
         $this->addAction(dptext('examine'), explode('#', dptext('examine#exam#exa#x#look#l')), 'actionExamine', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF | DP_ACTION_TARGET_LIVING | DP_ACTION_TARGET_OBJINV | DP_ACTION_TARGET_OBJENV, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext("who's here?"), dptext('who'), 'actionWho', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
         $this->addAction(dptext('take'), explode('#', dptext('take#get')), 'actionTake', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_OBJENV, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
         $this->addAction(dptext('drop'), dptext('drop'), 'actionDrop', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_OBJINV, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
         $this->addAction(dptext('say'), dptext('say'), 'actionSay', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('help'), dptext('help'), 'actionHelp', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
         $this->addAction(dptext('give...'), dptext('give'), 'actionGive', array($this, 'actionGiveOperant'), DP_ACTION_TARGET_OBJINV, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
         $this->addAction(dptext('tell'), dptext('tell'), 'actionTell', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
         $this->addAction(dptext('shout'), dptext('shout'), 'actionShout', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('settings'), explode('#', dptext('settings#config')), 'actionSettings', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('source'), dptext('source'), 'actionSource', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('page links'), dptext('links'), 'actionLinks', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
 
         $this->addAction(dptext('smile'), dptext('smile'), 'actionSmile', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
         $this->addAction(dptext('grin'), dptext('grin'), 'actionGrin', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
@@ -105,10 +187,6 @@ class DpLiving extends DpObject
         $this->addAction(dptext('dance'), dptext('dance'), 'actionDance', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
         $this->addAction(dptext('emote'), dptext('emote'), 'actionEmote', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
 
-        /* Actions for admin only */
-        $this->addAction(dptext('svars'), dptext('svars'), 'actionSvars', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('force'), dptext('force'), 'actionForce', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('move!'), dptext('move!'), 'actionMove', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
         $this->setTimeout('timeoutHeartBeat', 2);
 
         $this->createDpLiving();
@@ -159,6 +237,16 @@ class DpLiving extends DpObject
     {
     }
 
+    function eventDpObject($name)
+    {
+        $args = func_get_args();
+        call_user_func_array(array($this, 'eventDpLiving'), $args);
+    }
+
+    function eventDpLiving($name)
+    {
+    }
+
     /**
      * Calls itself every "heartbeat"
      *
@@ -167,6 +255,11 @@ class DpLiving extends DpObject
     function timeoutHeartBeat()
     {
         $this->setTimeout('timeoutHeartBeat', 2);
+    }
+
+    function getSessionAge()
+    {
+        return get_age2string(time() - $this->creationTime);
     }
 
     /**
@@ -192,102 +285,11 @@ class DpLiving extends DpObject
     }
 
     /**
-     * Sets the message shown to the user when an action fails
-     *
-     * Call this method from action methods, for example actionFoo(). When the
-     * user performs an action but the action fails, there are two ways for the
-     * method implementing the action to communicate the failure to the user.
-     *
-     * <ol>
-     * <li>
-     * Call {@link DpUser:tell()} in the user and return TRUE, for
-     * example:<br><br>
-     * <code>
-     *$user->tell('Action foo failed because of bar.');
-     *return TRUE;
-     * </code>
-     * <br>
-     * The action system will stop looking for other ways to perform the
-     * action.<br><br>
-     * </li>
-     * <li>
-     * Call this setActionFailure method in the user and return FALSE. This
-     * failure setup is used when different objects can have the same actions
-     * implemented with addAction - if one fails, another might still
-     * succeed. Example:<br><br>
-     * <code>
-     *$user->setActionFailure('Action foo failed because of bar.');
-     *return FALSE;
-     * </code>
-     * <br>
-     * The action system will continue looking for other ways to perform
-     * the action. If it doesn't find any, the previously set failure message
-     * is communicated to the user. Otherwise, the next method implementing
-     * the action takes over. The action system will continue looking for
-     * object/methods implementing the action, until TRUE is returned or no
-     * more implementations are found. In that case, the last set action
-     * failure is returned. If no action failure was set, the default failure
-     * message is shown, see {@link setActionDefaultFailure()}.
-     * </li>
-     * </ol>
-     *
-     * @param   string  $actionFailure message to be shown when an action fails
-     * @example /websites/dutchpipe.org/dpuniverse/obj/note.php A readable note
-     * @see     getActionFailure(), setActionDefaultFailure(),
-     *          getActionDefaultFailure()
-     */
-    final public function setActionFailure($actionFailure)
-    {
-        $this->mActionFailure = $actionFailure;
-    }
-
-    /**
-     * Gets the message to be shown when an action fails
-     *
-     * @return  string  message to be shown when an action fails
-     * @see     setActionFailure(), setActionDefaultFailure(),
-     *          getActionDefaultFailure()
-     */
-    final public function getActionFailure()
-    {
-        return $this->mActionFailure;
-    }
-
-    /**
-     * Sets the default message shown to the user when an action fails
-     *
-     * Used when no message was set with setActionFailure, for example "What?".
-     *
-     * @param   string  $actionDefaultFailure default message to be shown when
-     *                                        an action fails
-     * @see     setActionFailure(), getActionFailure(),
-     *          getActionDefaultFailure()
-     */
-    final public function setActionDefaultFailure($actionDefaultFailure)
-    {
-        $this->mActionDefaultFailure = $actionDefaultFailure;
-    }
-
-    /**
-     * Gets the default message shown to the user when an action fails
-     *
-     * Used when no message was set with setActionFailure, for example "What?".
-     *
-     * @return  string  default message to be shown when an action fails
-     * @see     setActionFailure(), getActionFailure(),
-     *          setActionDefaultFailure()
-     */
-    final public function getActionDefaultFailure()
-    {
-        return $this->mActionDefaultFailure;
-    }
-
-    /**
      * Tries to perform the action given by the living object
      *
      * Called by the system to handle both actions performed by clicking on
      * menus and actions from the input area. The first method will result in an
-     * $action parameter such as "take object#242" (using an unique object id).
+     * $action parameter such as "take object_242" (using an unique object id).
      * With the second method, $action will contain what the user typed, such as
      * "take beer".
      *
@@ -304,9 +306,12 @@ class DpLiving extends DpObject
      *          DpObject::getTargettedActions(),
      *          DpObject::performActionSubject()
      */
-    final public function performAction($action)
+    public function performAction($action)
     {
         global $grCurrentDpObject;
+
+        $this->lastActionTime = !isset($this->lastActionTime)
+            ? new_dp_property(time()) : time();
 
         $action = trim($action);
         $grCurrentDpObject = $this;
@@ -317,17 +322,46 @@ class DpLiving extends DpObject
         if (TRUE !== $rval) {
             if (strlen($action) && $action !== dptext('look')
                     && $action !== dptext('l')) {
-                $this->tell($this->getActionFailure());
-                $this->setActionFailure($this->getActionDefaultFailure());
-
-                if ($this->getProperty('is_user')
-                        && $this === get_current_dpuser()) {
-                    get_current_dpuniverse()->setToldSomething();
+                $action_failure = $this->getActionFailure();
+                if (!isset($this->_GET['menuaction'])) {
+                    $this->tell($action_failure);
+                    if ($this->isUser && $this === get_current_dpuser()) {
+                        get_current_dpuniverse()->setToldSomething();
+                    }
                 }
+                $this->setActionFailure($this->getActionDefaultFailure());
             }
         }
         $grCurrentDpObject = FALSE;
         return $rval;
+    }
+
+    function getWeightCarry()
+    {
+        $inv = $this->getInventory();
+        $weight = 0;
+
+        foreach ($inv as &$ob) {
+            if (isset($ob->weight)) {
+                $weight += $ob->weight;
+            }
+        }
+
+        return $weight;
+    }
+
+    function getVolumeCarry()
+    {
+        $inv = $this->getInventory();
+        $volume = 0;
+
+        foreach ($inv as &$ob) {
+            if (isset($ob->volume)) {
+                $volume += $ob->volume;
+            }
+        }
+
+        return $volume;
     }
 
     /**
@@ -359,17 +393,22 @@ class DpLiving extends DpObject
             return FALSE;
         }
 
-        if (!($ob = $this->isPresent($noun))) {
-            if (!($ob = $env->isPresent($noun))) {
+        if (!($ob = $this->isPresent($noun))
+                && !($description = $this->getItemDescription($noun))) {
+            if (!($ob = $env->isPresent($noun))
+                    && !($description = $env->getItemDescription($noun))) {
                 $this->setActionFailure(sprintf(
                     dptext('There is no %s here.<br />'), $noun));
                 return FALSE;
             }
         }
 
-        $this->tell('<window>' . $ob->getAppearance(0, TRUE, NULL,
-            $this->getProperty('display_mode'), FALSE, 'dpobinv')
-            . '</window>');
+        if ($ob) {
+            $description = $ob->getAppearance(0, TRUE, NULL, $this->displayMode,
+                FALSE, 'dpobinv');
+        }
+
+        $this->tell("<window>$description</window>");
         return TRUE;
     }
 
@@ -396,10 +435,19 @@ class DpLiving extends DpObject
             $inv = $env->getInventory();
             $picked_up = FALSE;
             foreach ($inv as &$ob) {
-                if (FALSE === $ob->getProperty('is_living')) {
-                    $ob->moveDpObject($this);
+                if (!isset($ob->isLiving) || TRUE !== $ob->isLiving) {
+                    $result = $ob->moveDpObject($this);
                     $picked_up = TRUE;
-                    $this->tell(sprintf(dptext('You take %s.<br />'),
+                    if (FALSE !== $result) {
+                        if (E_MOVEOBJECT_HEAVY === $result) {
+                            $this->tell(dptext("You can't carry more weight, drop something first.<br />"));
+                        }
+                        if (E_MOVEOBJECT_VOLUME === $result) {
+                            $this->tell(dptext("You can't carry more volume, drop something first.<br />"));
+                        }
+                        continue;
+                    }
+                    $this->tell(dptext('You take %s.<br />',
                         $ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
                     $env->tell(ucfirst(sprintf(dptext('%s takes %s.<br />'),
                         $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
@@ -419,18 +467,38 @@ class DpLiving extends DpObject
             return FALSE;
         }
 
-        if (FALSE !== $ob->getProperty('is_living')) {
+        if (isset($ob->isLiving) && TRUE === $ob->isLiving) {
             $this->tell(ucfirst(sprintf(dptext('%s refuses to be taken.<br />'),
                 $ob->getTitle())));
             return TRUE;
         }
 
-        $ob->moveDpObject($this);
+        if ($ob->isHeap && preg_match("/^(\d+) /", $noun, $matches)
+                && $matches[1] > 0 && $matches[1] < $ob->amount) {
+            $result = $ob->moveDpObject($this, FALSE, $matches[1]);
+            $title_definite = $title_indefinite = $noun;
+        } else {
+            $result = $ob->moveDpObject($this);
+            $title_definite = $ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE);
+            $title_indefinite = $ob->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE);
+        }
+
+        if (FALSE !== $result) {
+            if (E_MOVEOBJECT_HEAVY === $result) {
+                $this->tell(ucfirst(
+                    dptext("You can't carry more weight, drop something first.<br />")));
+            }
+            if (E_MOVEOBJECT_VOLUME === $result) {
+                $this->tell(ucfirst(
+                    dptext("You can't carry more volume, drop something first.<br />")));
+            }
+            return TRUE;
+        }
         $this->tell(sprintf(dptext('You take %s.<br />'),
-            $ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
+            $title_definite));
         $env->tell(ucfirst(sprintf(dptext('%s takes %s.<br />'),
             $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
-            $ob->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE))),
+            $title_indefinite)),
             $this);
         return TRUE;
     }
@@ -483,16 +551,22 @@ class DpLiving extends DpObject
             return FALSE;
         }
 
-        $ob->moveDpObject($env);
+        if ($ob->isHeap && preg_match("/^(\d+) /", $noun, $matches)
+                && $matches[1] > 0 && $matches[1] < $ob->amount) {
+            $result = $ob->moveDpObject($env, FALSE, $matches[1]);
+            $title_definite = $title_indefinite = $noun;
+        } else {
+            $result = $ob->moveDpObject($env);
+            $title_definite = $ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE);
+            $title_indefinite = $ob->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE);
+        }
         if (FALSE === $silently) {
-            $this->tell(sprintf(dptext('You drop %s.<br />'),
-                $ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
+            $this->tell(sprintf(dptext('You drop %s.<br />'), $title_definite));
         }
 
         $env->tell(ucfirst(sprintf(dptext('%s drops %s.<br />'),
             $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
-            $ob->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE))),
-            $this);
+            $title_indefinite)), $this);
         return TRUE;
     }
 
@@ -505,12 +579,8 @@ class DpLiving extends DpObject
      */
     function actionInventory($verb, $noun)
     {
-        if (FALSE === ($env = $this->getEnvironment())) {
-            return FALSE;
-        }
-
         $inventory = $this->getAppearance(0, TRUE, NULL,
-            $this->getProperty('display_mode'), -1, 'dpobinv');
+            $this->displayMode, -1, 'dpobinv');
         /* :KLUDGE: */
         $carrying_str = dptext('You are carrying:');
         $inventory = str_replace($carrying_str, "<b>$carrying_str</b>",
@@ -536,7 +606,7 @@ class DpLiving extends DpObject
             return FALSE;
         }
         $env->tell(ucfirst(sprintf(dptext('%s says: %s<br />'),
-            $this->getTitle(), $noun)), $this);
+            $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE), $noun)), $this);
         $this->tell(sprintf(dptext('You say: %s<br />'), $noun));
         return TRUE;
     }
@@ -581,7 +651,7 @@ class DpLiving extends DpObject
         $what = substr($noun, 0, $pos);
         $who = substr($noun, $pos + $to_len);
         if (!($what_ob = $this->isPresent($what))) {
-            $this->tell(sprintf(dptext('You have no %s.<br />'), $hwat));
+            $this->tell(sprintf(dptext('You have no %s.<br />'), $what));
             return TRUE;
         }
         if (FALSE === ($env = $this->getEnvironment())
@@ -666,145 +736,6 @@ class DpLiving extends DpObject
             }
         }
         $this->tell(sprintf(dptext('You shout: %s<br />'), $noun));
-        return TRUE;
-    }
-
-    /**
-     * Shows this living object a window with help information
-     *
-     * @param   string  $verb       the action, "help"
-     * @param   string  $noun       empty string
-     * @return  boolean TRUE
-     */
-    function actionHelp($verb, $noun)
-    {
-        $this->tell("<window><div id=\"helptext\">"
-            . dptext("<b>Standard commands:</b><br />
-Avatar and display settings: <tt>settings, config</tt><br />
-Examine stuff: <tt>examine <i>item</i>, look at <i>item</i></tt><br />
-Pick up stuff: <tt>take <i>item</i>, take all, get <i>item</i>, get all</tt><br />
-What am I carrying?: <tt>inventory, inv, i</tt><br />
-Drop stuff: <tt>drop <i>item</i>, drop all</tt><br />
-Give stuff to others: <tt>give <i>item</i> to <i>user</i></tt><br />
-Say something to users on this page: <tt>say <i>what</i>, '<i>what</i></tt><br />
-Tell to another user anywhere: <tt>tell <i>user</i> <i>what</i>, \"<i>user</i> <i>what</i></tt><br />
-Shout something to all users on the site: <tt>shout <i>what</i></tt><br />
-Emotions: <tt>smile, grin, laugh, shrug, pat, emote</tt><br />
-Read something readable: <tt>read <i>item</i></tt><br />
-List of people on this site: <tt>who</tt><br />
-View source of page: <tt>source</tt><br /><br />
-<tt><i>item</i></tt> can be something like <tt>beer, cool beer</tt> or <tt>beer 3</tt> to refer to the third beer. All commands are case insensitive!<br /><br />
-Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to guest#2, drink beer 2</tt>")
-            . "<br clear=\"all\" /></div></window>");
-        return TRUE;
-    }
-
-    /**
-     * Shows this living object source code of environment or of another object
-     *
-     * @param   string  $verb       the action, "source"
-     * @param   string  $noun       what to show source of, could be empty
-     * @return  boolean TRUE for action completed, FALSE otherwise
-     */
-    function actionSource($verb, $noun)
-    {
-        if (!strlen($noun)) {
-            $what = $this->getEnvironment();
-        } else {
-            if (FALSE === ($what = $this->isPresent($noun))
-                    && FALSE === ($what =
-                    $this->getEnvironment()->isPresent($noun))) {
-                $this->tell(sprintf(dptext("Can't find: %s<br />"), $noun));
-                return TRUE;
-            }
-        }
-
-        if (FALSE === ($what = $this->getEnvironment())) {
-            return FALSE;
-        }
-        /* Without the \n and &nbsp; to &#160 conversion, highlight_file gave
-         invalid XHTML */
-        $this->tell("<window styleclass=\"dpwindow_src\">\n"
-            . str_replace('&nbsp;', '&#160;', highlight_file(DPUNIVERSE_PATH
-            . $what->getProperty('location'), TRUE) . "\n</window>"));
-        return TRUE;
-    }
-
-    /**
-     * Shows this living a list of links in its environment or in another object
-     *
-     * @param   string  $verb       the action, "links"
-     * @param   string  $noun       what to take, could be empty
-     * @return  boolean TRUE for action completed, FALSE otherwise
-     */
-    function actionLinks($verb, $noun)
-    {
-        if (!strlen($noun)) {
-            $what = $this->getEnvironment();
-        } else {
-            if (FALSE === ($what = $this->isPresent($noun))
-                    && FALSE === ($what =
-                    $this->getEnvironment()->isPresent($noun))) {
-                $this->tell(sprintf(dptext("Can't find: %s<br />"), $noun));
-                return TRUE;
-            }
-        }
-
-        if (FALSE === method_exists($what, 'getExits')
-                || 0 === count($links = $what->getExits())) {
-            $tell = '<b>' . sprintf(dptext('No links found in %s'),
-                $what->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))
-                . '</b><br />';
-        } else {
-            $tell = '<b>' . sprintf(dptext('Links found in: %s'),
-                $what->getTitle()) . '</b><br /><br />';
-            foreach ($links as $linktitle => $linkurl) {
-                if ($linktitle === DPUNIVERSE_NAVLOGO) {
-                    $linkcommand = dptext('home');
-                } else {
-                    $linkcommand = explode(' ', $linktitle);
-                    $linkcommand = strtolower($linktitle);
-                }
-                $tell .= "<a href=\"" . DPSERVER_CLIENT_URL
-                    . "?location=$linkurl\">$linkcommand</a><br />";
-            }
-        }
-        $this->tell('<window>' . $tell . '</window>');
-        return TRUE;
-    }
-
-    /**
-     * Shows this living object a list of users on the site
-     *
-     * @param   string  $verb       the action, "who"
-     * @param   string  $noun       empty string
-     * @return  boolean TRUE
-     */
-    function actionWho($verb, $noun)
-    {
-        $users = get_current_dpuniverse()->getUsers();
-        if (0 === count($users)) {
-           $this->tell('<window><b>' . dptext('No one is on this site.')
-            . '</b></window>');
-            return TRUE;
-        }
-
-        $tell = '<b>' . dptext('People currently on this site:') . '</b><br />';
-        $tell .= '<table cellpadding="0" cellspacing="0" border="0" style="'
-            . 'margin-top: 5px">';
-        foreach ($users as &$user) {
-            $env = $user->getEnvironment();
-            $loc = $env->getProperty('location');
-            if (0 !== strpos($loc, 'http://')) {
-                $loc = DPSERVER_CLIENT_URL . '?location=' . $loc;
-            }
-            $env = FALSE === $env ? '-' : '<a href="' . $loc . '">'
-                . $env->getTitle() . '</a>';
-            $tell .= '<tr><td>' . $user->getTitle()
-                . '</td><td style="padding-left: 10px">' . $env . '</td></tr>';
-        }
-        $tell .= '</table>';
-        $this->tell("<window>$tell</window>");
         return TRUE;
     }
 
@@ -1064,283 +995,6 @@ Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to g
             . " $noun<br />");
         $env->tell(ucfirst($this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))
             . " $noun<br />", $this);
-        return TRUE;
-    }
-
-    /**
-     * Shows this living object a window with settings
-     *
-     * @param   string  $verb       the action, "settings"
-     * @param   string  $noun       empty string
-     * @return  boolean TRUE for action completed, FALSE otherwise
-     * @see     setSettings()
-     */
-    function actionSettings($verb, $noun)
-    {
-        $this->tell('<script>
-var settings_obj = null;
-
-function send_settings()
-{
-    settings_obj = get_http_obj();
-    if (settings_obj) {
-        settings_obj.onreadystatechange = rcv_settings;
-
-        var avatar_nr = 1;
-        for (i=1;_gel("avatar_nr"+i) != undefined;i++) {
-            if (_gel("avatar_nr"+i).checked) {
-                avatar_nr = i;
-                break;
-            }
-        }
-
-        settings_obj.open("GET", (str = "' . DPSERVER_CLIENT_URL . '?location='
-            . $this->getEnvironment()->getProperty('location')
-            . '&rand="+Math.round(Math.random()*9999)
-            + "&call_object="+escape("' . $this->getUniqueId() . '")
-            + "&method=setSettings"
-            + "&avatar_nr="+avatar_nr
-            + "&display_mode="+(_gel("display_mode1").checked ? _gel("display_mode1").value : _gel("display_mode2").value)),
-            true);
-        settings_obj.send(null);
-    } else {
-        alert("' . dptext('Could not establish connection with server.') . '");
-    }
-    return false;
-}
-
-function rcv_settings()
-{
-    if (settings_obj.readyState != 4) {
-        return;
-    }
-    if (settings_obj.status == 200) {
-        handle_response(settings_obj);
-    }
-    settings_obj = null;
-}
-</script>');
-        $nr_of_avatars = $this->_getNrOfAvatars();
-        $cur_avatar_nr = (int)$this->getProperty('avatar_nr');
-        for ($avatar_settings = '', $i = 1; $i <= $nr_of_avatars; $i++) {
-            $avatar_settings .= '<input type="radio" id="avatar_nr' . $i
-                . '" name="avatar_nr" value="' . $i . '"'
-                . ($cur_avatar_nr !== $i ? '' : ' checked="checked"')
-                . ' onClick="send_settings()" style="cursor: pointer" />' . $i
-                . "&#160; ";
-        }
-
-        $this->tell('<window>' . dptext('Choose your avatar:') . '<br />'
-. $avatar_settings . '<br /><br />'
-. dptext('People and items on the page are displayed in:') . '<br />
-<input type="radio" id="display_mode1" name="display_mode" value="graphical"' . ($this->getProperty('display_mode') == 'graphical' ? ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dptext('Graphical mode') . '<br />
-<input type="radio" id="display_mode2" name="display_mode" value="abstract"' . ($this->getProperty('display_mode') == 'abstract' ? ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dptext('Abstract mode') . '<br /><br />
-<div id="box"><a href="http://www.messdudes.com/" target="_blank"><b>Mess Dudes</b></a> has kindly allowed DutchPIPE to use a number of avatars.</div>
-</window>');
-        return TRUE;
-    }
-
-    /**
-     * Applies settings from the settings menu obtained with actionSettings()
-     *
-     * Called from the Javascript that goes with the menu that pops up after the
-     * settings action has been performed. Applies avatar and dispay mode
-     * settings, based on the DpUser::_GET variable in this living object.
-     *
-     * @see     actionSettings
-     * @todo    save settings for registered users in the database
-     */
-    function setSettings()
-    {
-        if (!isset($this->_GET['avatar_nr'])
-                || 0 === strlen($avatar_nr = $this->_GET['avatar_nr'])
-                || !isset($this->_GET['display_mode'])
-                || 0 === strlen($display_mode = $this->_GET['display_mode'])) {
-            $this->tell(dptext('Error receiving display mode.<br />'));
-        }
-
-        $this->addProperty('avatar_nr', $avatar_nr);
-        $this->setTitleImg(DPUNIVERSE_AVATAR_URL . 'user' . $avatar_nr
-            . '.gif');
-        $this->setBody('<img src="' . DPUNIVERSE_AVATAR_URL . 'user'
-            . $avatar_nr . '_body.gif" border="0" alt="" align="left" '
-            . 'style="margin-right: 15px" />' . dptext('A user.') . '<br />');
-
-        $this->addProperty('display_mode', $display_mode);
-
-        if (FALSE !== ($body = $this->getEnvironment()->
-                getAppearanceInventory(0, TRUE, NULL, $display_mode))) {
-            $this->tell($body);
-        }
-        $this->getEnvironment()->tell(array('abstract' =>
-            '<changeDpElement id="'
-            . $this->getUniqueId() . '">'
-            . $this->getAppearance(1, FALSE) . '</changeDpElement>',
-            'graphical' => '<changeDpElement id="'
-            . $this->getUniqueId() . '">'
-            . $this->getAppearance(1, FALSE, $this, 'graphical')
-            . '</changeDpElement>'), $this);
-    }
-
-    /**
-     * Shows this administrator various PHP/server information about a user
-     *
-     * @param   string  $verb       the action, "svars"
-     * @param   string  $noun       who to show info of, could be empty
-     * @return  boolean TRUE for action completed, FALSE otherwise
-     */
-    function actionSvars($verb, $noun)
-    {
-        if (!strlen($noun)) {
-            $ob =& $this;
-        } else {
-            if (FALSE === ($env = $this->getEnvironment())) {
-                return FALSE;
-            }
-            if (FALSE === ($ob = $this->isPresent($noun))) {
-                if (FALSE === ($ob = $env->isPresent($noun))) {
-                    if (FALSE ===
-                            ($ob = get_current_dpuniverse()->findUser($noun))) {
-                        $this->setActionFailure(sprintf(
-                            dptext('Target %s not found.<br />'), $noun));
-                        return FALSE;
-                    }
-                }
-            }
-        }
-        $this->tell('<window><b>' . sprintf(dptext('Server variables of %s:'),
-            $ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))
-            . '</b><br /><pre>' . print_r($ob->_SERVER, TRUE) . '</pre>'
-            . '<b>' . sprintf(dptext('Properties of %s:'),
-            $ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))
-            . '</b><pre>' . print_r($ob->getProperties(), TRUE)
-            . '</pre></window>');
-        return TRUE;
-    }
-
-    /**
-     * Makes this administrator force another living object to perform an action
-     *
-     * @param   string  $verb       the action, "force"
-     * @param   string  $noun       who and what to force
-     * @return  boolean TRUE for action completed, FALSE otherwise
-     */
-    function actionForce($verb, $noun)
-    {
-        if (!strlen($noun = trim($noun))
-                || FALSE === ($pos = strpos($noun, ' '))) {
-            $this->setActionFailure(
-                dptext('Syntax: force <i>who what</i>.<br />'));
-            return FALSE;
-        }
-        $who = substr($noun, 0, $pos);
-        $what = substr($noun, $pos + 1);
-        if (FALSE === ($who_ob = $this->isPresent($who))) {
-            if (FALSE !== ($env = $this->getEnvironment())) {
-                $who_ob = $env->isPresent($who);
-            }
-        }
-        if (FALSE === $who_ob) {
-            $this->setActionFailure(sprintf(
-                dptext('Target %s not found.<br />'), $who));
-            return FALSE;
-        }
-
-        $this->tell(sprintf(
-            dptext('You give %s the old "Jedi mind-trick" stink eye.<br />'),
-            $who_ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
-        $env->tell(ucfirst(sprintf(
-            dptext('%s gives %s the old "Jedi mind-trick" stink eye.<br />'),
-            $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
-            $who_ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))),
-            $this, $who_ob);
-        $who_ob->tell(ucfirst(sprintf(
-            dptext('%s gives you the old "Jedi mind-trick" stink eye.<br />'),
-            $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))));
-
-        $who_ob->performAction($what);
-        return TRUE;
-    }
-
-    /**
-     * Makes this administrator move an object to another environment
-     *
-     * @param   string  $verb       the action, "move"
-     * @param   string  $noun       what and where to move
-     * @return  boolean TRUE for action completed, FALSE otherwise
-     */
-    function actionMove($verb, $noun)
-    {
-        if (!strlen($noun = trim($noun))
-                || FALSE === ($pos = strpos($noun, ' '))) {
-            $this->setActionFailure(
-                dptext('Syntax: move <i>what where</i>.<br />'));
-            return FALSE;
-        }
-
-        $what = substr($noun, 0, $pos);
-        if (FALSE === ($what_ob = $this->isPresent($what))) {
-            if (FALSE !== ($env = $this->getEnvironment())) {
-                $what_ob = $env->isPresent($what);
-            }
-            if (FALSE === $what_ob) {
-                $what_ob = get_current_dpuniverse()->findUser($what);
-            }
-        }
-        if (FALSE === $what_ob) {
-            $this->setActionFailure(sprintf(
-                dptext('Object to move %s not found.<br />'), $what));
-            return FALSE;
-        }
-
-        $where = substr($noun, $pos + 1);
-        $env = $this->getEnvironment();
-        if ('!' === $where) {
-            $where_ob = $this->getEnvironment();
-            if (FALSE === $where_ob) {
-                $this->setActionFailure(sprintf(
-                    dptext("Can't move object %s to this location: you have no environment.<br />"),
-                    $what));
-            }
-        }
-        elseif ('me' === $where) {
-            $where_ob = $this;
-        }
-        elseif (FALSE === ($where_ob = $this->isPresent($where))) {
-            if (FALSE !== $env) {
-                $where_ob = $env->isPresent($where);
-            }
-            if (FALSE === $where_ob) {
-                $where_ob = get_current_dpuniverse()->findUser($where);
-            }
-        }
-        if (FALSE === $where_ob) {
-            $this->setActionFailure(sprintf(
-                dptext('Target %s not found.<br />'), $where));
-            return FALSE;
-        }
-
-        if ($this === $what_ob && $this === $where_ob) {
-            $this->setActionFailure(
-                dptext('You cannot move yourself into yourself.<br />'));
-            return FALSE;
-        }
-
-        $this->tell(sprintf(
-            dptext('You give %s the old "Jedi mind-trick" stink eye.<br />'),
-            $what_ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
-        if (FALSE !== $env) {
-            $env->tell(ucfirst(sprintf(
-                dptext('%s gives %s the old "Jedi mind-trick" stink eye.<br />'),
-                $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
-                $what_ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))),
-                $this, $what_ob);
-            }
-        $what_ob->tell(ucfirst(sprintf(
-            dptext('%s gives you the old "Jedi mind-trick" stink eye.<br />'),
-            $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))));
-
-        $what_ob->moveDpObject($where_ob);
         return TRUE;
     }
 }

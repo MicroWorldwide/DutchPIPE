@@ -18,9 +18,9 @@
  * @package    DutchPIPE
  * @subpackage config
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpserver-ini.php 91 2006-08-07 13:41:53Z ls $
+ * @version    Subversion: $Id: dpserver-ini.php 195 2007-06-10 22:09:08Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @tutorial   DutchPIPE/DutchPIPE.pkg
  * @see        dpserver.php, dpclient.php, dpuniverse-ini.php
@@ -37,13 +37,32 @@
 define('DPSERVER_HOST_URL', 'http://www.yourdomain.com');
 //define('DPSERVER_HOST_URL', 'http://localhost');
 
+if (!defined('DPSERVER_CLIENT_DIR')) {
+    /**
+     * The rest of the URL for the client PHP script, /dpclient.php by default
+     *
+     * @see        DPSERVER_HOST_URL, DPSERVER_CLIENTJS_URL
+     */
+    define('DPSERVER_CLIENT_DIR', '/');
+}
+
+if (!defined('DPSERVER_CLIENT_FILENAME')) {
+    /**
+     * The rest of the URL for the client PHP script, /dpclient.php by default
+     *
+     * @see        DPSERVER_HOST_URL, DPSERVER_CLIENTJS_URL
+     */
+    define('DPSERVER_CLIENT_FILENAME', 'dpclient.php');
+}
+
 if (!defined('DPSERVER_CLIENT_URL')) {
     /**
      * The rest of the URL for the client PHP script, /dpclient.php by default
      *
      * @see        DPSERVER_HOST_URL, DPSERVER_CLIENTJS_URL
      */
-    define('DPSERVER_CLIENT_URL', '/dpclient.php');
+    define('DPSERVER_CLIENT_URL', DPSERVER_CLIENT_DIR .
+        DPSERVER_CLIENT_FILENAME);
 }
 
 /**
@@ -51,7 +70,7 @@ if (!defined('DPSERVER_CLIENT_URL')) {
  *
  * @see        DPSERVER_HOST_URL, DPSERVER_CLIENTJS_URL
  */
-define('DPSERVER_CLIENTJS_URL', '/dpclient-js.php');
+define('DPSERVER_CLIENTJS_URL', DPSERVER_CLIENT_DIR . 'dpclient-js.php');
 
 /**
  * The name of the cookie DutchPIPE uses to store user information
@@ -79,8 +98,8 @@ define('DPSERVER_TIMEZONE', 'Europe/Amsterdam');
  *             DPSERVER_SOCKET_PORT, DPSERVER_MAX_SOCKET_BACKLOG,
  *             DPSERVER_SOCKERR_MSG
  */
-define('DPSERVER_SOCKET_TYPE', AF_UNIX);
-//define('DPSERVER_SOCKET_TYPE', AF_INET);
+define('DPSERVER_SOCKET_TYPE', AF_INET);
+//define('DPSERVER_SOCKET_TYPE', AF_UNIX);
 
 /**
  * Path to the file used for socket connections
@@ -147,7 +166,7 @@ define('DPSERVER_MAX_SOCKET_BACKLOG', 5);
  * Defaults to the mother directory of the directory this file is in.
  * Leave this untouched if the DutchPIPE directory structure wasn't changed.
  */
-define('DPSERVER_ROOT_PATH', dirname(realpath(__FILE__ . '/..')) . '/');
+define('DPSERVER_ROOT_PATH', realpath(dirname(__FILE__) . '/..') . '/');
 
 /**
  * Path to the root of the DutchPIPE universe
@@ -416,4 +435,16 @@ define('DPSERVER_CLIENT_CHUNK', 2048);
  * @see        DPSERVER_CLIENT_CHUNK
  */
 define('DPSERVER_SERVER_CHUNK', 2048);
+
+/**
+ * Maximum memory usage
+ *
+ * Memory limit in bytes that the server may allocate. Use -1 for unlimited.
+ * When an integer is used, the value is measured in bytes. You may also use
+ * shorthand notation as described in this FAQ:
+ * http://www.php.net/manual/en/faq.using.php#faq.using.shorthandbytes
+ *
+ * See also: http://www.php.net/manual/en/ini.core.php#ini.memory-limit
+ */
+define('DPSERVER_MEMORY_LIMIT', '32M');
 ?>

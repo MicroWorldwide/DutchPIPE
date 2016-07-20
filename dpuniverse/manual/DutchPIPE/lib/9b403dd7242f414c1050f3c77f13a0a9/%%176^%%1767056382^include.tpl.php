@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.0, created on 2006-08-13 20:42:38
+<?php /* Smarty version 2.6.0, created on 2007-06-11 15:26:21
          compiled from include.tpl */ ?>
 <?php if (isset($this->_sections['includes'])) unset($this->_sections['includes']);
 $this->_sections['includes']['name'] = 'includes';

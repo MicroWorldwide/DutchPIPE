@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.0, created on 2006-08-13 20:42:31
+<?php /* Smarty version 2.6.0, created on 2007-06-11 15:25:45
          compiled from method.tpl */ ?>
 <a name='method_detail'></a>
 <?php if (isset($this->_sections['methods'])) unset($this->_sections['methods']);
