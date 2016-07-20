@@ -2,7 +2,7 @@
 /**
  * Handles the current HTTP page or AJAX request by the user
  *
- * DutchPIPE version 0.1; PHP version 5
+ * DutchPIPE version 0.2; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id$
+ * @version    Subversion: $Id: dpcurrentrequest.php 243 2007-07-08 16:26:23Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php
  */
@@ -32,7 +32,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: 0.2.0
+ * @version    Release: 0.2.1
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  */
 class DpCurrentRequest
@@ -584,7 +584,15 @@ class DpCurrentRequest
                 . 'index.php');
             $this->mrUser->tell('<location>' . DPSERVER_CLIENT_DIR
                 . '</location>');
+        } elseif (!$tmp->standaloneTitleSet && isset($this->__GET['title'])) {
+            /*
+             * Standalone pages send their title in the first AJAX call. Could
+             * be improved as it always does that, while it is only needed once.
+             */
+            $tmp->title = $this->__GET['title'];
+            $tmp->standaloneTitleSet = new_dp_property(TRUE);
         }
+
         //echo "\n";
         $this->mrEnvironment = $tmp;
 
@@ -786,9 +794,11 @@ class DpCurrentRequest
             }
             if ($type = $this->mrEnvironment->isMovingArea) {
                 $this->mrUser->tell('<script type="text/javascript" ' .
-                    'src="/interface/iutil.js"></script>');
+                    'src="' . DPUNIVERSE_WWW_URL
+                    . 'interface/iutil.js"></script>');
                 $this->mrUser->tell('<script type="text/javascript" ' .
-                    'src="/interface/idrag.js"></script>');
+                    'src="' . DPUNIVERSE_WWW_URL
+                    . 'interface/idrag.js"></script>');
                 $containment = $type === 1 ? "containment : 'parent',\n" : '';
                 $cssfix = $type == 1 ? '.dpinventory, .dpinventory2'
                     : '.dpinventory';

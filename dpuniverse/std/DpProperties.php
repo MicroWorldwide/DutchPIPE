@@ -2,7 +2,7 @@
 /**
  * The DutchPIPE property and coinherit system which all objects extend on
  *
- * DutchPIPE version 0.1; PHP version 5
+ * DutchPIPE version 0.2; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id:$
+ * @version    Subversion: $Id: DpProperties.php 243 2007-07-08 16:26:23Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  */
 
@@ -26,7 +26,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: 0.2.0
+ * @version    Release: 0.2.1
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  */
 class DpProperties
@@ -348,7 +348,7 @@ class DpProperties
     }
 
     /**
-     * Directly retreive the value of an existing DutchPIPE property
+     * Directly retrieve the value of an existing DutchPIPE property
      *
      * @param      string    $nm        name of property
      * @return     mixed     value of property

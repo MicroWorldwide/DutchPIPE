@@ -2,7 +2,7 @@
 /**
  * A Village Square
  *
- * DutchPIPE version 0.1; PHP version 5
+ * DutchPIPE version 0.2; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id$
+ * @version    Subversion: $Id: square.php 243 2007-07-08 16:26:23Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -32,7 +32,7 @@ inherit(DPUNIVERSE_STD_PATH . 'DpPage.php');
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: 0.2.0
+ * @version    Release: 0.2.1
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -71,13 +71,12 @@ beautiful fountain catches your attention.</p><p align="justify">To the
             . '187,224,187,249,207,251,212,258,212,282,190,290,140,292,113,'
             . '288');
         $this->addItem(dptext('fountain'),
-            dptext('A beautiful fountain.'), 'getFountainItem',
+            dptext('A beautiful fountain. '), 'getFountainItem',
             'fountain_area');
         $this->addAction(dptext('search'), dptext('search'), 'actionSearch',
             DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
             DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY,
             'fountain_area',
-            NULL,
             dptext('search fountain'));
         $this->setNavigationTrail(
             array(DPUNIVERSE_NAVLOGO, ''),

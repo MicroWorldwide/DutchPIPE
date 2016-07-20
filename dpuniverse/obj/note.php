@@ -2,7 +2,7 @@
 /**
  * A small note that users can read
  *
- * DutchPIPE version 0.1; PHP version 5
+ * DutchPIPE version 0.2; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: note.php 185 2007-06-09 21:53:43Z ls $
+ * @version    Subversion: $Id: note.php 243 2007-07-08 16:26:23Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -32,7 +32,7 @@ inherit(DPUNIVERSE_STD_PATH . 'DpObject.php');
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: 0.2.0
+ * @version    Release: 0.2.1
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -87,21 +87,21 @@ final class Note extends DpObject
      */
     public function actionRead($verb, $noun)
     {
-        /* Replies to user entering "read" */
+        /* Replies to object entering "read" */
         if (!strlen($noun)) {
-            get_current_dpuser()->setActionFailure(
+            get_current_dpobject()->setActionFailure(
                 dptext('What do you want to read?<br />'));
             return FALSE;
         }
 
-        /* Replies to user entering "read noet" (typo) */
+        /* Replies to object entering "read noet" (typo) */
         if (FALSE === $this->isId($noun)) {
-            get_current_dpuser()->setActionFailure(dptext('Read WHAT?<br />'));
+            get_current_dpobject()->setActionFailure(dptext('Read WHAT?<br />'));
             return FALSE;
         }
 
         /* Shows a nice window with content */
-        get_current_dpuser()->tell('<window>' . dptext('Hello world.')
+        get_current_dpobject()->tell('<window>' . dptext('Hello world.')
             . '</window>');
         return TRUE;
     }

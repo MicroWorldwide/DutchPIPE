@@ -2,7 +2,7 @@
 /**
  * Common functions available to all objects in the universe
  *
- * DutchPIPE version 0.1; PHP version 5
+ * DutchPIPE version 0.2; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpfunctions.php 159 2007-06-05 22:49:56Z ls $
+ * @version    Subversion: $Id: dpfunctions.php 238 2007-07-08 15:40:07Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php
  */
@@ -120,6 +120,50 @@ function inherit($path)
     }
 
     require_once(DPUNIVERSE_PREFIX_PATH . $path);
+}
+
+/**
+ * Verifies that the contents of a variable can be called as a method
+ *
+ * Identical to the PHP {@link http://www.php.net/is_callable is_callable}
+ * method, except that it can be not be the name of a function stored in a
+ * string variable, it must be an object and the name of a method within the
+ * object, like this:
+ *
+ *     array($SomeObject, 'MethodName')
+ *
+ * @param      mixed     &$var        variable to check
+ * @return     boolean   TRUE if var is callable, FALSE otherwise
+ * @see        parse_dp_callable
+ */
+function is_dp_callable(&$var)
+{
+    return is_array($var) && is_callable($var);
+}
+
+/**
+ * Replaces the contents of a callable variable
+ *
+ * Checks if the given variable can be called as a method with is_dp_callable.
+ * If it is, calls the method and replaces the variable with the result.
+ *
+ * @param      mixed     &$var        variable to check
+ * @see        is_dp_callable
+ */
+function parse_dp_callable(&$var)
+{
+    if (!is_dp_callable($var)) {
+        return;
+    }
+
+    $nr_of_args = func_num_args() - 1;
+    if (1 === $nr_of_args) {
+        $var = $var[0]->{$var[1]}();
+        return;
+    }
+
+    $args = array_slice(func_get_args(), 1);
+    $var = call_user_func_array(array($var[0], $var[1]), $args);
 }
 
 /**

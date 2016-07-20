@@ -49,9 +49,8 @@
             </div><br clear="all" />
         </div>
         <div id="dpfooter">
-            <a href="/dpclient.php?location=/page/copyright.php">Legal
-            Notices</a> | Copyright &copy; 2007 Lennert Stock. All rights
-            reserved. Last update: Fri Apr 6 2007, 22:30 CET.
+            <a href="<?php echo DPSERVER_CLIENT_URL; ?>?location=/page/copyright.php">Legal
+            Notices</a> | Running DutchPIPE 0.2.1 by Lennert Stock.
         </div>
         &#160;<a name="bottom"></a>
     </body>

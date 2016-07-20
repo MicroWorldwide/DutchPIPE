@@ -6,7 +6,7 @@
  * define the settings and behavious of "the universe".
  * See dpserver-ini.php for settings dealing with the server related settings.
  *
- * DutchPIPE version 0.1; PHP version 5
+ * DutchPIPE version 0.2; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -18,7 +18,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpuniverse-ini.php 190 2007-06-10 14:19:42Z ls $
+ * @version    Subversion: $Id: dpuniverse-ini.php 238 2007-07-08 15:40:07Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php, dpserver-ini.php
  */
@@ -162,7 +162,9 @@ define('DPUNIVERSE_INCLUDE_PATH', '/include/');
 /**
  * Path to the publicly reachable web directory
  *
- * Leave this untouched if the DutchPIPE directory structure wasn't changed.
+ * The absolute path after the host name of the URL.
+ * If DutchPIPE is installed on http://www.example.com/, this path is /.
+ * On http://www.example.com/subdir/ it would be /subdir/.
  *
  * @see        DPUNIVERSE_WWW_URL
  */

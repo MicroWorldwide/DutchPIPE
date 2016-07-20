@@ -4,7 +4,7 @@
  *
  * Defines DpObjects, users, pages, etc. (our 'rules of nature')
  *
- * DutchPIPE version 0.1; PHP version 5
+ * DutchPIPE version 0.2; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -16,7 +16,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpuniverse.php 198 2007-06-10 23:43:06Z ls $
+ * @version    Subversion: $Id: dpuniverse.php 243 2007-07-08 16:26:23Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        currentdpuserrequest.php, dpserver.php, dpfunctions.php
  */
@@ -54,7 +54,7 @@ define('_DPUSER_LAST_SCRIPTID', 8);    /* Script id of last AJAX request */
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: 0.2.0
+ * @version    Release: 0.2.1
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  */
 final class DpUniverse
@@ -725,10 +725,10 @@ final class DpUniverse
         $unique_id = $this->mUniqueDpObjectCnt;
         $this->mUniqueDpObjectCnt++;
 
-        if ($pathname && substr($pathname, 0, 1) != '/'
+        if ($pathname && (substr($pathname, 0, 1) != '/'
                 || ((FALSE === strpos($pathname, '://'))
                 && (strlen($pathname) < 4
-                || substr($pathname, - 4) != '.php'))) {
+                || substr($pathname, - 4) != '.php')))) {
             require_once(DPUNIVERSE_PREFIX_PATH . DPUNIVERSE_STD_PATH
                 . 'DpPage.php');
             $object = new DpPage($unique_id, time() + DPUNIVERSE_RESET_CYCLE,
@@ -1364,7 +1364,8 @@ final class DpUniverse
                 $user->tell('<window><form method="post" '
                     . 'onsubmit="send_captcha(' . $captcha_id
                     . '); return false"><div align="center">'
-                    . '<img id="captchaimage" src="/dpcaptcha.php?captcha_id='
+                    . '<img id="captchaimage" src="' . DPSERVER_CLIENT_DIR
+                    . 'dpcaptcha.php?captcha_id='
                     . $captcha_id . '" border="0" alt="" /></div>'
                     . '<br clear="all" />'
                     . dptext('To complete registration, please enter the code you see above:')

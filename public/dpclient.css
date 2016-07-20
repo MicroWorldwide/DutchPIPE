@@ -73,25 +73,36 @@ a.dpsmall { font-size: 11px; font-family: verdana,arial,helvetica }
 .actionwindow
 {
     display: none;
-    cursor: pointer;
+    padding: 0px;
     position: absolute;
+    z-index: 7;
+    background-color: #eeeeee;
+    opacity: 0.95;
+    -moz-opacity: 0.95;
+}
+.actionwindow, .actionwindow_inner
+{
+    cursor: pointer;
     font-weight: normal;
     text-align: left;
-    width: 90px;
-    background-color: #eeeeee;
+}
+.actionwindow_inner
+{
+    display: block;
     border: solid 1px black;
     padding-left: 2px;
     padding-right: 2px;
     padding-top: 3px;
     padding-bottom: 3px;
-    display: block;
-    opacity: 0.95;
-    -moz-opacity: 0.95;
-    z-index: 5;
 }
-.action_menu_selected, .action_menu { padding-left: 4px; padding-right: 4px; font-size: 11px; font-family: arial,verdana,'Bitstream Vera Sans',helvetica,sans-serif }
-.action_menu_selected { background-color: #000066; color: #fff }
-.action_menu { background-color: transparent; color: #000066 }
+.am, .am_deep, .am_selected, .am_deep_selected { overflow: hidden; white-space: nowrap }
+.am { position: relative; background-color: transparent; color: #000066; padding-bottom: 1px; padding-left: 4px; padding-right: 4px; font-size: 11px; line-height: 14px; font-family: arial,verdana,'Bitstream Vera Sans',helvetica,sans-serif }
+.am_deep { background: transparent url(images/marr_out.gif) no-repeat top right; }
+.am_deep_ghosted { background-image: none !important }
+.am_selected { background-color: #000066; color: #fff }
+.am_deep_selected { background: #000066 url(images/marr_over.gif) no-repeat top right; }
+.am_deep_selected_ghosted { background-image: none !important }
+.am_ghosted { color: graytext !important }
 .dpwindow_default, .dpwindow_drink, .dpwindow_error, .dpwindow_todo, .dpwindow_src
 {
     display: none;

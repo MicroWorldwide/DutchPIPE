@@ -8,7 +8,7 @@
  * dpclient-js.php. It talks to the PHP server using a fast file socket
  * connection.
  *
- * DutchPIPE version 0.1; PHP version 5
+ * DutchPIPE version 0.2; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -20,7 +20,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpclient.php 196 2007-06-10 22:54:38Z ls $
+ * @version    Subversion: $Id: dpclient.php 238 2007-07-08 15:40:07Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver-ini.php, dpserver.php, dpclient.css
  */

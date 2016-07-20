@@ -2,7 +2,7 @@
 /**
  * In Front Of A House
  *
- * DutchPIPE version 0.1; PHP version 5
+ * DutchPIPE version 0.2; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id$
+ * @version    Subversion: $Id: alley.php 243 2007-07-08 16:26:23Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -32,7 +32,7 @@ inherit(DPUNIVERSE_STD_PATH . 'DpPage.php');
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: 0.2.0
+ * @version    Release: 0.2.1
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -117,10 +117,10 @@ house.</p><p align="justify">A door leads <a href="%s">inside</a>. To the
         $this->removeExit(dptext('n'));
 
         if (!$isDoorUnlocked) {
-            $this->addAction(dptext('unlock'), dptext('unlock'), 'actionUnlock',
+            $this->addAction(dptext('unlock door'), dptext('unlock'), 'actionUnlock',
                 DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
                 DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY,
-                'door_area', dptext('unlock'), dptext('unlock door'));
+                'door_area', dptext('unlock door'));
             $this->addAction(dptext('lock'), dptext('lock'), 'actionLock',
                 DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
                 DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY);
@@ -131,10 +131,10 @@ house.</p><p align="justify">A door leads <a href="%s">inside</a>. To the
             $this->addAction(dptext('unlock'), dptext('unlock'), 'actionUnlock',
                 DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
                 DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY);
-            $this->addAction(dptext('lock'), dptext('lock'), 'actionLock',
+            $this->addAction(dptext('lock door'), dptext('lock'), 'actionLock',
                 DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
                 DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY,
-                'door_area', dptext('lock'), dptext('lock door'));
+                'door_area', dptext('lock door'));
             $this->addExit(explode('#',
                 dptext('n#house#enter house#inside#door#enter door')),
                 DPUNIVERSE_PAGE_PATH . 'house.php',
@@ -147,12 +147,12 @@ house.</p><p align="justify">A door leads <a href="%s">inside</a>. To the
 
     public function actionUnlock($verb, $noun)
     {
+        echo "verb: $verb\nnoun: $noun\n";
         if (dptext('door') != $noun && dptext('door with key') != $noun
                 && dptext('door with silver key') != $noun) {
             $this->setActionFailure(dptext('Unlock what?'));
             return FALSE;
         }
-
         $user = get_current_dpuser();
 
         if (!($key = $user->isPresent(dptext('silver key')))) {
@@ -210,7 +210,7 @@ house.</p><p align="justify">A door leads <a href="%s">inside</a>. To the
         return TRUE;
     }
 
-    public function getDoorStatusStr($verb, $nounitem)
+    public function getDoorStatusStr($item)
     {
         return $this->isDoorUnlocked ? dptext('unlocked') : dptext('locked');
     }

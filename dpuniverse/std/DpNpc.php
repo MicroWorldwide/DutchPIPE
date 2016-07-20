@@ -2,7 +2,7 @@
 /**
  * A 'non playing character', a bot
  *
- * DutchPIPE version 0.1; PHP version 5
+ * DutchPIPE version 0.2; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpNpc.php 198 2007-06-10 23:43:06Z ls $
+ * @version    Subversion: $Id: DpNpc.php 243 2007-07-08 16:26:23Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpLiving
  */
@@ -36,7 +36,7 @@ inherit(DPUNIVERSE_STD_PATH . 'DpLiving.php');
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: 0.2.0
+ * @version    Release: 0.2.1
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpLiving
  */
@@ -145,18 +145,14 @@ class DpNpc extends DpLiving
             $type = 'message';
             $data = "<message><![CDATA[$data]]></message>";
         }
-        echo "Telling NPC: $data\n";
         if (strlen($data) > 19
                 && FALSE !== ($pos1 = strpos($data, '<location><![CDATA['))
                 && FALSE !== ($pos2 = strpos($data, ']]></location>'))
                 && $pos2 > $pos1 + 14) {
-            echo "1\n";
             $data = substr($data, 0, $pos2);
             $data = substr($data, $pos1 + 19);
             $newlocation = $data;
-            if (!$newlocation) {
-                echo "2\n";
-
+            if (!$newlocation || '/' === $newlocation) {
                 $newlocation = DPUNIVERSE_PAGE_PATH . 'index.php';
             }
             $newlocation = get_current_dpuniverse()->getDpObject($newlocation);

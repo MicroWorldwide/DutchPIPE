@@ -2,7 +2,7 @@
 /**
  * Inside The House
  *
- * DutchPIPE version 0.1; PHP version 5
+ * DutchPIPE version 0.2; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id$
+ * @version    Subversion: $Id: house.php 243 2007-07-08 16:26:23Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -32,7 +32,7 @@ inherit(DPUNIVERSE_STD_PATH . 'DpPage.php');
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: 0.2.0
+ * @version    Release: 0.2.1
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -112,7 +112,7 @@ final class House extends DpPage
             $this->addAction(dptext('unlock'), dptext('unlock'), 'actionUnlock',
                 DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
                 DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY,
-                'door_area', dptext('unlock'), dptext('unlock door'));
+                'door_area', dptext('unlock door'));
             $this->addAction(dptext('lock'), dptext('lock'), 'actionLock',
                 DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
                 DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY);
@@ -123,7 +123,7 @@ final class House extends DpPage
             $this->addAction(dptext('lock'), dptext('lock'), 'actionLock',
                 DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
                 DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY,
-                'door_area', dptext('lock'), dptext('lock door'));
+                'door_area', dptext('lock door'));
         }
 
         $this->tell('<changeDpElement id="dppage_body">' . $this->getBody()
@@ -152,13 +152,15 @@ final class House extends DpPage
             $this->addAction(dptext('unlock'), dptext('unlock'), 'actionUnlock',
                 DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
                 DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY,
-                'chest_area', dptext('unlock'), dptext('unlock chest'));
+                'chest_area', dptext('unlock chest'));
             $this->addAction(dptext('lock'), dptext('lock'), 'actionLock',
                 DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
                 DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY);
             $this->addAction(dptext('search'), dptext('search'), 'actionSearch',
                 DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
-                DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY);
+                DP_ACTION_AUTHORIZED_DISABLED, DP_ACTION_SCOPE_INVENTORY,
+                'chest_area',
+                dptext('search chest'));
         } else {
             $this->addAction(dptext('unlock'), dptext('unlock'), 'actionUnlock',
                 DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
@@ -166,12 +168,11 @@ final class House extends DpPage
             $this->addAction(dptext('lock'), dptext('lock'), 'actionLock',
                 DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
                 DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY,
-                'chest_area', dptext('lock'), dptext('lock chest'));
+                'chest_area', dptext('lock chest'));
             $this->addAction(dptext('search'), dptext('search'), 'actionSearch',
                 DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
                 DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY,
                 'chest_area',
-                NULL,
                 dptext('search chest'));
         }
         $this->tell('<changeDpElement id="dppage_body">' . $this->getBody()
@@ -180,8 +181,7 @@ final class House extends DpPage
 
     public function setHouseBody()
     {
-        $this->setBody(dptext(DPUNIVERSE_PAGE_PATH . 'house.html'), 'file',
-            '<img src="' . DPUNIVERSE_IMAGE_URL
+        $this->setBody('<img src="' . DPUNIVERSE_IMAGE_URL
 . (!$this->isChestUnlocked ? 'house_chestclosed.jpg' : 'house_chestopen.jpg')
 . '" width="450" height="338" border="0" usemap="#house_map" alt=""
 style="border: solid 1px black; margin-right: 10px" title="" alt="" align="left" />
@@ -403,12 +403,12 @@ alley.</p>'), DPSERVER_CLIENT_URL . '?location=/page/alley.php'))
         return TRUE;
     }
 
-    public function getDoorStatusStr($verb, $nounitem)
+    public function getDoorStatusStr($item)
     {
         return $this->isDoorUnlocked ? dptext('unlocked') : dptext('locked');
     }
 
-    public function getChestStatusStr($verb, $nounitem)
+    public function getChestStatusStr($item)
     {
         return $this->isChestUnlocked ? dptext('unlocked') : dptext('locked');
     }

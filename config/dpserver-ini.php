@@ -8,7 +8,7 @@
  * and the user's browser. See {@link dpuniverse-ini.php} for settings dealing
  * with the "universe".
  *
- * DutchPIPE version 0.1; PHP version 5
+ * DutchPIPE version 0.2; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -20,7 +20,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpserver-ini.php 195 2007-06-10 22:09:08Z ls $
+ * @version    Subversion: $Id: dpserver-ini.php 238 2007-07-08 15:40:07Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @tutorial   DutchPIPE/DutchPIPE.pkg
  * @see        dpserver.php, dpclient.php, dpuniverse-ini.php
@@ -39,7 +39,8 @@ define('DPSERVER_HOST_URL', 'http://www.yourdomain.com');
 
 if (!defined('DPSERVER_CLIENT_DIR')) {
     /**
-     * The rest of the URL for the client PHP script, /dpclient.php by default
+     * The rest of the URL for the directory to to the client PHP script, / by
+     * default
      *
      * @see        DPSERVER_HOST_URL, DPSERVER_CLIENTJS_URL
      */
@@ -48,7 +49,7 @@ if (!defined('DPSERVER_CLIENT_DIR')) {
 
 if (!defined('DPSERVER_CLIENT_FILENAME')) {
     /**
-     * The rest of the URL for the client PHP script, /dpclient.php by default
+     * The rest of the URL for the client PHP script, dpclient.php by default
      *
      * @see        DPSERVER_HOST_URL, DPSERVER_CLIENTJS_URL
      */

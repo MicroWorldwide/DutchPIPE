@@ -2,7 +2,7 @@
 /**
  * Provides 'DpServer' class to answer normal and AJAX requests from web clients
  *
- * DutchPIPE version 0.1; PHP version 5
+ * DutchPIPE version 0.2; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpserver.php 185 2007-06-09 21:53:43Z ls $
+ * @version    Subversion: $Id: dpserver.php 243 2007-07-08 16:26:23Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpclient.php, dpuniverse.php
  */
@@ -39,7 +39,7 @@ error_reporting(E_ALL | E_STRICT);
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: 0.2.0
+ * @version    Release: 0.2.1
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpclient.php, dpuniverse.php
  */
@@ -150,6 +150,9 @@ final class DpServer
                     "socket_create(): unable to create socket [%u]: %s\n"),
                     socket_last_error(), socket_strerror(socket_last_error())));
             }
+
+            /* Reuse the port in case it was not properly closed */
+            socket_set_option($socket, SOL_SOCKET, SO_REUSEADDR, 1);
 
             /* Bind the socket to a file, for example /tmp/dutchpipesock */
             if (FALSE === socket_bind($socket, DPSERVER_SOCKET_ADDRESS,
@@ -293,6 +296,16 @@ final class DpServer
         } while (true);
 
         socket_close($sock);
+    }
+
+    /**
+     * Closes the socket when the server is destroyed.
+     */
+    function __destruct()
+    {
+        if ($this->mMsgsock) {
+            socket_close($this->mMsgsock);
+        }
     }
 
     /**

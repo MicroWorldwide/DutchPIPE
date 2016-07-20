@@ -138,7 +138,7 @@ INSTRUCTIONS FOR INSTALLING DUTCHPIPE ON LINUX, BSD, UNIX, ...
 
        For the example case:
 
-       cd scripts
+       cd script
        ./start_dpserver.php
 
        It will output some memory and debug information, so you might

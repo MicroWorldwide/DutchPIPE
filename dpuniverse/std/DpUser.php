@@ -2,7 +2,7 @@
 /**
  * A user object, the object representing a real user
  *
- * DutchPIPE version 0.1; PHP version 5
+ * DutchPIPE version 0.2; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpUser.php 185 2007-06-09 21:53:43Z ls $
+ * @version    Subversion: $Id: DpUser.php 243 2007-07-08 16:26:23Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpLiving
  */
@@ -63,7 +63,7 @@ inherit(DPUNIVERSE_INCLUDE_PATH . 'title_types.php');
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: 0.2.0
+ * @version    Release: 0.2.1
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  */
 class DpUser extends DpLiving
@@ -154,18 +154,19 @@ class DpUser extends DpLiving
 
         /* Actions for everybody */
         $this->addAction(dptext("who's here?"), dptext('who'), 'actionWho', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('help'), dptext('help'), 'actionHelp', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('settings'), explode('#', dptext('settings#config')), 'actionSettings', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('source'), dptext('source'), 'actionSource', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('page links'), dptext('links'), 'actionLinks', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('tools'), dptext('settings')), explode('#', dptext('settings#config')), 'actionSettings', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('tools'), dptext('source')), dptext('source'), 'actionSource', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('tools'), dptext('page links')), dptext('links'), 'actionLinks', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
 
         /* Actions for admin only */
-        $this->addAction(dptext('test'), dptext('test'), 'actionTest', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('reset'), dptext('reset'), 'actionReset', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('svars'), dptext('svars'), 'actionSvars', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('force'), dptext('force'), 'actionForce', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('move'), dptext('move'), 'actionMove', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('admin'), dptext('goto...')), dptext('goto'), 'actionGoto', '/page/.php', DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('admin'), dptext('reset')), dptext('reset'), 'actionReset', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('admin'), dptext('svars')), dptext('svars'), 'actionSvars', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF | DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('admin'), dptext('force...')), dptext('force'), 'actionForce', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('admin'), dptext('move...')), dptext('move'), 'actionMove', array($this, 'actionMoveOperant'), DP_ACTION_TARGET_SELF | DP_ACTION_TARGET_LIVING | DP_ACTION_TARGET_OBJINV | DP_ACTION_TARGET_OBJENV, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
 
+        /* Last action in menu */
+        $this->addAction(dptext('help'), dptext('help'), 'actionHelp', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
     }
 
     /**
@@ -753,74 +754,14 @@ function send_settings()
         return TRUE;
     }
 
-    function actionTest($verb, $noun)
+    function actionGoto($verb, $noun)
     {
-        if ('1a' == $noun) {
-            $this->setWeight(0);
-            $this->tell('weight property test member access:');
-            $this->tell('wt: ' . $this->weight);
-            $this->weight = -1;
-            $this->tell('wt: ' . $this->weight);
-            $this->weight = 0;
-            $this->tell('wt: ' . $this->weight);
-            $this->weight = 1;
-            $this->tell('wt: ' . $this->weight);
-            $this->weight = 10;
-            $this->tell('wt: ' . $this->weight);
-            $this->weight = 20;
-            $this->tell('wt: ' . $this->weight);
-        } elseif ('1b' == $noun) {
-            $this->setWeight(0);
-            $this->tell('weight property test method access:');
-            $this->tell('wt: ' . $this->getWeight());
-            $this->setWeight(-1);
-            $this->tell('wt: ' . $this->getWeight());
-            $this->setWeight(0);
-            $this->tell('wt: ' . $this->getWeight());
-            $this->setWeight(1);
-            $this->tell('wt: ' . $this->getWeight());
-            $this->setWeight(10);
-            $this->tell('wt: ' . $this->getWeight());
-            $this->setWeight(20);
-            $this->tell('wt: ' . $this->getWeight());
-        } elseif ('2a' == $noun) {
-            $this->setValue(0);
-            $this->tell('value property test member access:');
-            $this->tell('value: ' . $this->value);
-            $this->value = -1;
-            $this->tell('value: ' . $this->value);
-            $this->value = 0;
-            $this->tell('value: ' . $this->value);
-            $this->value = 1;
-            $this->tell('value: ' . $this->value);
-            $this->value = 10;
-            $this->tell('value: ' . $this->value);
-            $this->value = 1001;
-            $this->tell('value: ' . $this->value);
-        } elseif ('2b' == $noun) {
-            $this->setValue(0);
-            $this->tell('value property test method access:');
-            $this->tell('value: ' . $this->getValue());
-            $this->setValue(-1);
-            $this->tell('value: ' . $this->getValue());
-            $this->setValue(0);
-            $this->tell('value: ' . $this->getValue());
-            $this->setValue(1);
-            $this->tell('value: ' . $this->getValue());
-            $this->setValue(10, 'USD');
-            $this->tell('value: ' . $this->getValue());
-            $this->setValue(1001);
-            $this->tell('value: ' . $this->getValue());
-        } elseif ('3' == $noun) {
-            $inv = $this->getInventory();
-            foreach ($inv as &$ob) {
-                $this->tell($ob->getTitle() . ': ' . $ob->getWeight());
-            }
-        }
-        else {
-            $this->tell('test &lt;1a|1b|2a|2b|3&gt;<br />');
+        if (!strlen($noun)) {
+            $this->setActionFailure(dptext('Goto where?<br />'));
+            return FALSE;
         }
 
+        $this->tell("<location>$noun</location>");
         return TRUE;
     }
 
@@ -869,6 +810,21 @@ function send_settings()
     }
 
     /**
+     * Completes the move action performed by clicking on an object
+     *
+     * @param   string  $verb       the action, "move"
+     * @return  string  a string such as "beer "
+     * @see     actionMove()
+     */
+    function actionMoveOperant($verb, &$menuobj)
+    {
+        $title = strtolower($menuobj->getTitle());
+
+        return (FALSE === strpos($title, ' ') ? $title : '&quot;' . $title . '&quot;')
+            . ' ';
+    }
+
+    /**
      * Makes this administrator move an object to another environment
      *
      * @param   string  $verb       the action, "move"
@@ -884,7 +840,18 @@ function send_settings()
             return FALSE;
         }
 
-        $what = substr($noun, 0, $pos);
+        $noun = str_replace('&quot;', '"', $noun);
+
+        if (substr($noun, 0, 1) == '"') {
+            $noun = trim(substr($noun, 1));
+            if (FALSE !== ($pos2 = strpos($noun, '"'))) {
+                $what = substr($noun, 0, $pos2);
+            }
+        }
+        if (!isset($what)) {
+            $what = substr($noun, 0, $pos);
+        }
+
         if (FALSE === ($what_ob = $this->isPresent($what))) {
             if (FALSE !== ($env = $this->getEnvironment())) {
                 $what_ob = $env->isPresent($what);
@@ -899,7 +866,22 @@ function send_settings()
             return FALSE;
         }
 
-        $where = substr($noun, $pos + 1);
+        $pos = !isset($pos2) ? $pos + 1 : $pos2 + 2;
+        if (strlen($where = trim(substr($noun, $pos))))  {
+            if (substr($where, 0, 1) == '"') {
+                $where = trim(substr($where, 1));
+                if ($pos = strpos($where, '"')) {
+                    $where = substr($where, 0, $pos);
+                }
+            }
+        }
+
+        if (!strlen($where))  {
+            $this->setActionFailure(
+                dptext('Syntax: move <i>what where</i>.<br />'));
+            return FALSE;
+        }
+
         $env = $this->getEnvironment();
         if ('!' === $where) {
             $where_ob = $this->getEnvironment();

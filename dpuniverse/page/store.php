@@ -2,7 +2,7 @@
 /**
  * The Shop's Store
  *
- * DutchPIPE version 0.1; PHP version 5
+ * DutchPIPE version 0.2; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id$
+ * @version    Subversion: $Id: store.php 243 2007-07-08 16:26:23Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -32,7 +32,7 @@ inherit(DPUNIVERSE_STD_PATH . 'DpPage.php');
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: 0.2.0
+ * @version    Release: 0.2.1
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -329,6 +329,12 @@ leave <a href="%s">west</a> to the shop.<br />'),
      */
     function getStoreActionsMenu($itemid)
     {
+        /* Bounce back a checksum so the client can find the right response */
+        if (!isset(get_current_dpuser()->_GET['checksum'])) {
+            return;
+        }
+        $checksum = get_current_dpuser()->_GET['checksum'];
+
         $user = get_current_dpuser();
 
         $actions = array(
@@ -338,14 +344,16 @@ leave <a href="%s">west</a> to the shop.<br />'),
 
         $action_menu = '';
         foreach ($actions as $menu => $fullaction) {
-            $action_menu .= '<div class="action_menu" '
-                . 'onMouseOver="this.className=\'action_menu_selected\'" '
-                . 'onMouseOut="this.className=\'action_menu\'" '
+            $action_menu .= '<div id="action_menu0" '
+                . 'class="am" onMouseOver="action_over(this)" '
+                . 'onMouseOut="action_out(this)" '
                 . 'onClick="send_action2server(\'' . $fullaction . '\')">'
                 . $menu . "</div>\n";
         }
         get_current_dpuser()->tell('<actions id="' . $this->uniqueId
-            . '">' . $action_menu . '</actions>');
+            . '" level="0" checksum="' . $checksum
+            . '"><div class="actionwindow_inner">' . $action_menu
+            . '</div></actions>');
     }
 
     /**
@@ -353,6 +361,12 @@ leave <a href="%s">west</a> to the shop.<br />'),
      */
     function getSellersActionsMenu($itemid)
     {
+        /* Bounce back a checksum so the client can find the right response */
+        if (!isset(get_current_dpuser()->_GET['checksum'])) {
+            return;
+        }
+        $checksum = get_current_dpuser()->_GET['checksum'];
+
         $user = get_current_dpuser();
 
         $actions = array(
@@ -361,14 +375,16 @@ leave <a href="%s">west</a> to the shop.<br />'),
 
         $action_menu = '';
         foreach ($actions as $menu => $fullaction) {
-            $action_menu .= '<div class="action_menu" '
-                . 'onMouseOver="this.className=\'action_menu_selected\'" '
-                . 'onMouseOut="this.className=\'action_menu\'" '
+            $action_menu .= '<div id="action_menu0" '
+                . 'class="am" onMouseOver="action_over(this)" '
+                . 'onMouseOut="action_out(this)" '
                 . 'onClick="send_action2server(\'' . $fullaction . '\')">'
                 . $menu . "</div>\n";
         }
         get_current_dpuser()->tell('<actions id="' . $this->uniqueId
-            . '">' . $action_menu . '</actions>');
+            . '" level="0" checksum="' . $checksum
+            . '"><div class="actionwindow_inner">' . $action_menu
+            . '</div></actions>');
     }
 }
 ?>

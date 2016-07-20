@@ -31,7 +31,7 @@
         </div>
         <div id="dpfooter">
             <a href="<?php echo DPSERVER_CLIENT_URL; ?>?location=/page/copyright.php">Legal
-            Notices</a> | Running DutchPIPE 0.2.0 by Lennert Stock.
+            Notices</a> | Running DutchPIPE 0.2.1 by Lennert Stock.
         </div>
         &#160;<a name="bottom"></a>
     </body>
