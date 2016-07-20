@@ -13,7 +13,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpNpc.php 2 2006-05-16 00:20:42Z ls $
+ * @version    Subversion: $Id: DpNpc.php 22 2006-05-30 20:40:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpLiving
  */
@@ -42,9 +42,11 @@ class DpNpc extends DpLiving
     function createDpLiving()
     {
         // Standard setup calls to set some default values:
-        $this->addId('npc');
-        $this->setTitle("A NPC", DPUNIVERSE_TITLE_TYPE_INDEFINITE,
-            DPUNIVERSE_IMAGE_URL . 'npc.gif');
+        $this->addId(dptext('npc'));
+        $this->setTitle(dptext('NPC'));
+        $this->setTitleDefinite(dptext('the NPC'));
+        $this->setTitleIndefinite(dptext('a NPC'));
+        $this->setTitleImg(DPUNIVERSE_IMAGE_URL . 'npc.gif');
         $this->addProperty('is_npc');
 
         // Call CreateDpNpc for objects that extend on this object:
@@ -100,16 +102,23 @@ class DpNpc extends DpLiving
             $newlocation = get_current_dpuniverse()->getDpObject($newlocation);
             if (FALSE === ($env = $this->getEnvironment())
                     || $env !== $newlocation) {
+
+
                 if (!$env) {
-                    $from_where = 'enters the site';
+                    $from_where = sprintf(dptext("%s enters the site.<br />"),
+                        ucfirst($this->getTitle(
+                        DPUNIVERSE_TITLE_TYPE_DEFINITE)));
                 } else {
-                    $env->tell(ucfirst($this->getTitle()) . ' leaves to '
-                        . $newlocation->getTitle() . '.<br />', $this);
-                    $from_where = 'arrives from ' . $env->getTitle();
+                    $env->tell(sprintf(dptext("%s leaves to %s.<br />"),
+                        ucfirst($this->getTitle(
+                        DPUNIVERSE_TITLE_TYPE_DEFINITE)),
+                        $newlocation->getTitle()), $this);
+                    $from_where = sprintf(dptext("%s arrives from %s.<br />"),
+                        ucfirst($this->getTitle(
+                        DPUNIVERSE_TITLE_TYPE_DEFINITE)), $env->getTitle());
                 }
                 $this->moveDpObject($newlocation);
-                $newlocation->tell(ucfirst($this->getTitle())
-                    . " $from_where.<br />", $this);
+                $newlocation->tell($from_where, $this);
             }
         }
     }

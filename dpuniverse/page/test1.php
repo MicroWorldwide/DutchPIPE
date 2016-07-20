@@ -13,7 +13,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: test1.php 2 2006-05-16 00:20:42Z ls $
+ * @version    Subversion: $Id: test1.php 22 2006-05-30 20:40:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -42,23 +42,25 @@ final class Test1 extends DpPage
     public function createDpPage()
     {
         // Standard setup calls:
-        $this->setTitle('Test Page 1');
-        $this->setBody(DPUNIVERSE_PAGE_PATH . 'test1.html', 'file');
+        $this->setTitle(dptext('Test Page 1'));
+        $this->setBody(dptext(DPUNIVERSE_PAGE_PATH . 'test1.html'), 'file');
         $this->setNavigationTrail(
             array(DPUNIVERSE_NAVLOGO, '/'),
-            'Test Page 1');
+            dptext('Test Page 1'));
 
         // Creates a flower based on the standard DpObject, moves it here:
         $ob = get_current_dpuniverse()->newDpObject(DPUNIVERSE_STD_PATH
             . 'DpObject.php');
-        $ob->addId('flower', 'purple flower');
-        $ob->setTitle('purple flower');
+        $ob->addId(explode('#', dptext('flower#purple flower')));
+        $ob->setTitle(dptext('purple flower'));
+        $ob->setTitleDefinite(dptext('the purple flower'));
+        $ob->setTitleIndefinite(dptext('a purple flower'));
         $ob->setTitleImg(DPUNIVERSE_IMAGE_URL . 'flower.gif');
         $ob->setBody('<img src="' . DPUNIVERSE_IMAGE_URL
             . 'flower_body.jpg" width="190" height="216" border="0" '
             . 'alt="" align="left" style="margin-right: 15px; border: solid '
-            . '1px black" />It is the purple white flower of the Dutchman\'s '
-            . 'Pipe.');
+            . '1px black" />' .
+            dptext('It is the purple white flower of the Dutchman\'s Pipe.'));
         $ob->moveDpObject($this);
     }
 }

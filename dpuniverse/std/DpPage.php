@@ -13,7 +13,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpPage.php 2 2006-05-16 00:20:42Z ls $
+ * @version    Subversion: $Id: DpPage.php 22 2006-05-30 20:40:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -54,9 +54,10 @@ class DpPage extends DpObject
      */
     function createDpObject()
     {
-        $this->addId('page');
+        $this->setTitleType(DPUNIVERSE_TITLE_TYPE_NAME);
+        $this->addId(dptext('page'));
         $this->addProperty('is_page');
-        $this->addExit('login', DPUNIVERSE_PAGE_PATH . 'login.php');
+        $this->addExit(dptext('login'), DPUNIVERSE_PAGE_PATH . 'login.php');
         if (method_exists($this, 'createDpPage')) {
             $this->createDpPage();
         }
@@ -231,10 +232,11 @@ class DpPage extends DpObject
         }
         $this->mNavigationTrail = func_get_args();
 
+        $navlogo = dptext(DPUNIVERSE_NAVLOGO);
         foreach ($this->mNavigationTrail as $link) {
             if (is_array($link)) {
-                if ($link[0] === DPUNIVERSE_NAVLOGO) {
-                    $link[0] = 'home';
+                if ($link[0] === $navlogo) {
+                    $link[0] = dptext('home');
                 }
                 $link[0] = explode(' ', $link[0]);
                 $link[0] = strtolower($link[0][0]);
@@ -261,7 +263,7 @@ class DpPage extends DpObject
     function getNavigationTrailHtml()
     {
         if (0 === sizeof($this->mNavigationTrail)) {
-            return '<div id="navlink">' . DPUNIVERSE_NAVLOGO . '</div>';
+            return '<div id="navlink">' . dptext(DPUNIVERSE_NAVLOGO) . '</div>';
         }
         $trail = array();
         foreach ($this->mNavigationTrail as $navitem) {
@@ -278,14 +280,14 @@ class DpPage extends DpObject
             return $navitem;
         }
 
-        $link = $navitem[1] == '/' ? '/' : '/dpclient.php?location='
+        $link = $navitem[1] == '/' ? '/' : DPSERVER_CLIENT_URL . '?location='
             . $navitem[1];
 
         return $navitem[0] <> DPUNIVERSE_NAVLOGO
             ? '<div id="navlink"><a class="navtrail" href="' . $link . '">'
                 . $navitem[0] . '</a></div>'
             : '<div id="navlink"><a class="navtrail" href="' . $link
-                . '" style="cursor: pointer">' . DPUNIVERSE_NAVLOGO
+                . '" style="cursor: pointer">' . dptext(DPUNIVERSE_NAVLOGO)
                 . '</a></div>';
     }
 }

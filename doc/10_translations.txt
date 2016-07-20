@@ -1,0 +1,59 @@
+DutchPIPE now has some basic internationalization (I18N) and
+localization (L10N) support.
+
+Currently, it is only possible to run a DutchPIPE site either in one
+language or the other: it is not yet possible for one user to see a
+page in one language and another user on the same page another
+language.
+
+You must enable I18N/L10N in config/dpserver-ini.php.
+
+Currently, there are two languages/regions:
+English (the default)
+Dutch/The Netherlands
+
+To make a new translation, make a directory in locale/ equal to the
+locale/en/ subdirectory tree, using the right language/region code in
+the same format as the nl_NL directory.
+
+This isn't a manual to gettext, start at http://www.php.net/gettext
+for PHP gettext documentation, pointers to GNU gettext documentation
+and links to language/region codes.
+
+Then edit the translation table located at:
+locale/<your dir>/LC_MESSAGES/messages.po.
+
+To complete, run:
+msgfmt messages.po
+in that directory, and a new messages.mo is created.
+
+Then translate text files such as HTML files for pages and place them
+in locale/<yourdir>/ using the same directory structure as under
+dpuniverse/ where the original English versions can be found.
+For example, the Dutch translation for dpuniverse/page/index.html can
+be found in locale/nl_NL/page/index.html.
+
+All translations are optional, if you don't provide a line in
+messages.po or a text file, the English version is used, or whatever
+language you use when adding new stuff.
+
+You don't need to add to messages.po or put files such as index.html
+in locale if you don't plan to contribute code to DutchPIPE and don't
+plan to provide more language options on your site in the future.
+In that case, just code your new objects and pages in the new
+language. Bits in English from the core system will be translated,
+and new stuff already in your language won't be touched.
+
+Although gettext is fast, it has of course a speed penalty and it is
+turned off by default in config/dpserver-ini.php. You won't notice
+under normal circumstances, but if you have a very busy server you'll
+hit your capacity ceiling sooner.
+
+If you have a new translation, please contribute it!
+
+Todo:
+- Split messages.po into core translation and one or more other files.
+- A system to add stuff easily (better than msgmerge in one big file).
+- Multiple-languages within one site.
+- Provide static translations plus tools, for speed optimalization
+

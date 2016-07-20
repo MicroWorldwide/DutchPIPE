@@ -13,12 +13,38 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpuniverse-ini.php 2 2006-05-16 00:20:42Z ls $
+ * @version    Subversion: $Id: dpuniverse-ini.php 22 2006-05-30 20:40:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  */
 
 /*
+ * MySQL settings. Please give your host (an empty string if MySQL is running on
+ * your local host is sufficient), database user and password, and database name
+ * (dutchpipe by default).
+ */
+define('DPUNIVERSE_MYSQL_HOST', '');
+define('DPUNIVERSE_MYSQL_USER', '<youruser>');
+define('DPUNIVERSE_MYSQL_PASSWORD', '<yourpass>');
+define('DPUNIVERSE_MYSQL_DB', 'dutchpipe');
+
+/*
+ * File owners/permissions
+ *
+ * What user owns the *NIX files and is running the server?
+ * Don't run DutchPIPE under "root".
+ */
+define('DPUNIVERSE_FILE_OWNER', 'dutchpipe');
+
+/*
+ * If you just installed DutchPIPE, haven't changed the directory structure
+ * and just want it up and running, you're done here. Make sure you adjusted
+ * dpserver-ini.php.
+ */
+
+/*
  * Pathnames
+ *
+ * Leave these untouched if the DutchPIPE directory structure wasn't changed.
  */
 define('DPUNIVERSE_ROOT_BASE_PATH', dirname(realpath(__FILE__ . '/..')));
 define('DPUNIVERSE_ROOT_PATH', DPUNIVERSE_ROOT_BASE_PATH . '/');
@@ -43,25 +69,19 @@ define('DPUNIVERSE_CAPTCHA_IMAGES_PATH', DPUNIVERSE_SCRIPT_PATH
 define('DPUNIVERSE_TEMPLATE_PATH', DPUNIVERSE_ROOT_PATH . 'template/');
 
 /*
- * File owners/permissions
- *
- * What user owns the *NIX files?
- */
-define('DPUNIVERSE_FILE_OWNER', 'dutchpipe');
-
-/*
  * System options
  */
-define('DPUNIVERSE_RUNKIT', FALSE); /* Experimental, currently not functional */
-define('DPUNIVERSE_ERROR_REPORTING', E_ALL | E_STRICT);
 
-/*
- * MySQL
+/* Experimental, currently not functional, leave it on FALSE */
+define('DPUNIVERSE_RUNKIT', FALSE);
+
+/**
+ * Which errors to report according to
+ * http://www.php.net/manual/en/ref.errorfunc.php#errorfunc.constants
+ *
+ * By default all messages including "strict" messages are shown.
  */
-define('DPUNIVERSE_MYSQL_HOST', '');
-define('DPUNIVERSE_MYSQL_USER', '<youruser>');
-define('DPUNIVERSE_MYSQL_PASSWORD', '<yourpass>');
-define('DPUNIVERSE_MYSQL_DB', 'dutchpipe');
+define('DPUNIVERSE_ERROR_REPORTING', E_ALL | E_STRICT);
 
 /*
  * Site behaviour
@@ -78,7 +98,7 @@ define('DPUNIVERSE_MAX_USERNAME_LEN', 12);
 
 /* Default message for invalid commands */
 define('DPUNIVERSE_ACTION_DEFAULT_FAILURE',
-'What? Enter <tt>help</tt> for a list of commands.<br />');
+    dptext('What? Enter <tt>help</tt> for a list of commands.<br />'));
 
 /* How many secs must be a connection be dead before a user is thrown out? */
 define('DPUNIVERSE_LINKDEATH_KICKTIME', 15);
@@ -102,7 +122,6 @@ define('DPUNIVERSE_LINKDEATH_SHOWBOTTIME', 5);
 define('DPUNIVERSE_MAX_RESETS', 10);
 
 /* Used by DutchPIPE.org in the title bar */
-define('DPUNIVERSE_NAVLOGO', '<img src="/images/navlogo.gif" align="absbottom" '
-    . 'width="73" height="15" border="0" alt="DutchPIPE" />Home');
-
+define('DPUNIVERSE_NAVLOGO', dptext('<img src="/images/navlogo.gif"
+align="absbottom" width="73" height="15" border="0" alt="DutchPIPE" />Home'));
 ?>

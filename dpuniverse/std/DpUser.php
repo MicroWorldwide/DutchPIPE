@@ -13,7 +13,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpUser.php 2 2006-05-16 00:20:42Z ls $
+ * @version    Subversion: $Id: DpUser.php 22 2006-05-30 20:40:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpLiving
  */
@@ -88,15 +88,17 @@ class DpUser extends DpLiving
      */
     function createDpLiving()
     {
-        $this->addId('user');
+        $this->addId(dptext('user'));
         $this->addProperty('is_user');
         $avatar_nr = $this->_getRandAvatarNr();
         $this->addProperty('avatar_nr', $avatar_nr);
-        $this->setTitle("User", DPUNIVERSE_TITLE_TYPE_NAME,
-            DPUNIVERSE_AVATAR_URL . 'user' . $avatar_nr . '.gif');
+        $this->setTitle(dptext('User'));
+        $this->setTitleType(DPUNIVERSE_TITLE_TYPE_NAME);
+        $this->setTitleImg(DPUNIVERSE_AVATAR_URL . 'user' . $avatar_nr
+            . '.gif');
         $this->setBody('<img src="' . DPUNIVERSE_AVATAR_URL . 'user'
             . $avatar_nr . '_body.gif" border="0" alt="" align="left" '
-            . 'style="margin-right: 15px" />A user.<br />');
+            . 'style="margin-right: 15px" />' . dptext('A user.') . '<br />');
     }
 
     /**
@@ -129,11 +131,11 @@ class DpUser extends DpLiving
     }
 
     /**
-     * Sends something to dpclient.js running on the user's browser
+     * Sends something to dpclient-js.php running on the user's browser
      *
      * Sends the given data to the user's browser. It's up the user's DutchPIPE
-     * Javascript client, dpclient.js by default, what to do with the received
-     * content. dpclient.js can be send data like
+     * Javascript client, dpclient-js.php by default, what to do with the
+     * received content. dpclient-js.php can be send data like
      * '<message>hello world</message>' and '<window>hello world</window>',
      * to show something in the message area and pop up a window respectively.
      *
@@ -149,17 +151,17 @@ class DpUser extends DpLiving
         if (FALSE === is_null($from)
                 && (FALSE === ($env = $this->getEnvironment())
                 || $env !== $from)) {
-            echo "Message skipped, no longer in page\n";
+            echo dptext("Message skipped, no longer in page\n");
             return;
         }
 
         // If this user is the same user doing the current HTTP request, tell
         // straight away. Otherwise, store the message for the next time we get
         // a HTTP request from the user.
-        if (TRUE === get_current_dpuniverse()->mNoDirectTell || $this !== get_current_dpuser()) {
-            echo "Storing {$this->getTitle()}: "
-                . (strlen($data) > 512 ? substr($data, 0, 512) : $data)
-                . "\n";
+        if (TRUE === get_current_dpuniverse()->mNoDirectTell
+                || $this !== get_current_dpuser()) {
+            echo sprintf(dptext("Storing %s: %s\n"), $this->getTitle(),
+                (strlen($data) > 512 ? substr($data, 0, 512) : $data));
             get_current_dpuniverse()->storeTell($this, $data, $from);
             return;
         }
@@ -213,9 +215,8 @@ class DpUser extends DpLiving
                 $data = "<$mtype_start>$data</$mtype_end>";
             }
             if ($data !== '1') {
-                echo "Telling {$this->getTitle()}: "
-                    . (strlen($data) > 512 ? substr($data, 0, 512) : $data)
-                    . "\n";
+                echo sprintf(dptext("Telling %s: %s\n"), $this->getTitle(),
+                    (strlen($data) > 512 ? substr($data, 0, 512) : $data));
             }
             if ($mtype_end === '' || $mtype_end === 'header'
                     || $mtype_end === 'cookie' || $mtype_end === 'location') {

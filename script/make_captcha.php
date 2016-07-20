@@ -27,7 +27,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: make_captcha.php 3 2006-05-16 00:56:14Z root $
+ * @version    Subversion: $Id: make_captcha.php 22 2006-05-30 20:40:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver.php, /www/captcha.php
  */
@@ -39,9 +39,10 @@ require_once(realpath(dirname(__FILE__) . '/../config')
 
 mysql_pconnect(DPUNIVERSE_MYSQL_HOST, DPUNIVERSE_MYSQL_USER,
     DPUNIVERSE_MYSQL_PASSWORD)
-    || die('Could not connect: ' . mysql_error() . "\n");
+    || die(dptext("Could not connect: %s\n", mysql_error()));
+
 mysql_select_db(DPUNIVERSE_MYSQL_DB)
-    || die('Failed to select database: ' . DPUNIVERSE_MYSQL_DB . "\n");
+    || die(dptext("Failed to select database: %s\n", DPUNIVERSE_MYSQL_DB));
 
 /**
  * Get a string width and height with given parameters
@@ -75,7 +76,8 @@ function getstringdimensions($String, $Font, $FontSize)
  * @param  string   Text hex color code
  * @return string   Animated gif image binary content
  */
-function distortion_string($String, $Font, $FontSize, $BGColor='#FFFFFF', $TextColor='#9999CC')
+function distortion_string($String, $Font, $FontSize, $BGColor='#FFFFFF',
+        $TextColor='#9999CC')
 {
   // Font is here
   putenv('GDFONTPATH=' . realpath(dirname($Font)));
@@ -85,7 +87,8 @@ function distortion_string($String, $Font, $FontSize, $BGColor='#FFFFFF', $TextC
   list($Width, $Height) = getstringdimensions($String, $Font, $FontSize);
 
   // First, we create the source image with GD Image
-  $ImageRessource = imagecreatetruecolor($Width, $Height) or die("Cannot Initialize new GD image stream");;
+  $ImageRessource = imagecreatetruecolor($Width, $Height)
+    || die(dptext("Cannot Initialize new GD image stream"));
 
   // Translate color codes
   $Hex = '[0-9A-Fa-f]';
@@ -95,14 +98,17 @@ function distortion_string($String, $Font, $FontSize, $BGColor='#FFFFFF', $TextC
     $BGColors = array(255, 255, 255);
   }
   if (preg_match("/^#?($Hex$Hex)($Hex$Hex)($Hex$Hex)$/", $TextColor, $Parts)) {
-    $TextColors = array(hexdec($Parts[1]), hexdec($Parts[2]), hexdec($Parts[3]));
+    $TextColors = array(hexdec($Parts[1]), hexdec($Parts[2]),
+        hexdec($Parts[3]));
   } else {
     $TextColors = array(0, 0, 0);
   }
 
   // Colors allocations
-  $BGColor = imagecolorallocate($ImageRessource, $BGColors[0], $BGColors[1], $BGColors[2]);
-  $TextColor = imagecolorallocate($ImageRessource, $TextColors[0], $TextColors[1], $TextColors[2]);
+  $BGColor = imagecolorallocate($ImageRessource, $BGColors[0], $BGColors[1],
+    $BGColors[2]);
+  $TextColor = imagecolorallocate($ImageRessource, $TextColors[0],
+    $TextColors[1], $TextColors[2]);
 
   // We set the background
   imagefilledrectangle($ImageRessource, 0, 0, $Width, $Height, $BGColor);
@@ -178,7 +184,7 @@ $fp = fopen(DPUNIVERSE_CAPTCHA_IMAGES_PATH . $file, 'w');
 fwrite($fp, $str);
 fclose($fp);
 chown(DPUNIVERSE_CAPTCHA_IMAGES_PATH . $file, DPUNIVERSE_FILE_OWNER);
-echo "Created $code.gif\n";
+echo sprintf(dptext("Created %s.gif\n"), $code);
 
 $oldest_time = time() + 3600; /* Future */
 $oldest_file = FALSE;
@@ -201,7 +207,8 @@ if ($count > 24 && FALSE !== $oldest_file) {
     echo "Removed: $oldest_file\n";
 }
 
-$query = "SELECT captchaId, captchaFile, captchaTimestamp from Captcha order by captchaTimestamp";
+$query = "SELECT captchaId, captchaFile, captchaTimestamp FROM Captcha "
+    . "ORDER BY captchaTimestamp";
 $result = mysql_query($query);
 if ($result) {
     $num_rows = mysql_num_rows($result);

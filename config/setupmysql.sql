@@ -20,6 +20,8 @@ CREATE TABLE `Captcha` (
   PRIMARY KEY  (`captchaId`)
 );
 
+INSERT INTO `Captcha` VALUES ("1", "avyrjy.gif", now());
+
 CREATE TABLE `UserAgents` (
   `userAgentId` int(11) NOT NULL auto_increment,
   `userAgentString` varchar(255) NOT NULL,

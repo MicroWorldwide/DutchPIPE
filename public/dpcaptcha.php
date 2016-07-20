@@ -13,30 +13,36 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpcaptcha.php 2 2006-05-16 00:20:42Z ls $
+ * @version    Subversion: $Id: dpcaptcha.php 22 2006-05-30 20:40:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see         dpclient.php
  */
 
+require_once('../config/dpserver-ini.php');
 require_once('../config/dpuniverse-ini.php');
+require_once(DPSERVER_LIB_PATH . 'dptext.php');
 
 error_reporting(DPUNIVERSE_ERROR_REPORTING);
 
-mysql_pconnect(DPUNIVERSE_MYSQL_HOST, DPUNIVERSE_MYSQL_USER, DPUNIVERSE_MYSQL_PASSWORD)
-    || die('Could not connect: ' . mysql_error() . "\n");
+mysql_pconnect(DPUNIVERSE_MYSQL_HOST, DPUNIVERSE_MYSQL_USER,
+    DPUNIVERSE_MYSQL_PASSWORD)
+    || die(sprintf(dptext('Could not connect: %s<br />'), mysql_error()));
 
 mysql_select_db(DPUNIVERSE_MYSQL_DB)
-    || die('Failed to select database: ' . DPUNIVERSE_MYSQL_DB . "\n");
+    || die(sprintf(dptext('Failed to select database: %s<br />',
+    DPUNIVERSE_MYSQL_DB)));
 
 if (!isset($_GET) || !isset($_GET['captcha_id'])
-        || !($result = mysql_query("SELECT captchaFile from Captcha where captchaId='" . $_GET['captcha_id'] . "'"))
+        || !($result = mysql_query(
+        "SELECT captchaFile FROM Captcha WHERE captchaId='"
+        . $_GET['captcha_id'] . "'"))
         || FALSE === ($row = mysql_fetch_array($result))) {
-    die("Failed to retrieve CAPTCHA image information.\n");
+    die(dptext('Failed to retrieve CAPTCHA image information.<br />'));
 }
 
 $captcha_image = file_get_contents(DPUNIVERSE_CAPTCHA_IMAGES_PATH . $row[0]);
 if (FALSE === $captcha_image) {
-    die("Failed to retreieve CAPTCHA image file.\n");
+    die(dptext('Failed to retrieve CAPTCHA image file.<br />'));
 }
 
 header('Content-Type: image/gif');

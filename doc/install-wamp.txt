@@ -1,0 +1,116 @@
+1. DOWNLOAD AND INSTALL DUTCHPIPE
+
+    Download DutchPIPE from:
+    http://dutchpipe.org/dpclient.php?location=/page/download.php
+
+    Extract the files in c:\ so you now have the directory:
+    c:\dutchpipe\
+
+2. DOWNLOAD AND INSTALL WAMP5
+
+    Download WAMP5 from http://www.wampserver.com/en/download.php
+
+    Launch what you have downloaded to start the installation process
+
+    You can choose the installation folder. This step-by-step guide uses
+    the default choice, c:\wamp
+
+    You can choose to auto launch WAMP5 at startup, we didn't do that.
+
+    You can choose, if this is your first WAMP5 install, what directory
+    contains your homepage. Choose c:\dutchpipe\public
+
+    You can choose whether you want to start WAMP5. Choose yes.
+
+3. CONFIGURE WAMP5
+
+    Now WAMP5 is running, an icon appeared on your tray bar at the bottom
+    right of your screen.
+
+    Click on the WAMP5 tray bar icon and select:
+    PHP extensions -> php_sockets
+    so that php_sockets is enabled
+
+    Click on the WAMP5 tray bar icon and select:
+    Config files -> httpd.conf
+
+    Notepad or your editor is launched. Search for the line:
+    DirectoryIndex index.php index.php3 index.html index.htm index.html.var
+    and change it to
+    DirectoryIndex dpclient.php index.php index.php3 index.html index.htm index.html.var
+
+    Save the file.
+
+4. CONFIGURE DUTCHPIPE
+
+    Launch c:\dutchpipe\config\setupmysql.sql and select & copy all text.
+
+    Click on the WAMP5 tray bar icon and select:
+    MySQL -> MySQL console
+
+    Your password is still empty if this is your first install, press RETURN.
+
+    Click on the top left part of the console window, and select from the menu:
+    Edit -> Paste
+
+    You can now close the MySQL console window.
+
+    Edit c:\dutchpipe\config\dpserver-ini.php
+
+    Change the first pair of define's:
+    define('DPSERVER_HOST_URL', 'http://www.yourdomain.com');
+    //define('DPSERVER_HOST_URL', 'http://localhost');
+    to this:
+    //define('DPSERVER_HOST_URL', 'http://www.yourdomain.com');
+    define('DPSERVER_HOST_URL', 'http://localhost');
+
+    Change these two lines:
+    define('DPSERVER_SOCKET_TYPE', AF_UNIX);
+    //define('DPSERVER_SOCKET_TYPE', AF_INET);
+    into:
+    define('DPSERVER_SOCKET_TYPE', AF_UNIX);
+    //define('DPSERVER_SOCKET_TYPE', AF_INET);
+
+    Check if the DPSERVER_SOCKET_PORT is a free port on your machine (3333 by
+    default). Change if necessary.
+
+    Save the file.
+
+    Edit c:\dutchpipe\config\dpuniverse-ini.php
+
+    Change these two lines:
+    define('DPUNIVERSE_MYSQL_USER', '<youruser>');
+    define('DPUNIVERSE_MYSQL_PASSWORD', '<yourpass>');
+    into
+    define('DPUNIVERSE_MYSQL_USER', 'root');
+    define('DPUNIVERSE_MYSQL_PASSWORD', '');
+
+    You should later secure MySQL by running the DutchPIPE database with
+    another user and a password, but we're now just getting up DutchPIPE
+    locally.
+
+    Save the file.
+
+5. RESTART WAMP5
+
+   Click on the WAMP5 tray bar icon and select at the bottom:
+   Restart All Services
+
+6. START DUTCHPIPE SERVER
+
+   Launch a command prompt window.
+
+   CD to this directory:
+   cd c:\dutchpipe\script
+
+   Enter the following line:
+   c:\wamp\php\php.exe -c c:\wamp\apache2\bin c:\dutchpipe\script\start_dpserver.php
+
+   The DutchPIPE server is now running
+
+7. DONE
+
+   Launch your web browser and go to http://localhost/
+
+   You should see the standard DutchPIOPE environment.
+

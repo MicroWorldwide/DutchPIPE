@@ -13,7 +13,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: barkeeper.php 2 2006-05-16 00:20:42Z ls $
+ * @version    Subversion: $Id: barkeeper.php 22 2006-05-30 20:40:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpNpc
  */
@@ -52,23 +52,24 @@ final class Barkeeper extends DpNpc
     public function createDpNpc()
     {
         // Standard setup calls:
-        $this->addId('barkeeper');
-        $this->setTitle('barkeeper');
+        $this->addId(explode('#', dptext('barkeeper')));
+        $this->setTitle(dptext('barkeeper'));
+        $this->setTitleDefinite(dptext('the barkeeper'));
+        $this->setTitleIndefinite(dptext('a barkeeper'));
         $this->setTitleImg(DPUNIVERSE_IMAGE_URL . 'barkeeper.gif');
         $this->setBody('<img src="' . DPUNIVERSE_IMAGE_URL
             . 'barkeeper_body.gif" width="125" height="200" border="0" alt="" '
-            . 'align="left" style="margin-right: 15px" />The barkeeper is '
-            . 'serving free beer!<br />');
+            . 'align="left" style="margin-right: 15px" />'
+            . dptext('The barkeeper is serving free beer!<br />'));
 
         // Sets up chat lines:
         $this->mChat = array(
-            'The barkeeper says: Today free beer for everybody!<br />',
-            'The barkeeper hiccups.<br />',
-            'The barkeeper drinks a cool, fresh beer.<br />',
-            'The barkeeper says: Hello there.<br />',
-            'The barkeeper stumbles, seems to fall, but takes a step and '
-                . 'recovers.<br />',
-            'The barkeeper says: Why don\'t you have a beer with me?<br />');
+            dptext('The barkeeper says: Today free beer for everybody!<br />'),
+            dptext('The barkeeper hiccups.<br />'),
+            dptext('The barkeeper drinks a cool, fresh beer.<br />'),
+            dptext('The barkeeper says: Hello there.<br />'),
+            dptext('The barkeeper stumbles, seems to fall, but takes a step and recovers.<br />'),
+            dptext('The barkeeper says: Why don\'t you have a beer with me?<br />'));
 
         // Fetch beer in a few seconds:
         $this->setTimeout('timeoutMakeNewBeer', 4);
@@ -76,7 +77,8 @@ final class Barkeeper extends DpNpc
 
     function resetDpNpc()
     {
-        $this->actionShout('shout', 'Today free beer in the bar for everyone!');
+        $this->actionShout(dptext('shout'),
+            dptext('Today free beer in the bar for everyone!'));
         $this->timeoutMakeNewBeer();
     }
 
@@ -85,7 +87,7 @@ final class Barkeeper extends DpNpc
         // Do something when someone drops an empty glass on this page:
         if (EVENT_ENTERED_ENV === $name) {
             $ob = func_get_arg(1);
-            if ($ob->isId('glass')
+            if ($ob->isId(dptext('glass'))
                     && FALSE === $ob->getProperty('is_full')) {
                 $this->setTimeout('timeoutCheckEmptyGlasses', 4);
             }
@@ -100,7 +102,7 @@ final class Barkeeper extends DpNpc
         $inv = $env->getInventory();
         $count = 0;
         foreach ($inv as &$ob) {
-            if ($ob->isId('glass')
+            if ($ob->isId(dptext('glass'))
                     && FALSE === $ob->getProperty('is_full')) {
                 $ob->removeDpObject();
                 $count++;
@@ -108,9 +110,12 @@ final class Barkeeper extends DpNpc
         }
 
         if ($count > 0) {
-            $env->tell('The barkeeper notices the empty beer glass'
-                . ($count < 2 ? ' and carries it away'
-                : 'es and carries them away') . '<br />');
+            if ($count < 2) {
+                $env->tell(dptext('The barkeeper notices the empty beer glass and carries it away.<br />'));
+            } else {
+                $env->tell(dptext('The barkeeper notices the empty beer glasses and carries them away.<br />'));
+            }
+
             $this->setTimeout('timeoutMakeNewBeer', 4);
         }
     }
@@ -123,7 +128,7 @@ final class Barkeeper extends DpNpc
         $inv = $env->getInventory();
         $nr_of_beers = 0;
         foreach ($inv as &$ob) {
-            if ($ob->isId('glass')
+            if ($ob->isId(dptext('glass'))
                     && FALSE !== $ob->getProperty('is_full')) {
                 $nr_of_beers++;
             }
@@ -135,29 +140,35 @@ final class Barkeeper extends DpNpc
                 $beer_obj = get_current_dpuniverse()->newDpObject(
                     DPUNIVERSE_STD_PATH . 'DpDrink.php');
 
-                $beer_obj->addId('beer', 'cool beer', 'fresh beer',
-                    'cool fresh beer', 'cool,fesh beer', 'cool, fresh beer',
-                    'glass');
-                $beer_obj->setTitle('cool, fresh beer');
+                $beer_obj->addId(explode('#',
+                    dptext('beer#cool beer#fresh beer#cool fresh beer#cool,fresh beer#cool, fresh beer#glass')));
+                $beer_obj->setTitle(dptext('cool, fresh beer'));
+                $beer_obj->setTitleDefinite(dptext('the cool, fresh beer'));
+                $beer_obj->setTitleIndefinite(dptext('a cool, fresh beer'));
                 $beer_obj->setTitleImg(DPUNIVERSE_IMAGE_URL . 'beer_full.gif');
                 $beer_obj->setBody('<img src="' . DPUNIVERSE_IMAGE_URL
                     . 'beer_full_body.gif" alt="" border="0" align="left" style="margin-'
-                    . 'right: 20px"/>A cool, fresh beer.<br />');
+                    . 'right: 20px"/>' . dptext('A cool, fresh beer.<br />'));
 
-                $beer_obj->setEmptyIds(array('glass', 'beer glass',
-                    'empty glass', 'empty beer glass'));
-                $beer_obj->setEmptyTitle('empty beer glass');
+                $beer_obj->setEmptyIds(explode('#',
+                    dptext('glass#beer glass#empty glass#empty beer glass')));
+                $beer_obj->setEmptyTitle(dptext('empty beer glass'));
+                $beer_obj->setEmptyTitleDefinite(dptext('the empty beer glass'));
+                $beer_obj->setEmptyTitleIndefinite(dptext('an empty beer glass'));
                 $beer_obj->setEmptyTitleImg(DPUNIVERSE_IMAGE_URL . 'beer_empty.gif');
                 $beer_obj->setEmptyBody('<img src="' . DPUNIVERSE_IMAGE_URL
                     . 'beer_empty_body.gif" alt="" border="0" align="left" style="margin-'
-                    . 'right: 20px"/>An empty beer glass.<br />');
+                    . 'right: 20px"/>' . dptext('An empty beer glass.<br />'));
 
                 $beer_obj->moveDpObject($env);
                 $nr_of_beers--;
             }
-            $env->tell('The barkeeper serves ' . ($served_beers == 1
-                ? 'a new beer' : 'some new beers')
-                . '. Be quick and get your free beer before it\'s gone!<br />');
+
+            if ($served_beers == 1) {
+                $env->tell(dptext('The barkeeper serves a new beer. Be quick and get your free beer before it\'s gone!<br />'));
+            } else {
+                $env->tell(dptext('The barkeeper serves some new beers. Be quick and get your free beer before it\'s gone!<br />'));
+            }
         }
     }
 
@@ -169,9 +180,9 @@ final class Barkeeper extends DpNpc
         if (3 == mt_rand(1, 7) && FALSE !== ($env = $this->getEnvironment())) {
             $env->tell($this->mChat[mt_rand(0, sizeof($this->mChat) - 1)]);
             if (2 == mt_rand(1, 3)) {
-                $this->actionTake('get', 'beer');
+                $this->actionTake(dptext('get'), dptext('beer'));
             } elseif (50 == mt_rand(50, 51)) {
-                $this->actionDrop('drop', 'all');
+                $this->actionDrop(dptext('drop'), dptext('all'));
             }
         }
         DpNpc::timeoutHeartBeat();

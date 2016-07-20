@@ -13,7 +13,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: test2.php 2 2006-05-16 00:20:42Z ls $
+ * @version    Subversion: $Id: test2.php 22 2006-05-30 20:40:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -42,13 +42,12 @@ final class Test2 extends DpPage
     public function createDpPage()
     {
         // Standard setup calls:
-        $this->setTitle("Test Page 2");
-        $this->setBody('This is Dutchy\'s Bar where they serve cold beer. '
-            . 'Today all beer is free, so be sure and grab your beer before '
-            . 'it\'s gone!<br />');
+        $this->setTitle(dptext('Test Page 2'));
+        $this->setBody(dptext('This is Dutchy\'s Bar where they serve cold
+beer. Today all beer is free, so be sure and grab your beer before it\'s gone!<br />'));
         $this->setNavigationTrail(
             array(DPUNIVERSE_NAVLOGO, '/'),
-            "Test Page 2");
+            dptext('Test Page 2'));
 
         // Creates a barkeeper, moves it here:
         $barkeeper = get_current_dpuniverse()->newDpObject(DPUNIVERSE_NPC_PATH

@@ -66,6 +66,11 @@ REQUIREMENTS
     on Safari, please contact me.
 
 GETTING STARTED/INSTALLATION
+    For step-by-step instructions how to install DutchPIPE using WAMP5
+    (Apache, MySQL and PHP for Windows), see:
+    doc/install-wamp.txt
+
+    For *NIX and generic instructions, continue here:
 
     1. Obtain the software from http://dutchpipe.org/
 
@@ -74,7 +79,6 @@ GETTING STARTED/INSTALLATION
     3. Configure your installation by patching:
     config/dpserver-ini.php
     config/dpuniverse-ini.php
-    public/dpclient.js (the dphost_url variable)
     Follow the instructions in these files.
 
     Make sure the first line of:
@@ -114,13 +118,11 @@ GETTING STARTED/INSTALLATION
 
     6. Restart your web server
     In my case: /usr/local/etc/rc.d/apache22.sh restart
-    Or on Windows I simply restart Apache from the tray bar.
 
     7. Run the DutchPIPE server
     In my case:
     cd scripts
     ./start_dpserver.php
-    On Windows I used: c:\wamp\php\php.exe start_dpserver.php
 
     It will output some memory and debug information, so you might
     want to try:
@@ -132,7 +134,6 @@ GETTING STARTED/INSTALLATION
 
     8. Browse to your DutchPIPE public installation
     In my case: http://dutchpipe.org/
-    On Windows I tested locally and I went to: http://localhost
 
     You should now see an example DutchPIPE installation in your
     browser.

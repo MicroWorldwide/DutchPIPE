@@ -13,12 +13,12 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpserver.php 16 2006-05-18 22:03:43Z ls $
+ * @version    Subversion: $Id: dpserver.php 22 2006-05-30 20:40:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpclient.php, dpuniverse.php
  */
 
-// Shows all possible errors:
+/* Shows all possible errors */
 error_reporting(E_ALL | E_STRICT);
 
 /**
@@ -73,7 +73,7 @@ final class DpServer
      */
     function __construct($iniFile = 'dpserver-ini.php')
     {
-        // Used by showStatus() further below:
+        /* Used by showStatus() further below */
         if (function_exists('getrusage')) {
             $rusage = getrusage();
             $this->mUtimeBefore = (int)$rusage["ru_utime.tv_sec"] * 1e6 +
@@ -82,15 +82,15 @@ final class DpServer
                 (int)$rusage["ru_stime.tv_usec"];
         }
 
-        // Get the server settings:
+        /* Get the server settings */
         require_once($iniFile);
 
         error_reporting(DPSERVER_ERROR_REPORTING);
 
-        // Allow the script to hang around waiting for connections:
+        /* Allow the script to hang around waiting for connections */
         set_time_limit(DPSERVER_MAXUPTIME);
 
-        // See what we're getting as it comes in:
+        /* See what we're getting as it comes in */
         ob_implicit_flush();
 
         date_default_timezone_set(DPSERVER_TIMEZONE);
@@ -105,58 +105,62 @@ final class DpServer
      */
     function runDpServer(&$universe)
     {
-        // Check if the server is already running:
+        /* Check if the server is already running */
         if (file_exists(DPSERVER_SOCKET_PATH)) {
-            // :KLUDGE: should be improved:
+            /* :KLUDGE: should be improved */
             unlink(DPSERVER_SOCKET_PATH);
-            //die("Cannot start server: server already running\n");
+            //die(dptext("Cannot start server: server already running\n"));
         }
 
         if (DPSERVER_SOCKET_TYPE === AF_UNIX) {
-            // Initialize the server, first create a socket:
+            /* Initialize the server, first create a socket */
             if (FALSE === ($socket = socket_create(AF_UNIX, SOCK_STREAM, 0))) {
-                die('socket_create() unable to create socket ['
-                    . socket_last_error() . ']: '
-                    . socket_strerror(socket_last_error()) . "\n");
+                die(sprintf(dptext(
+                    "socket_create(): unable to create socket [%u]: %s\n"),
+                    socket_last_error(), socket_strerror(socket_last_error())));
             }
 
-            // Bind the socket to a file, for example /tmp/dutchpipesock:
+            /* Bind the socket to a file, for example /tmp/dutchpipesock */
             if (FALSE === socket_bind($socket, DPSERVER_SOCKET_PATH)) {
-                die('socket_bind() unable to bind [' . socket_last_error() . ']: '
-                    . socket_strerror(socket_last_error()) . "\n");
+                die(sprintf(dptext(
+                    "socket_bind() unable to bind socket [%u]: %s\n"),
+                    socket_last_error(), socket_strerror(socket_last_error())));
             }
             if (FALSE === chmod(DPSERVER_SOCKET_PATH, 0777)) {
-                die('Cannot start server: reason: chmod on ' . DPSERVER_SOCKET_PATH
-                    . " failed\n");
+                die(sprintf(dptext(
+                    "Cannot start server: reason: chmod on %s failed\n"),
+                    DPSERVER_SOCKET_PATH));
             }
         } elseif (DPSERVER_SOCKET_TYPE === AF_INET) {
-            // Initialize the server, first create a socket:
-            if (FALSE === ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP))) {
-                die('socket_create() unable to create socket ['
-                    . socket_last_error() . ']: '
-                    . socket_strerror(socket_last_error()) . "\n");
+            /* Initialize the server, first create a socket */
+            if (FALSE === ($socket = socket_create(AF_INET, SOCK_STREAM,
+                    SOL_TCP))) {
+                die(sprintf(dptext(
+                    "socket_create(): unable to create socket [%u]: %s\n"),
+                    socket_last_error(), socket_strerror(socket_last_error())));
             }
 
-            // Bind the socket to a file, for example /tmp/dutchpipesock:
-            if (FALSE === socket_bind($socket, DPSERVER_SOCKET_ADDRESS, DPSERVER_SOCKET_PORT)) {
-                die('socket_bind() unable to bind [' . socket_last_error() . ']: '
-                    . socket_strerror(socket_last_error()) . "\n");
+            /* Bind the socket to a file, for example /tmp/dutchpipesock */
+            if (FALSE === socket_bind($socket, DPSERVER_SOCKET_ADDRESS,
+                    DPSERVER_SOCKET_PORT)) {
+                die(sprintf(dptext(
+                    "socket_bind() unable to bind socket [%u]: %s\n"),
+                    socket_last_error(), socket_strerror(socket_last_error())));
             }
         } else {
-            echo "Invalid socket protocol.\n";
-            exit;
+            die(dptext("Invalid socket protocol.\n"));
         }
-        // Start listening to the socket which dpclient.php talks to:
-        if (FALSE === socket_listen($socket, DP_SERVER_MAX_SOCKET_BACKLOG)) {
-            die('socket_listen() failed [' . socket_last_error() . ']: '
-                . socket_strerror(socket_last_error()) . "\n");
+        /* Start listening to the socket which dpclient.php talks to */
+        if (FALSE === socket_listen($socket, DPSERVER_MAX_SOCKET_BACKLOG)) {
+            die(sprintf(dptext("socket_listen(): failure [%u]: %s\n"),
+                socket_last_error(), socket_strerror(socket_last_error())));
         }
 
-        // Accept connections and loop for each request:
+        /* Accept connections and loop for each request */
         do {
             if (FALSE === ($this->mMsgsock = socket_accept($socket))) {
-                echo 'socket_accept() failed [' . socket_last_error() . ']: '
-                    . socket_strerror(socket_last_error()) . "\n";
+                echo sprintf(dptext("socket_accept(): failure [%u]: %s\n"),
+                    socket_last_error(), socket_strerror(socket_last_error()));
                 break;
             }
 
@@ -170,32 +174,39 @@ final class DpServer
             $allbuf = '';
             do {
                 if (DPSERVER_SOCKET_TYPE === AF_UNIX) {
-                    // Read in what dpclient.php is telling us in chunks:
+                    /* Read in what dpclient.php is telling us in chunks */
                     if (FALSE === ($buf = socket_read($this->mMsgsock,
                             DPSERVER_SERVER_CHUNK, PHP_NORMAL_READ))) {
-                        echo 'socket_read() failed [' . socket_last_error() . ']: '
-                            . socket_strerror(socket_last_error()) . "\n";
+                        echo sprintf(dptext(
+                            "socket_read(): failure [%u]: %s\n"),
+                            socket_last_error(),
+                            socket_strerror(socket_last_error()));
                         break 2;
                     }
                     if (!strlen($buf = trim($buf))) {
                         continue;
                     }
-                    // This can be used to shutdown the server:
+                    /* This can be used to shutdown the server */
                     if ($buf == 'shutdown') {
                         socket_close($this->mMsgsock);
                         break 2;
                     }
-                    // Read the 2KB blocks until dpclient.php sends us a 'quit':
+
+                    /*
+                     * Read the 2KB blocks until dpclient.php sends us a 'quit'
+                     */
                     if ($buf <> 'quit') {
                         $allbuf .= $buf;
                         continue;
                     }
                 } else {
-                    // Read in what dpclient.php is telling us in chunks:
+                    /* Read in what dpclient.php is telling us in chunks */
                     if (FALSE === ($buf = socket_read($this->mMsgsock,
                             DPSERVER_SERVER_CHUNK))) {
-                        echo 'socket_read() failed [' . socket_last_error() . ']: '
-                            . socket_strerror(socket_last_error()) . "\n";
+                        echo sprintf(dptext(
+                            "socket_read(): failure [%u]: %s\n"),
+                            socket_last_error(),
+                            socket_strerror(socket_last_error()));
                         break 2;
                     }
                     if (!strlen($buf = trim($buf))) {
@@ -203,18 +214,22 @@ final class DpServer
                     }
                     $allbuf .= $buf;
 
-                    // This can be used to shutdown the server:
-                    if (strlen($allbuf) >= 7 && substr($allbuf, -7) == 'shutdown') {
+                    /* This can be used to shutdown the server */
+                    if (strlen($allbuf) >= 7 &&
+                            substr($allbuf, -7) == 'shutdown') {
                         socket_close($this->mMsgsock);
                         break 2;
                     }
-                    // Read the 2KB blocks until dpclient.php sends us a 'quit':
+
+                    /*
+                     * Read the 2KB blocks until dpclient.php sends us a 'quit'
+                     */
                     if (strlen($allbuf) < 4 || substr($allbuf, -4) != 'quit') {
                         continue;
                     }
-                    //$allbuf = substr($allbuf, 0, strlen($all    buf - 4));
+                    //$allbuf = substr($allbuf, 0, strlen($allbuf - 4));
                 }
-                // Check for invalid input from dpclient.php:
+                /* Check for invalid input from dpclient.php */
                 if (strlen($allbuf) <= 6
                         || FALSE === ($pos1 = strpos($allbuf, "<vars>"))
                         || FALSE === ($pos2 = strpos($allbuf, "</vars>"))
@@ -223,8 +238,10 @@ final class DpServer
                     break;
                 }
 
-                // Cut out and unserialize the three global PHP vars
-                // dpclient.php passed on:
+                /*
+                 * Cut out and unserialize the three global PHP vars
+                 * dpclient.php passed on
+                 */
                 $vars = substr($allbuf, 0, $pos2);
                 $vars = substr($vars, $pos1 + 6);
                 $tmp = unserialize($vars);
@@ -238,15 +255,19 @@ final class DpServer
 
                 list($__SERVER, $__SESSION, $__COOKIE, $__GET, $__POST,
                     $__FILES) = $tmp;
-                echo "handling...\n";
-                // Pass on the request to the universe object. The universe
-                // object can response by calling tellCurrentDpUserRequest() below:
-                $universe->handleCurrentDpUserRequest($this, $__SERVER, $__SESSION,
-                    $__COOKIE, $__GET, $__POST, $__FILES);
+                /*
+                 * Pass on the request to the universe object. The universe
+                 * object can response by calling tellCurrentDpUserRequest()
+                 * below
+                 */
+                $universe->handleCurrentDpUserRequest($this, $__SERVER,
+                    $__SESSION, $__COOKIE, $__GET, $__POST, $__FILES);
 
-                // :KLUDGE: Shows server status once in a while. The ticks
-                // system or external cron triggered calls should be used in the
-                // future:
+                /*
+                 * :KLUDGE: Shows server status once in a while. The ticks
+                 * system or external cron triggered calls should be used in the
+                 * future
+                 */
                 if (1 === mt_rand(1, 2 + sizeof($universe->mDpUsers))) {
                     $this->_showStatus($universe);
                 }
@@ -272,8 +293,8 @@ final class DpServer
             return;
         }
         if (FALSE === socket_write($this->mMsgsock, $talkback, $len)) {
-            echo 'socket_write() failed [' . socket_last_error() . ']: '
-                . socket_strerror(socket_last_error()) . "\n";
+            echo sprintf(dptext("socket_write(): failure [%u]: %s\n"),
+                socket_last_error(), socket_strerror(socket_last_error()));
         }
     }
 
@@ -284,20 +305,41 @@ final class DpServer
      */
     private function _showStatus(&$universe)
     {
-        if (function_exists('memory_get_usage')) {
-            // Shows a line with memory and universe info:
-            echo 'Memory: ' . round(memory_get_usage() / 1024) . 'KB  #Objects: '
-                . sizeof($universe->mDpObjects) . '  #Users: '
-                . sizeof($universe->mDpUsers) . '  #Environments: '
-                . sizeof($universe->mEnvironments) . '  #Timeouts: '
-                . sizeof($universe->mTimeouts) . "\n";
+        if (DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE === DPSERVER_DEBUG_TYPE) {
+            $this->_showStatusMemoryGetUsage($universe);
+        } elseif (DPSERVER_DEBUG_TYPE_GETRUSAGE === DPSERVER_DEBUG_TYPE) {
+            $this->_showStatusMemoryGetrusage($universe);
+        }
+    }
+
+    /**
+     * Shows a line with memory and universe info
+     */
+    private function _showStatusMemoryGetUsage(&$universe)
+    {
+        if (!function_exists('memory_get_usage')) {
             return;
         }
 
-        // Outcomment this to get info based on getrusage, see man getrusage:
-        /*
+        print_f("Memory: %uKB KB  #Objects: %u  #Users: %u  #Environments: %u  "
+            . "#Timeouts: %u\n",
+            round(memory_get_usage() / 1024),
+            sizeof($universe->mDpObjects),
+            sizeof($universe->mDpUsers),
+            sizeof($universe->mEnvironments),
+            sizeof($universe->mTimeouts));
+    }
+
+    /**
+     * Shows a line with getrusage info, see man getrusage
+     */
+    private function _showStatusMemoryGetrusage(&$universe)
+    {
+        if (!function_exists('getrusage')) {
+            return;
+        }
+
         $dat = getrusage();
-        //print_r($dat);
 
         $utime_after = (int)$dat["ru_utime.tv_sec"]*1e6 +
             (int)$dat["ru_utime.tv_usec"];
@@ -328,12 +370,12 @@ final class DpServer
             }
             $this->mShowedStatusHeader = 30;
 
-            echo "Memory\t" . implode("\t", $keys) . "\n";
+            echo sprintf(dptext("Memory\t%s\n"), implode("\t", $keys));
         }
-        echo round(memory_get_usage() / 1024) . "kb\t" . implode("\t", $dat)
-            . "\n";
+
+        echo sprintf(dptext("%uKB\t%s\n"), round(memory_get_usage() / 1024),
+            implode("\t", $dat));
         $this->mShowedStatusHeader--;
-        */
     }
 }
 ?>

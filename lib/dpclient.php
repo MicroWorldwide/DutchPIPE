@@ -4,8 +4,9 @@
  *
  * Passes the HTTP request to the PHP server along with its environment and user
  * variables, and returns the info retrieved from the PHP server back to the
- * user's browser. Used to serve pages, and by the AJAX engine in dpclient.js.
- * It talks to the PHP server using a fast file socket connection.
+ * user's browser. Used to serve pages, and by the AJAX engine in
+ * dpclient-js.php. It talks to the PHP server using a fast file socket
+ * connection.
  *
  * DutchPIPE version 0.1; PHP version 5
  *
@@ -18,12 +19,13 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpclient.php 2 2006-05-16 00:20:42Z ls $
+ * @version    Subversion: $Id: dpclient.php 22 2006-05-30 20:40:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver-ini.php, dpserver.php, dpclient.css
  */
 
-require_once(dirname(realpath(__FILE__ . '/..')) . '/config/dpserver-ini.php');
+require_once(dirname(realpath($_SERVER['SCRIPT_FILENAME']  . '/..'))
+    . '/config/dpserver-ini.php');
 
 error_reporting(DPSERVER_ERROR_REPORTING);
 
@@ -53,34 +55,40 @@ function talk2server($socketPath)
     if (DPSERVER_SOCKET_TYPE === AF_UNIX) {
         /* Creates a file socket and connects to it */
         if (FALSE === ($socket = socket_create(AF_UNIX, SOCK_STREAM, 0))) {
-            $gLastErrorMsg = '<h1>The DutchPIPE server is down</h1>socket_create() '
-                . 'unable to create socket [' . socket_last_error() . ']: '
-                . socket_strerror(socket_last_error()) . "\n";
+            $gLastErrorMsg = '<h1>' . DPSERVER_SOCKERR_MSG . '</h1>'
+                . sprintf(dptext(
+                "socket_create(): unable to create socket [%u]: %s\n"),
+                socket_last_error(), socket_strerror(socket_last_error()));
             return FALSE;
         }
         if (FALSE === @socket_connect($socket, $socketPath)) {
-            $gLastErrorMsg = '<h1>The DutchPIPE server is down</h1>'
-                . 'socket_connect() unable to connect [' . socket_last_error()
-                . ']: ' . socket_strerror(socket_last_error($socket)) . "\n";
+            $gLastErrorMsg = '<h1>' . DPSERVER_SOCKERR_MSG . '</h1>'
+                . sprintf(dptext(
+                "socket_create(): unable to connect [%u]: %s\n"),
+                socket_last_error(), socket_strerror(socket_last_error()));
             return FALSE;
         }
     } elseif (DPSERVER_SOCKET_TYPE === AF_INET) {
         /* Creates a TCP/IP socket and connects to it */
-        if (FALSE === ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP))) {
-            $gLastErrorMsg = '<h1>The DutchPIPE server is down</h1>socket_create() '
-                . 'unable to create socket [' . socket_last_error() . ']: '
-                . socket_strerror(socket_last_error()) . "\n";
+        if (FALSE === ($socket = socket_create(AF_INET, SOCK_STREAM,
+                SOL_TCP))) {
+            $gLastErrorMsg = '<h1>' . DPSERVER_SOCKERR_MSG . '</h1>'
+                . sprintf(dptext(
+                "socket_create(): unable to create socket [%u]: %s\n"),
+                socket_last_error(), socket_strerror(socket_last_error()));
             return FALSE;
         }
-        if (FALSE === @socket_connect($socket, DPSERVER_SOCKET_ADDRESS, DPSERVER_SOCKET_PORT)) {
-            $gLastErrorMsg = '<h1>The DutchPIPE server is down</h1>'
-                . 'socket_connect() unable to connect [' . socket_last_error()
-                . ']: ' . socket_strerror(socket_last_error($socket)) . "\n";
+        if (FALSE === @socket_connect($socket, DPSERVER_SOCKET_ADDRESS,
+                DPSERVER_SOCKET_PORT)) {
+            $gLastErrorMsg = '<h1>' . DPSERVER_SOCKERR_MSG . '</h1>'
+                . sprintf(dptext(
+                "socket_create(): unable to connect [%u]: %s\n"),
+                socket_last_error(), socket_strerror(socket_last_error()));
             return FALSE;
         }
     } else {
-        $gLastErrorMsg = '<h1>The DutchPIPE server is down</h1>Invalid socket '
-            . 'protocol';
+        $gLastErrorMsg = '<h1>' . DPSERVER_SOCKERR_MSG. '</h1>'
+            . dptext('Invalid socket protocol');
         return FALSE;
     }
 
@@ -106,7 +114,7 @@ function talk2server($socketPath)
 
         elseif (strlen($buf) > 11 && substr($buf, 0, 11) == "Set-Login: ") {
             $cookie_data = substr($buf, 11);
-            setcookie('dutchpipe', $cookie_data);
+            setcookie(DPSERVER_COOKIE_NAME, $cookie_data);
             $cookie_set = TRUE;
         }
 
@@ -130,7 +138,7 @@ function talk2server($socketPath)
                 $remove_registered_cookie = TRUE;
             }
             else {
-                setcookie('dutchpipe', $cookie_data, time() + 630720000);
+                setcookie(DPSERVER_COOKIE_NAME, $cookie_data, time() + 630720000);
                 $cookie_set = TRUE;
             }
         }
@@ -155,10 +163,10 @@ function talk2server($socketPath)
 
     if (FALSE === $cookie_set) {
         if (FALSE !== $remove_guest_cookie) {
-            setcookie('dutchpipe', FALSE);
+            setcookie(DPSERVER_COOKIE_NAME, FALSE);
         }
         if (FALSE !== $remove_registered_cookie) {
-            setcookie('dutchpipe', FALSE, time() - 3600);
+            setcookie(DPSERVER_COOKIE_NAME, FALSE, time() - 3600);
         }
     }
 
@@ -175,7 +183,7 @@ function talk2server($socketPath)
 }
 
 /**
- * Handles AJAX requests from dpclient.js
+ * Handles AJAX requests from dpclient-js.php
  */
 function handle_ajax_request($output)
 {
@@ -290,6 +298,7 @@ function handle_normal_request($output)
     $messages = $windows = array();
     $body = '';
     $dpelements = '';
+    $closetext = dptext('close');
 
     foreach ($xml->event as $e) {
         foreach ($e as $type => $data) {
@@ -314,8 +323,8 @@ function handle_normal_request($output)
                 break;
             case 'window':
                 $windows[] = '<div class="dpwindow_default" id="dpwindow">'
-                    . $data . '<p align="right"><a '
-                    . 'href="javascript:close_dpwindow()">close</a></p></div>';
+                    . $data . '<p align="right"><a href="javascript:'
+                    . 'close_dpwindow()">' . $closetext . '</a></p></div>';
                 break;
             default:
                 break;
@@ -324,7 +333,8 @@ function handle_normal_request($output)
     }
 
     if (0 === strlen($body)) {
-        $body = '<h1>Error fetching page. Invalid page XML.</h1>';
+        $body = '<h1>' . dptext('Error fetching page. Invalid page XML.')
+            . '</h1>';
     }
 
     if (strlen($dpelements)) {

@@ -13,7 +13,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: note.php 2 2006-05-16 00:20:42Z ls $
+ * @version    Subversion: $Id: note.php 22 2006-05-30 20:40:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -41,13 +41,16 @@ final class Note extends DpObject
      */
     public function createDpObject()
     {
-        $this->setTitle('small note');
+        $this->setTitle(dptext('small note'));
+        $this->setTitleDefinite(dptext('the small note'));
+        $this->setTitleIndefinite(dptext('a small note'));
         $this->setTitleImg(DPUNIVERSE_IMAGE_URL . 'smallnote.gif');
-        $this->addId('note', 'paper note', 'small note', 'small paper note',
-            'small, paper note', 'a small note');
-        $this->setBody('This is a small paper note. You can read it.<br />');
+        $this->addId(explode('#',
+            dptext('note#paper note#small note#small paper note#small, paper note#a small note')));
+        $this->setBody(
+            dptext('This is a small paper note. You can read it.<br />'));
 
-        $this->addAction('read me!', 'read', 'actionRead');
+        $this->addAction(dptext('read me!'), dptext('read'), 'actionRead');
     }
 
     /**
@@ -61,18 +64,20 @@ final class Note extends DpObject
     {
         /* Replies to user entering "read" */
         if (!strlen($noun)) {
-            get_current_dpuser()->setActionFailure('What do you want to read?<br />');
+            get_current_dpuser()->setActionFailure(
+                dptext('What do you want to read?<br />'));
             return FALSE;
         }
 
         /* Replies to user entering "read noet" (typo) */
         if (FALSE === $this->isId($noun)) {
-            get_current_dpuser()->setActionFailure('Read WHAT?<br />');
+            get_current_dpuser()->setActionFailure(dptext('Read WHAT?<br />'));
             return FALSE;
         }
 
         /* Shows a nice window with content */
-        get_current_dpuser()->tell('<window>Hello world.</window>');
+        get_current_dpuser()->tell('<window>' . dptext('Hello world.')
+            . '</window>');
         return TRUE;
     }
 }

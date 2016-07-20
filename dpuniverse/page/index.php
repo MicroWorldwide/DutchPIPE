@@ -13,7 +13,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: index.php 2 2006-05-16 00:20:42Z ls $
+ * @version    Subversion: $Id: index.php 22 2006-05-30 20:40:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -41,11 +41,11 @@ final class Index extends DpPage
      */
     public function createDpPage()
     {
-        $this->setTitle('Home');
-        $this->setBody(DPUNIVERSE_PAGE_PATH . 'index.html', 'file');
+        $this->setTitle(dptext('Home'));
+        $this->setBody(dptext(DPUNIVERSE_PAGE_PATH . 'index.html'), 'file');
 
-        $this->addExit('test1', DPUNIVERSE_PAGE_PATH . 'test1.php');
-        $this->addExit('test2', DPUNIVERSE_PAGE_PATH . 'test2.php');
+        $this->addExit(dptext('test1'), DPUNIVERSE_PAGE_PATH . 'test1.php');
+        $this->addExit(dptext('test2'), DPUNIVERSE_PAGE_PATH . 'test2.php');
 
         // Creates a note, moves it here:
         $note = get_current_dpuniverse()->newDpObject(DPUNIVERSE_OBJ_PATH

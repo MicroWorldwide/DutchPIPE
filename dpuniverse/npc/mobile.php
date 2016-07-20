@@ -13,7 +13,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: mobile.php 2 2006-05-16 00:20:42Z ls $
+ * @version    Subversion: $Id: mobile.php 22 2006-05-30 20:40:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpNpc
  */
@@ -52,20 +52,21 @@ final class Mobile extends DpNpc
     public function createDpNpc()
     {
         // Standard setup calls:
-        $this->addId('mobile', 'npc', 'mobile npc');
-        $this->setTitle('Mobile NPC',
-            DPUNIVERSE_TITLE_TYPE_INDEFINITE, DPUNIVERSE_IMAGE_URL . 'npc.gif');
-        $this->setBody('A mobile comptuer generated character that runs around '
-            . ' the website.<br />');
-        $this->addAction('kick', 'kick', 'actionKick', DP_ACTION_OPERANT_MENU,
-            DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL,
-            DP_ACTION_SCOPE_ENVIRONMENT);
+        $this->addId(explode('#', dptext('mobile#npc#mobile npc')));
+        $this->setTitle(dptext('mobile NPC'));
+        $this->setTitleDefinite(dptext('the mobile NPC'));
+        $this->setTitleIndefinite(dptext('a mobile NPC'));
+        $this->setTitleImg(DPUNIVERSE_IMAGE_URL . 'npc.gif');
+        $this->setBody(dptext('A mobile computer generated character that runs around the website.<br />'));
+        $this->addAction(dptext('kick'), dptext('kick'), 'actionKick',
+            DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
+            DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_ENVIRONMENT);
 
         // Sets up chat lines:
         $this->mChat = array(
-            "The mobile NPC says: This is sooo depressing.<br />",
-            "The mobile NPC says: How boring.<br />",
-            "The mobile NPC says: Oh this is so exciting.<br />");
+            dptext("The mobile NPC says: This is sooo depressing.<br />"),
+            dptext("The mobile NPC says: How boring.<br />"),
+            dptext("The mobile NPC says: Oh this is so exciting.<br />"));
     }
 
     /**
@@ -105,9 +106,9 @@ final class Mobile extends DpNpc
             if ($i++ > 9) {
                 return;
             }
-        } while ($rnd_link === 'login');
+        } while ($rnd_link === dptext('login'));
         if ($rnd_link[0] === DPUNIVERSE_NAVLOGO) {
-            $linkcommand = 'home';
+            $linkcommand = dptext('home');
         } else {
             $linkcommand = explode(' ', $rnd_link);
             $linkcommand = strtolower($rnd_link);
@@ -120,7 +121,7 @@ final class Mobile extends DpNpc
         $living = get_current_dpobject();
 
         if (!strlen($noun)) {
-            $living->setActionFailure('Kick who?<br />');
+            $living->setActionFailure(dptext('Kick who?<br />'));
             return FALSE;
         }
 
@@ -129,17 +130,22 @@ final class Mobile extends DpNpc
         }
 
         if (!$this->isId($noun)) {
-            $living->setActionFailure(ucfirst($noun) . ' is not here.<br />');
+            $living->setActionFailure(ucfirst(sprintf(
+                dptext('%s is not here.<br />'), $noun)));
             return FALSE;
         }
 
-        $living->tell('You give the ' . $this->getTitle() .
-            ' a good hard kick!<br />');
-        $env->tell($living->getTitle() . ' gives the ' . $this->getTitle() .
-            ' a good hard kick!<br />', $living);
-        $this->tell($living->getTitle() . ' gives you a good hard kick!<br/>');
+        $living->tell(sprintf(dptext('You give %s a good hard kick!<br />'),
+            $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
+        $env->tell(sprintf(dptext('%s gives %s a good hard kick!<br />'),
+            $living->getTitle(),
+            $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)), $living);
+        $this->tell($living->getTitle(sprintf(dptext(
+            '%s gives you a good hard kick!<br/>'),
+            DPUNIVERSE_TITLE_TYPE_DEFINITE)));
         $env->tell('<window autoclose="2500" styleclass="dpwindow_drink">'
-            . '<div style="text-align: center"><h1>*KICK*</h1></div></window>');
+            . '<div style="text-align: center"><h1>' . dptext('*KICK*')
+            . '</h1></div></window>');
 
         // Fetch beer in a few seconds:
         $this->setTimeout('timeoutKick', 3);
@@ -149,7 +155,8 @@ final class Mobile extends DpNpc
 
     function timeoutKick()
     {
-        $this->performAction("say Oh, ok, I know when I'm not wanted.");
+        $this->performAction(gettext(
+            "say Oh, ok, I know when I'm not wanted."));
         $this->randomWalk();
     }
 }

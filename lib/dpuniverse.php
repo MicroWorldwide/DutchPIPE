@@ -15,12 +15,12 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpuniverse.php 15 2006-05-18 21:50:46Z ls $
+ * @version    Subversion: $Id: dpuniverse.php 22 2006-05-30 20:40:55Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver.php, dpfunctions.php
  */
 
-// Shows all possible errors:
+/* Shows all possible errors */
 error_reporting(E_ALL | E_STRICT);
 
 /**
@@ -35,15 +35,15 @@ $grCurrentDpUniverse = NULL;
  */
 $grCurrentDpObject = NULL;
 
-define('_DPUSER_OBJECT', 0);           // Reference to /std/DpUser.php object
-define('_DPUSER_MESSAGES', 1);         // Array of strings with messages
-define('_DPUSER_NAME', 2);             // Name of user behind http request
-define('_DPUSER_COOKIEID', 3);         // Cookie Id used for authorization
-define('_DPUSER_COOKIEPASS', 4);       // Cookie Pass used for authorization
-define('_DPUSER_ISREGISTERED', 5);     // Is it a registered user?
-define('_DPUSER_TIME_LASTREQUEST', 6); // Last http request UNIX time
-define('_DPUSER_CURRENT_SCRIPTID', 7); // Script id of current AJAX request
-define('_DPUSER_LAST_SCRIPTID', 8);    // Script id of last AJAX request
+define('_DPUSER_OBJECT', 0);           /* Reference to /std/DpUser.php object */
+define('_DPUSER_MESSAGES', 1);         /* Array of strings with messages */
+define('_DPUSER_NAME', 2);             /* Name of user behind http request */
+define('_DPUSER_COOKIEID', 3);         /* Cookie Id used for authorization */
+define('_DPUSER_COOKIEPASS', 4);       /* Cookie Pass used for authorization */
+define('_DPUSER_ISREGISTERED', 5);     /* Is it a registered user? */
+define('_DPUSER_TIME_LASTREQUEST', 6); /* Last http request UNIX time */
+define('_DPUSER_CURRENT_SCRIPTID', 7); /* Script id of current AJAX request */
+define('_DPUSER_LAST_SCRIPTID', 8);    /* Script id of last AJAX request */
 
 /**
  * A DutchPIPE universe, handling objects, users, pages, etc. (rules of nature)
@@ -114,6 +114,8 @@ class DpUniverse
 
     /**
      * Constructs this universe based on a universe ini file
+     *
+     * @param      string    $iniFile    path to settings file for this universe
      */
     function __construct($iniFile = 'dpuniverse-ini.php')
     {
@@ -123,14 +125,16 @@ class DpUniverse
         $this->mGuestCnt = mt_rand(25, 75);
 
         /* These functions will be available for all objects */
+        require_once(DPSERVER_LIB_PATH . 'dptext.php');
         require_once(DPUNIVERSE_LIB_PATH . 'dpfunctions.php');
 
         mysql_pconnect(DPUNIVERSE_MYSQL_HOST, DPUNIVERSE_MYSQL_USER,
             DPUNIVERSE_MYSQL_PASSWORD)
-            || die('Could not connect: ' . mysql_error() . "\n");
+            || die(sprintf(dptext("Could not connect: %s\n"), mysql_error()));
 
         mysql_select_db(DPUNIVERSE_MYSQL_DB)
-            || die('Failed to select database: ' . DPUNIVERSE_MYSQL_DB . "\n");
+            || die(sprintf(dptext("Failed to select database: %s\n"),
+            DPUNIVERSE_MYSQL_DB));
     }
 
     /**
@@ -150,26 +154,33 @@ class DpUniverse
      * Several variables are passed which represent their corresponding PHP
      * global arrays: $_SERVER, $_COOKIE, etc.
      */
-    function handleCurrentDpUserRequest(&$rDpServer = NULL, &$rServerVars = NULL,
-            &$rSessionVars = NULL, &$rCookieVars = NULL, &$rGetVars = NULL,
-            &$rPostVars = NULL, &$rFilesVars = NULL)
+    function handleCurrentDpUserRequest(&$rDpServer = NULL,
+            &$rServerVars = NULL, &$rSessionVars = NULL, &$rCookieVars = NULL,
+            &$rGetVars = NULL, &$rPostVars = NULL, &$rFilesVars = NULL)
     {
         if (!is_null($rDpServer)) {
             $this->mrDpServer = $rDpServer;
             $GLOBALS['grCurrentDpUniverse'] = &$this;
         }
 
-        // Because we don't use a 'ticks' system or something similar yet,
-        // user requests are used to handle some generic cyclic calls:
+        /*
+         * Because we don't use a 'ticks' system or something similar yet, user
+         * user requests are used to handle some generic cyclic calls
+         */
         $this->handleLinkdead();
         $this->handleReset();
 
-        $this->mrCurrentDpUserRequest = new CurrentDpUserRequest($this, $rServerVars,
-            $rSessionVars, $rCookieVars, $rGetVars, $rPostVars, $rFilesVars);
+        $this->mrCurrentDpUserRequest = new CurrentDpUserRequest($this,
+            $rServerVars, $rSessionVars, $rCookieVars, $rGetVars, $rPostVars,
+            $rFilesVars);
         if (FALSE === $this->mrCurrentDpUserRequest->checkUser()) {
             if (!isset($rGetVars['ajax'])) {
-                $this->tellCurrentDpUserRequest('<event><div id="dppage"><![CDATA[Your browser did not report a '
-                    . 'User Agent string to the server. This is required.<br />'
+                $agent = dptext('Your browser did not report a User Agent
+string to the server. This is required.<br />');
+
+                $this->tellCurrentDpUserRequest('<event><div id="dppage">'
+                    . '<![CDATA['
+                    . $agent
                     . ']]></div></event>');
             }
             return;
@@ -179,8 +190,10 @@ class DpUniverse
             return;
         }
 
-        // Because we don't use a 'ticks' system or something similar yet,
-        // user requests are used to handle some generic cyclic calls:
+        /*
+         * Because we don't use a 'ticks' system or something similar yet, user
+         * user requests are used to handle some generic cyclic calls
+         */
         $this->handleRunkit();
 
         $this->mrCurrentDpUserRequest->handleLocation();
@@ -188,9 +201,12 @@ class DpUniverse
         $this->mDpUsers[$this->mrCurrentDpUserRequest->mUserArrKey]
             [_DPUSER_TIME_LASTREQUEST] = time();
 
-        // scriptids are used to detect if a user has multiple browser windows
-        // open. Each initiated dpclient.js sets such a random id:
-        $old_scriptid = $this->mDpUsers[$this->mrCurrentDpUserRequest->mUserArrKey]
+        /*
+         * scriptids are used to detect if a user has multiple browser windows
+         * open. Each initiated dpclient-js.php sets such a random id
+         */
+        $old_scriptid =
+            $this->mDpUsers[$this->mrCurrentDpUserRequest->mUserArrKey]
             [_DPUSER_CURRENT_SCRIPTID];
         $new_scriptid = is_null($rGetVars) || !isset($rGetVars['ajax'])
             || !isset($rGetVars['scriptid']) || 0 === (int)$rGetVars['scriptid']
@@ -211,8 +227,10 @@ class DpUniverse
                 [_DPUSER_CURRENT_SCRIPTID] = $new_scriptid;
         }
 
-        // Because we don't use a 'ticks' system or something similar yet,
-        // user requests are used to handle some generic cyclic calls:
+        /*
+         * Because we don't use a 'ticks' system or something similar yet, user
+         * user requests are used to handle some generic cyclic calls
+         */
         $this->handleTimeouts();
 
         $this->mrCurrentDpUserRequest->handleUser();
@@ -225,41 +243,49 @@ class DpUniverse
     {
         $cur_time = time();
 
-        // Time the user's browser should have done a page or AJAX request:
+        /* Time the user's browser should have done a page or AJAX request */
         $linkdeath_time = $cur_time - DPUNIVERSE_LINKDEATH_KICKTIME;
 
-        // Currently, this function is triggered by a user http request. If
-        // there's one user and he leaves, then if the next user enters, say
-        // a minute later (this time is defined here), he should not see
-        // 'X leaves the site.':
+        /*
+         * Currently, this function is triggered by a user http request. If
+         * there's one user and he leaves, then if the next user enters, say a
+         * minute later (this time is defined here), he should not see
+         * 'X leaves the site.'
+         */
         $showmsg_time = $linkdeath_time - DPUNIVERSE_LINKDEATH_SHOWMSGTIME;
 
-        // Bots may be visible a bit longer, since they don't have Javacript
-        // and sometimes do a lot of requests. With a short 'kick' time, users
-        // would get a lot of 'Bot enters the site' and 'Bot leaves the site'
-        // messages:
+        /*
+         * Bots may be visible a bit longer, since they don't have Javacript and
+         * sometimes do a lot of requests. With a short 'kick' time, users would
+         * get a lot of 'Bot enters the site' and 'Bot leaves the site'
+         * messages.
+         */
         $botkick_time = $cur_time - DPUNIVERSE_BOT_KICKTIME;
 
         $showbot_time = $botkick_time - DPUNIVERSE_LINKDEATH_SHOWBOTTIME;
 
         foreach ($this->mDpUsers as $i => &$u) {
-            // Throw out people who lost connection or browsed elsewhere. Need
-            // to think this one out (move them to a void, etc.), something
-            // simple for now:
+            /*
+             * Throw out people who lost connection or browsed elsewhere. Need
+             * to think this one out (move them to a void, etc.), something
+             * simple for now.
+             */
             $lastrequest_time = $u[_DPUSER_TIME_LASTREQUEST];
             $ajax_capable = $u[_DPUSER_OBJECT]->getProperty(
                 'is_ajax_capable');
 
-            // The "linkdeath" check:
+            /* The "linkdeath" check */
             if (($ajax_capable && $lastrequest_time < $linkdeath_time)
                     || (!$ajax_capable && $lastrequest_time < $botkick_time)) {
 
-                // This method is called before an instance of CurrentDpUserRequest
-                // is created and the current http request is handled. However,
-                // the tell() functions operate on the current request.
-                // Therefore, any sound made should be stored for the next
-                // cycle, otherwise the people get wrong messages.
-                // tell() in the User class checks for this variable:
+                /*
+                 * This method is called before an instance of
+                 * CurrentDpUserRequest is created and the current http request
+                 * is handled. However, the tell() functions operate on the
+                 * current request. Therefore, any sound made should be stored
+                 * for the next cycle, otherwise the people get wrong messages.
+                 * tell() in the User class checks for this variable:
+                 */
                 $this->mNoDirectTell = TRUE;
 
                 if (FALSE !== ($env =
@@ -267,16 +293,17 @@ class DpUniverse
                     if (($ajax_capable && $lastrequest_time > $showmsg_time)
                             || (!$ajax_capable
                             && $lastrequest_time > $showbot_time)) {
-                        // Drop stuff, tell people on the page the user left:
-                        $u[_DPUSER_OBJECT]->actionDrop('drop', 'all');
-                        $env->tell(ucfirst($u[_DPUSER_OBJECT]->getTitle(
-                            DPUNIVERSE_TITLE_TYPE_DEFINITE))
-                            . ' left the site.<br />',
+                        /* Drop stuff, tell people on the page the user left */
+                        $u[_DPUSER_OBJECT]->actionDrop(dptext('drop'),
+                            dptext('all'));
+                        $env->tell(sprintf(dptext('%s left the site.<br />'),
+                            ucfirst($u[_DPUSER_OBJECT]->getTitle(
+                            DPUNIVERSE_TITLE_TYPE_DEFINITE))),
                             $u[_DPUSER_OBJECT]);
                     } else {
-                        // Drop all silently:
-                        $u[_DPUSER_OBJECT]->actionDrop('drop', 'all',
-                            TRUE);
+                        /* Drop all silently */
+                        $u[_DPUSER_OBJECT]->actionDrop(dptext('drop'),
+                            dptext('all'), TRUE);
                     }
                 }
 
@@ -296,18 +323,18 @@ class DpUniverse
      */
     function handleReset()
     {
-        // Perform a limited number of resets per cycle:
+        /* Perform a limited number of resets per cycle */
         $max_resets = DPUNIVERSE_MAX_RESETS;
 
-        // Pick up where we were in the reset array:
+        /* Pick up where we were in the reset array */
         while (($ob = current($this->mDpObjectResets)) && $max_resets--) {
-            // Checks if the current object ready to reset:
+            /* Checks if the current object ready to reset */
             if ($ob->getProperty('reset_time') > time()) {
-                // No need to go on, check next http request cycle:
+                /* No need to go on, check next http request cycle */
                 return;
             }
 
-            // Resets the object, sets next reset time:
+            /* Resets the object, sets next reset time */
             $ob->__reset();
             $ob->addProperty('reset_time', time() + DPUNIVERSE_RESET_CYCLE);
 
@@ -315,7 +342,7 @@ class DpUniverse
                 reset($this->mDpObjectResets);
             }
 
-            // Check the next object:
+            /* Check the next object */
             continue;
         }
     }
@@ -337,7 +364,7 @@ class DpUniverse
                     : DPUNIVERSE_PAGE_PATH . 'index.php';
                 $this->mrUser->tell('<location>' . $__GET['location']
                     . '</location>');
-                $this->mMoveError = 'You notice a disruptance.<br />';
+                $this->mMoveError = dptext('You notice a disruptance.<br />');
             }
         }
     }
@@ -469,8 +496,8 @@ class DpUniverse
         $captchaId = addslashes($captchaId);
         $captchaGivenCode = addslashes($captchaGivenCode);
 
-        $result = mysql_query("SELECT captchaId FROM Captcha WHERE
-            captchaId='$captchaId' AND captchaFile='$captchaGivenCode.gif'");
+        $result = mysql_query("SELECT captchaId FROM Captcha WHERE "
+            . "captchaId='$captchaId' AND captchaFile='$captchaGivenCode.gif'");
 
         return $result && mysql_num_rows($result);
     }
@@ -517,7 +544,9 @@ class DpUniverse
 
         $this->mDpObjects[] =& $object;
         $this->mDpObjectResets[] =& $object;
-        echo "made new object $pathname\n";
+
+        echo sprintf(dptext("made new object %s\n"), $pathname);
+
         return $object;
     }
 
@@ -552,7 +581,7 @@ class DpUniverse
      */
     function removeDpObject(&$target)
     {
-        echo "removeDpObject() called in universe.\n";
+        echo dptext("removeDpObject() called in universe.\n");
         foreach ($this->mDpUsers as $i => &$u) {
             if ($u[_DPUSER_OBJECT] === $target) {
                 $del_user = $i;
@@ -694,10 +723,10 @@ class DpUniverse
      *
      * :WARNING: This method should normally only be called from DpObject.php.
      *
-     * @param       string|object   $what    description
+     * @param       string|object   $what   description
      * @param       object          $where  description
-     * @return      object|boolean  Returns the found object if 'what' was found.
-     *                              Returns FALSE if 'what' was not found.
+     * @return      object|boolean  Returns the found object if 'what' was found
+     *                              Returns FALSE if 'what' was not found
      * @see         get_environment, get_inventory
      */
     function &isPresent($what, &$where)
@@ -742,7 +771,7 @@ class DpUniverse
      * @param       string   $name   user name or id of player
      * @return      object|boolean   The found player or FALSE if not found
      */
-    function &findUser($name)
+    function &findUser($userName)
     {
         $rval = FALSE;
 
@@ -764,8 +793,10 @@ class DpUniverse
     {
         $users = array();
 
-        // :TODO: Since this will be used a lot, keep a seperate copy instead
-        // of constructing this arary each time:
+        /*
+         * :TODO: Since this will be used a lot, keep a seperate copy instead of
+         * constructing this arary each time
+         */
         foreach ($this->mDpUsers as &$u) {
             $users[] =& $u[_DPUSER_OBJECT];
         }
@@ -904,10 +935,10 @@ class CurrentDpUserRequest
     {
         /* Do we have a session cookie (guest) or fixed cookie (registered)? */
         if (isset($this->__COOKIE)
-                && isset($this->__COOKIE['dutchpipe'])
-                && strlen($this->__COOKIE['dutchpipe'])
+                && isset($this->__COOKIE[DPSERVER_COOKIE_NAME])
+                && strlen($this->__COOKIE[DPSERVER_COOKIE_NAME])
                 && strlen($cookie_data =
-                    trim($this->__COOKIE['dutchpipe'], ';'))
+                    trim($this->__COOKIE[DPSERVER_COOKIE_NAME], ';'))
                 && sizeof($cookie_data = explode(';', $cookie_data))
                 && 2 === sizeof($cookie_data)) {
             $this->mCookieId = $cookie_data[0];
@@ -930,7 +961,9 @@ class CurrentDpUserRequest
             /* Skip Ajax database check for now, but what are the security
                implications? */
             if (!isset($this->mrUser)) {
-                $result = mysql_query("SELECT userUsername FROM Users WHERE userCookieId='{$this->mCookieId}' and userCookiePassword='{$this->mCookiePass}'");
+                $result = mysql_query("SELECT userUsername FROM Users WHERE "
+                    . "userCookieId='{$this->mCookieId}' and "
+                    . "userCookiePassword='{$this->mCookiePass}'");
                 if (empty($result) || !($row = mysql_fetch_array($result))) {
                     $this->mrUser = NULL;
                     $this->mUsername = NULL;
@@ -945,7 +978,7 @@ class CurrentDpUserRequest
             if (isset($this->__GET) && isset($this->__GET['ajax'])) {
                 $this->mCookieId = FALSE;
                 $this->mUsername = 'Cookieless';
-                echo "NO COOKIE\n\n";
+                echo dptext("NO COOKIE\n");
                 return TRUE;
             }
         }
@@ -970,7 +1003,8 @@ class CurrentDpUserRequest
                 $this->__GET['location'] = DPUNIVERSE_PAGE_PATH . 'index.php';
             }
         }
-        $this->mrUser->setVars($this->__SERVER, $this->__SESSION, $this->__COOKIE, $this->__GET, $this->__POST, $this->__FILES);
+        $this->mrUser->setVars($this->__SERVER, $this->__SESSION,
+            $this->__COOKIE, $this->__GET, $this->__POST, $this->__FILES);
         return TRUE;
     }
 
@@ -1001,14 +1035,15 @@ class CurrentDpUserRequest
          */
 
         if (FALSE === $agent) {
-            echo "No agent\n";
+            echo dptext("No agent\n");
             return FALSE;
         }
         $result = mysql_query("SELECT userAgentTitle FROM UserAgentTitles "
             . "WHERE userAgentString='$agent'");
         if (FALSE === $result || !($row = mysql_fetch_array($result))) {
             $is_known_bot = FALSE;
-            $username = 'Guest#' . $this->mrDpUniverse->getGuestCnt();
+            $username = sprintf(dptext('Guest#%d'),
+                $this->mrDpUniverse->getGuestCnt());
         } else {
             $is_known_bot = TRUE;
             $username = $row[0];
@@ -1071,8 +1106,8 @@ class CurrentDpUserRequest
             $this->mrUser->setTitleImg(DPUNIVERSE_IMAGE_URL . 'bot.gif');
             $this->mrUser->setBody('<img src="' . DPUNIVERSE_IMAGE_URL
                 . 'bot.gif" border="0" alt="" align="left" '
-                . 'style="margin-right: 15px" />This is a search engine '
-                . 'indexing this site.<br />');
+                . 'style="margin-right: 15px" />'
+                . dptext('This is a search engine indexing this site.<br />'));
         }
 
         if (FALSE !== $this->mIsRegistered) {
@@ -1100,36 +1135,51 @@ class CurrentDpUserRequest
 
         end($this->mrDpUniverse->mDpUsers);
         $this->mUserArrKey = key($this->mrDpUniverse->mDpUsers);
-        echo "User created\n";
+        echo dptext("User created\n");
     }
 
     function handleLocation()
     {
         //echo "handleLocation()\n";
         if (is_null($this->mrEnvironment)) {
-            echo "getting location {$this->__GET['location']}\n";
-            $this->mrEnvironment = $this->mrDpUniverse->getDpObject($this->__GET['location'], isset($this->__GET['proxy']) || 0 === strpos($this->__GET['location'], '/mailman2'));
+            echo sprintf(dptext("Getting location %s\n"),
+                $this->__GET['location']);
+            $this->mrEnvironment = $this->mrDpUniverse->getDpObject(
+                $this->__GET['location'], isset($this->__GET['proxy'])
+                || 0 === strpos($this->__GET['location'], '/mailman2'));
         }
 
-        if (FALSE === ($env = $this->mrUser->getEnvironment()) || $env !== $this->mrEnvironment) {
+        if (FALSE === ($env = $this->mrUser->getEnvironment())
+                || $env !== $this->mrEnvironment) {
             //echo "\n\n" . $location ."\n\n";
             if (!$env) {
-                $from_where = 'enters the site';
+                $from_where = sprintf(dptext("%s enters the site.<br />"),
+                    ucfirst($this->mrUser->getTitle(
+                    DPUNIVERSE_TITLE_TYPE_DEFINITE)));
             } else {
-                $env->tell(ucfirst($this->mrUser->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)) . ' leaves to ' . $this->mrEnvironment->getTitle() . '.<br />', $this->mrUser);
-                $from_where = 'arrives from ' . $env->getTitle();
+                $env->tell(sprintf(dptext("%s leaves to %s.<br />"),
+                    ucfirst($this->mrUser->getTitle(
+                    DPUNIVERSE_TITLE_TYPE_DEFINITE)),
+                    $this->mrEnvironment->getTitle()), $this->mrUser);
+                $from_where = sprintf(dptext("%s arrives from %s.<br />"),
+                    ucfirst($this->mrUser->getTitle(
+                    DPUNIVERSE_TITLE_TYPE_DEFINITE)), $env->getTitle());
             }
             $this->mrUser->moveDpObject($this->mrEnvironment);
-            $this->mrEnvironment->tell(ucfirst($this->mrUser->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)) . " $from_where.<br />", $this->mrUser);
+            $this->mrEnvironment->tell($from_where, $this->mrUser);
         }
-        elseif (!isset($this->__GET['ajax']) && !isset($this->__GET['method'])) {
+
+        elseif (!isset($this->__GET['ajax'])
+                && !isset($this->__GET['method'])) {
             echo "handleLocation getAppearance\n";
-            if (FALSE !== ($body = $this->mrEnvironment->getAppearance(0, TRUE, NULL, $this->mrUser->getProperty('display_mode')))) {
+            if (FALSE !== ($body = $this->mrEnvironment->getAppearance(0, TRUE,
+                    NULL, $this->mrUser->getProperty('display_mode')))) {
                 $this->mrUser->tell('<div id="dppage">' . $body . '</div>');
             }
         }
         elseif (isset($this->__GET['method'])) {
-            if (!isset($this->__GET['call_object']) || !strlen($call_object = $this->__GET['call_object'])) {
+            if (!isset($this->__GET['call_object'])
+                    || !strlen($call_object = $this->__GET['call_object'])) {
                 $this->mrEnvironment->{$this->__GET['method']}();
             }
             else {
@@ -1144,14 +1194,18 @@ class CurrentDpUserRequest
             foreach ($getdivs as $getdiv) {
                 echo "getdiv: $getdiv\n";
                 if ($getdiv == 'dpinventory') {
-                    $this->mrUser->tell($this->mrEnvironment->getAppearanceInventory(0, TRUE, $this->mrUser, $this->mrUser->getProperty('display_mode')));
+                    $this->mrUser->tell($this->mrEnvironment->
+                        getAppearanceInventory(0, TRUE, $this->mrUser,
+                        $this->mrUser->getProperty('display_mode')));
                 } elseif ($getdiv == 'dpmessagearea') {
-                    $this->mrUser->tell('<div id="dpmessagearea">
-            <div id="dpmessagearea_inner">
-                <div id="messages"><br clear="all" /></div><br clear="all" />
-                <form id="actionform" method="get" onSubmit="return action_dutchpipe()"><input id="action" type="text" name="action" value="" size="40" maxlength="255" style="float: left; margin-top: 0px" /></form>
-            </div><br clear="all" />&#160;
-        </div>');
+                    $this->mrUser->tell('<div id="dpmessagearea">'
+                        . '<div id="dpmessagearea_inner"><div id="messages">'
+                        . '<br clear="all" /></div><br clear="all" />'
+                        . '<form id="actionform" method="get" onSubmit="return '
+                        . 'action_dutchpipe()"><input id="action" type="text" '
+                        . 'name="action" value="" size="40" maxlength="255" '
+                        . 'style="float: left; margin-top: 0px" /></form></div>'
+                        . '<br clear="all" />&#160;</div>');
                 }
             }
         }
@@ -1163,8 +1217,11 @@ class CurrentDpUserRequest
         if (isset($this->__GET['ajax'])) {
             $this->mrUser->addProperty('is_ajax_capable');
         }
-        // Skip once if the user has moved and hence the request died.
-        // Need to think if this must account for the three other calls below too:
+
+        /*
+         * Skip once if the user has moved and hence the request died. Need to
+         * think if this must account for the three other calls below too.
+         */
         if (!isset($this->mHasMoved)) {
             $this->handleMessages();
         }
@@ -1190,21 +1247,22 @@ class CurrentDpUserRequest
      */
     function handleMessages()
     {
-        // Loop through all users to find the current user:
+        /* Loop through all users to find the current user */
         foreach ($this->mrDpUniverse->mDpUsers as $i => &$u) {
-            // Check if this is the current user:
+            /* Check if this is the current user */
             if ($u[_DPUSER_OBJECT] === $this->mrUser) {
-                // Tell user all stored messages:
+                /* Tell user all stored messages */
                 foreach ($u[_DPUSER_MESSAGES] as &$message) {
                     if (is_null($message[1])
-                            || (FALSE !== ($env = $u[_DPUSER_OBJECT]->getEnvironment())
+                            || (FALSE !== ($env =
+                                $u[_DPUSER_OBJECT]->getEnvironment())
                             && $env === $message[1])) {
                         $this->mrUser->tell($message[0]);
                         $this->mToldSomething = TRUE;
                     } else {
                     }
                 }
-                // Delete these stored messages:
+                /* Delete these stored messages */
                 $this->mrDpUniverse->mDpUsers[$i][_DPUSER_MESSAGES] = array();
             }
         }
@@ -1214,6 +1272,7 @@ class CurrentDpUserRequest
     {
         if (isset($this->mMoveError)) {
             $tmp = $this->mUsername;
+            /* :KLUDGE: A random non-existing name */
             $this->mUsername = 'ddfjjsdfdfj';
             $this->mrUser->tell($this->mMoveError);
             unset($this->mMoveError);
