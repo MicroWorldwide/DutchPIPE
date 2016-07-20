@@ -10,10 +10,11 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpNpc.php 22 2006-05-30 20:40:55Z ls $
+ * @version    Subversion: $Id: DpNpc.php 45 2006-06-20 12:38:26Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpLiving
  */
@@ -27,6 +28,7 @@ inherit(DPUNIVERSE_STD_PATH . 'DpLiving.php');
  * A 'non playing character', a bot
  *
  * @package    DutchPIPE
+ * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
@@ -37,9 +39,18 @@ inherit(DPUNIVERSE_STD_PATH . 'DpLiving.php');
 class DpNpc extends DpLiving
 {
     /**
-     * Creates this "living" at object creation time
+     * Creates this NPC
+     *
+     * Called by DpLiving when this object is created.
+     *
+     * Calls {@link createDpNpc()} in the inheriting class.
+     *
+     * Adds a "is_npc" property to this object, set to TRUE.
+     *
+     * @access     private
+     * @see        createDpNpc()
      */
-    function createDpLiving()
+    final function createDpLiving()
     {
         // Standard setup calls to set some default values:
         $this->addId(dptext('npc'));
@@ -50,26 +61,60 @@ class DpNpc extends DpLiving
         $this->addProperty('is_npc');
 
         // Call CreateDpNpc for objects that extend on this object:
-        if (method_exists($this, 'createDpNpc')) {
-            $this->createDpNpc();
-        }
+        $this->createDpNpc();
     }
 
-    function resetDpLiving()
+    /**
+     * Sets this NPC up at the time it is created
+     *
+     * An empty function which can be redefined by the NPC class extending on
+     * DpNpc. When the object is created, it has no title, HTML body, et cetera,
+     * so in this method methods like {@link DpObject::setTitle()} are called.
+     *
+     * @see        resetDpNpc()
+     */
+    function createDpNpc()
     {
-        if (method_exists($this, 'resetDpNpc')) {
-            $this->resetDpNpc();
-        }
+    }
+
+    /**
+     * Resets this NPC
+     *
+     * Called by DpLiving at regular intervals as defined in dpuniverse-ini.php.
+     * Calls the method 'resetDpNpc' in this NPC. You can redefine that function
+     * to periodically do stuff such as alter the state of this NPC.
+     *
+     * @access     private
+     * @see        resetDpNpc()
+     */
+    final function resetDpLiving()
+    {
+        $this->resetDpNpc();
+    }
+
+    /**
+     * Resets this NPC
+     *
+     * Called by this NPC at regular intervals as defined in dpuniverse-ini.php.
+     * An empty function which can be redefined by the NPC class extending on
+     * DpNpc. To be used to periodically do stuff such as alter the state of the
+     * NPC.
+     *
+     * @see        createDpNpc()
+     */
+    function resetDpNpc()
+    {
     }
 
     /**
      * Tells data (message, window, location, ...) to this NPC
      *
-     * Tells a message to this object, for instance a chat line.
+     * Tells a message to this NPC, for instance a chat line or a new location.
      *
      * @param      string    $data      message string
+     * @see        DpObject::tell(), DpUser::tell(), DpPage::tell()
      */
-    function tell($data, &$from = NULL)
+    function tell($data)
     {
         if (empty($data)) {
             return;

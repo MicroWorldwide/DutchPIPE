@@ -10,10 +10,11 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpDrink.php 22 2006-05-30 20:40:55Z ls $
+ * @version    Subversion: $Id: DpDrink.php 45 2006-06-20 12:38:26Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -27,6 +28,7 @@ inherit(DPUNIVERSE_STD_PATH . 'DpObject.php');
  * A common drink which can be turned into beers, wine, etc.
  *
  * @package    DutchPIPE
+ * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
@@ -37,78 +39,116 @@ inherit(DPUNIVERSE_STD_PATH . 'DpObject.php');
 final class DpDrink extends DpObject
 {
     /**
-     * @var         string    Title used for empty drink
+     * Title used for empty drink
+     *
+     * @var         string
      * @access      private
      */
      private $mEmptyTitle;
 
     /**
-     * @var         string    Definite title used for empty drink
+     * Definite title used for empty drink
+     *
+     * @var         string
      * @access      private
      */
      private $mEmptyTitleDefinite;
 
     /**
-     * @var         string    Indefinite title used for empty drink
+     * Indefinite title used for empty drink
+     *
+     * @var         string
      * @access      private
      */
      private $mEmptyTitleIndefinite;
 
     /**
-     * @var         string    Title image used for empty drink
+     * Title image used for empty drink
+     *
+     * @var         string
      * @access      private
      */
     private $mEmptyTitleImg;
 
     /**
-     * @var         mixed     Body used for empty drink
+     * Body used for empty drink
+     *
+     * @var         mixed
      * @access      private
      */
     private $mEmptyBody;
 
     /**
-     * @var         array     Ids used for empty drink
+     * Ids used for empty drink
+     *
+     * @var         array
      * @access      private
      */
     private $mEmptyIds;
 
     /**
-     * @var         string    Original title so drink can be refilled
+     * Original title so drink can be refilled
+     *
+     * @var         string
      * @access      private
      */
     private $mOrigTitle;
 
     /**
-     * @var         string    Original definite title so drink can be refilled
+     * Original definite title so drink can be refilled
+     *
+     * @var         string
      * @access      private
      */
     private $mOrigTitleDefinite;
 
     /**
-     * @var         string    Original indefinite title so drink can be refilled
+     * Original indefinite title so drink can be refilled
+     *
+     * @var         string
      * @access      private
      */
     private $mOrigTitleIndefinite;
 
     /**
-     * @var         string    Original title image so drink can be refilled
+     * Original title image so drink can be refilled
+     *
+     * @var         string
      * @access      private
      */
     private $mOrigTitleImg;
 
     /**
-     * @var         mixed     Original title so drink can be refilled
+     * Original title so drink can be refilled
+     *
+     * @var         mixed
      * @access      private
      */
     private $mOrigBody;
 
     /**
-     * @var         array     Original ids so drink can be refilled
+     * Original ids so drink can be refilled
+     *
+     * @var         array
      * @access      private
      */
     private $mOrigIds;
 
-    function createDpObject()
+    /**
+     * Creates this drink object
+     *
+     * Called by DpDrink when this object is created. Adds standard actions
+     * which can be performed on this object.
+     *
+     * Calls {@link createDpDrink()} in the inheriting class.
+     *
+     * Adds "is_full" and "is_drink" properties to this object, both set to
+     * TRUE.
+     *
+     * @access     private
+     * @see        createDpDrink()
+     */
+    final function createDpObject()
     {
         $this->addId(dptext('bottle'));
         $this->addProperty('is_full');
@@ -121,11 +161,59 @@ final class DpDrink extends DpObject
             DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
             DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_ALL);
 
-        if (method_exists($this, 'createDpDrink')) {
-            $this->createDpDrink();
-        }
+        $this->createDpDrink();
     }
 
+    /**
+     * Sets this drink object up at the time it is created
+     *
+     * An empty function which can be redefined by the drink object extending on
+     * DpDrink. When the object is created, it has no title, HTML body, et
+     * cetera, so in this method methods like {@link DpObject::setTitle()} are
+     * called.
+     *
+     * @see        resetDpDrink()
+     */
+    function createDpDrink()
+    {
+    }
+
+    /**
+     * Resets this drink object
+     *
+     * Called by DpObject at regular intervals as defined in dpuniverse-ini.php.
+     * Calls the method 'resetDpDrink' in this drink object. You can redefine
+     * that function to periodically do stuff such as alter the state of this
+     * drink object.
+     *
+     * @access     private
+     * @see        resetDpDrink()
+     */
+    final function resetDpObject()
+    {
+        $this->resetDpDrink();
+    }
+
+    /**
+     * Resets this drink object
+     *
+     * Called by this drink object at regular intervals as defined in
+     * dpuniverse-ini.php. An empty function which can be redefined by the
+     * drink object extending on DpDrink. To be used to periodically do stuff
+     * such as alter the state of the drink object.
+     *
+     * @see        createDpDrink()
+     */
+    function resetDpDrink()
+    {
+    }
+
+    /**
+     * Checks if the given id is a valid id for this object
+     *
+     * @param      string    $id         name string to check
+     * @return     bool      TRUE if the id is valid, FALSE otherwise
+     */
     function isId($id)
     {
         return strlen($id)
@@ -135,6 +223,17 @@ final class DpDrink extends DpObject
                 || DpObject::isId($id));
     }
 
+    /**
+     * Fill or empty the drink
+     *
+     * Adjusts the drink's appearance and behaviour. Without an argument,
+     * fills the drink. Drink objects are filled by default after being created.
+     *
+     * Drink objects which are filled have the property "is_full" set to TRUE in
+     * them.
+     *
+     * @param      string    $isFull     TRUE to fill, FALSE to empty drink
+     */
     public function setFull($isFull = TRUE)
     {
         if (FALSE === $isFull) {
@@ -156,76 +255,160 @@ final class DpDrink extends DpObject
         }
     }
 
-    public function setEmptyIds($str)
+    /**
+     * Sets an array of names used to refer to this drink when it is empty
+     *
+     * Overwrites previous set ids. Ids are case insensitive and all turned
+     * into lowercase.
+     *
+     * @param      array     $ids        array of name strings
+     * @see        getEmptyIds(), DpObject::setIds(), DpObject::isId()
+     */
+    public function setEmptyIds($ids)
     {
-        $this->mEmptyIds = $str;
+        $this->mEmptyIds = $ids;
     }
 
+    /**
+     * Gets the array of ids for this drink when it is empty
+     *
+     * @return     array     array of name strings
+     * @see        setEmptyIds(), DpObject::getIds(), DpObject::isId()
+     */
     public function getEmptyIds()
     {
         return $this->mEmptyIds;
     }
 
-    public function setEmptyTitle($str)
+    /**
+     * Sets the title for this drink when it is empty
+     *
+     * @param      string    $title      short description, "beer"
+     * @see        DpObject::setTitle()
+     */
+    public function setEmptyTitle($title)
     {
-        $this->mEmptyTitle = $str;
+        $this->mEmptyTitle = $title;
     }
 
+    /**
+     * Gets the drinks's title when it is empty
+     *
+     * Gets the title as set with setEmptyTitle, for example "beer".
+     *
+     * @return     string    the drink's title when it is empty
+     * @see        DpObject::getTitle()
+     */
     public function getEmptyTitle()
     {
         return $this->mEmptyTitle;
     }
 
-    public function setEmptyTitleDefinite($str)
+    /**
+     * Sets the definite title for this drink when it is empty, "the beer"
+     *
+     * Must be called after setEmptyTitle, which resets the definite title.
+     *
+     * @param      string    $title      short definite description, "the beer"
+     * @see        DpObject::setTitleDefinite()
+     */
+    public function setEmptyTitleDefinite($title)
     {
-        $this->mEmptyTitleDefinite = $str;
+        $this->mEmptyTitleDefinite = $title;
     }
 
+    /**
+     * Gets the definite title for this drink when it is empty, "the beer"
+     *
+     * @return     string    the drink's definite titled when it is empty
+     * @see        DpObject::getTitleDefinite()
+     */
     public function getEmptyTitleDefinite()
     {
         return $this->mEmptyTitleDefinite;
     }
 
-    public function setEmptyTitleIndefinite($str)
+    /**
+     * Sets the indefinite title for this drink when it is empty, "a beer"
+     *
+     * Must be called after setEmptyTitle, which reset the indefinite title.
+     *
+     * @param      string    $title      short indefinite description, "a beer"
+     * @see        DpObject::setTitleIndefinite()
+     */
+    public function setEmptyTitleIndefinite($title)
     {
-        $this->mEmptyTitleIndefinite = $str;
+        $this->mEmptyTitleIndefinite = $title;
     }
 
+    /**
+     * Gets the indefinite title for this drink when it is empty, "a beer"
+     *
+     * @return     string    the drink's indefinite title when it is empty
+     * @see        DpObject::getTitleIndefinite()
+     */
     public function getEmptyTitleIndefinite()
     {
         return $this->mEmptyTitleIndefinite;
     }
 
-    public function setEmptyTitleImg($str)
+    /**
+     * Sets URL for the image representing this drink when it is empty
+     *
+     * @param      string    $titleImg   URL for image when this drink is empty
+     * @see        DpObject::setTitleImg()
+     */
+    public function setEmptyTitleImg($titleImg)
     {
-        $this->mEmptyTitleImg = $str;
+        $this->mEmptyTitleImg = $titleImg;
     }
 
+    /**
+     * Gets URL for the image representing this drink when it is empty
+     *
+     * Returns NULL if no image was set for this drink when it is empty.
+     *
+     * @return     string    URL for the image representing this drink when it
+     *                       is empty or NULL
+     * @see        DpObject::getTitleImg()
+     */
     public function getEmptyTitleImg()
     {
         return $this->mEmptyTitleImg;
     }
 
-    public function setEmptyBody($str)
+    /**
+     * Sets the HTML content of this drink when it is empty
+     *
+     * @param       string    $body       content data
+     * @see         getEmptyBody, DpObject::setBody(), DpObject::getBody()
+     */
+    public function setEmptyBody($body)
     {
-        $this->mEmptyBody = $str;
+        $this->mEmptyBody = $body;
     }
 
+    /**
+     * Gets the HTML content of this drink when it is empty
+     *
+     * @return     string    HTML content of this drink when it is empty
+     * @see        setEmptyBody(), DpObject::getBody(), DpObject::setBody()
+     */
     public function getEmptyBody()
     {
         return $this->mEmptyBody;
     }
 
-    public function setMessage($str)
-    {
-        $this->message = $str;
-    }
-
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
+    /**
+     * Makes a living object drink this object
+     *
+     * Drinks the drink if $noun is a valid id for this drink and the drink is
+     * "full".
+     *
+     * @param   string  $verb       the action, "drink"
+     * @param   string  $noun       what to drink, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     public function actionDrink($verb, $noun)
     {
         $user = get_current_dpuser();
@@ -277,10 +460,11 @@ final class DpDrink extends DpObject
     }
 
     /**
-     * Prevents insertion into containers, not used yet.
+     * Prevents insertion into containers, not used yet
      *
      * @return  boolean     TRUE if this drink can't be inserted, FALSE to allow
      *                      insertion
+     * @ignore
      */
     function preventInsert()
     {

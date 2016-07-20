@@ -12,10 +12,11 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage lib
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpuniverse.php 22 2006-05-30 20:40:55Z ls $
+ * @version    Subversion: $Id: dpuniverse.php 56 2006-06-24 17:49:36Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver.php, dpfunctions.php
  */
@@ -49,6 +50,7 @@ define('_DPUSER_LAST_SCRIPTID', 8);    /* Script id of last AJAX request */
  * A DutchPIPE universe, handling objects, users, pages, etc. (rules of nature)
  *
  * @package    DutchPIPE
+ * @subpackage lib
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
@@ -58,17 +60,19 @@ define('_DPUSER_LAST_SCRIPTID', 8);    /* Script id of last AJAX request */
 class DpUniverse
 {
     /**
-     * All objects on the site
+     * @var         array      All objects on the site
      */
-    public $mDpObjects = array();
+     public $mDpObjects = array();
 
     /**
-     * Reset queue, first element will reset first
+     * @var         array      Reset queue, first element will reset first
      */
     public $mDpObjectResets = array();
 
     /**
      * The environment of each object on the site in env => ob pairs.
+     *
+     * @var         array      The environments of objects
      */
     public $mEnvironments = array();
 
@@ -77,40 +81,46 @@ class DpUniverse
      *
      * Each element in the array represents a user. A user is stored in another
      * array, with the elements as defined by the _DPUNIVER_USER_ definitions.
+     *
+     * @var         array      All user objects on the site + data
      */
     public $mDpUsers = array();
 
     /**
-     * All pending timeouts on the site after use of setTimeout()
+     * @var         array      All pending timeouts after use of setTimeout()
      */
     public $mTimeouts = array();
 
     /**
      * Increasing guest counter used to form unique names for guests, for
      * example "Guest#8'
+     *
+     * @var         int        Increasing guest counter for unique guest names
      */
     public $mGuestCnt;
 
     /**
      * DpObject counter increased by newDpObject, used to generate unique object
      * ids
+     *
+     * @var         int        Used to generate unique object
      */
     public $mUniqueDpObjectCnt = 1;
 
     /**
-     * The server object that called us
+     * @var         object     The server object that called us
      */
-    public $mrDpServer;
+     public $mrDpServer;
 
     /**
-     * Info on the current HTTP user request
+     * @var         array      Info on the current HTTP user request
      */
-    public $mrCurrentDpUserRequest;
+     public $mrCurrentDpUserRequest;
 
     /**
-     * Do not tell anything to the current http request?
+     * @var         boolean    Do not tell anything to the current http request?
      */
-    public $mNoDirectTell = FALSE;
+     public $mNoDirectTell = FALSE;
 
     /**
      * Constructs this universe based on a universe ini file
@@ -153,6 +163,14 @@ class DpUniverse
      * Called each time a user's browser does a normal page or AJAX request.
      * Several variables are passed which represent their corresponding PHP
      * global arrays: $_SERVER, $_COOKIE, etc.
+     *
+     * @param   array   &$rDpServer    Reference to the server object
+     * @param   array   &$rServerVars  User server variables
+     * @param   array   &$rSessionVars User session variables
+     * @param   array   &$rCookieVars  User cookie variables
+     * @param   array   &$rGetVars     User get variables
+     * @param   array   &$rPostVars    User post variables
+     * @param   array   &$rFilesVars   User files variables
      */
     function handleCurrentDpUserRequest(&$rDpServer = NULL,
             &$rServerVars = NULL, &$rSessionVars = NULL, &$rCookieVars = NULL,
@@ -353,7 +371,7 @@ string to the server. This is required.<br />');
     function handleRunkit()
     {
         if (FALSE !== DPUNIVERSE_RUNKIT) {
-            if (FALSE === @runkit_lint_file(DPUNIVERSE_BASE_PATH
+            if (FALSE === @runkit_lint_file(DPUNIVERSE_PREFIX_PATH
                     . $this->__GET['location'])) {
                 if ($this->mrUser->getEnvironment()) {
                     $this->mrEnvironment = $this->mrUser->getEnvironment();
@@ -441,6 +459,8 @@ string to the server. This is required.<br />');
      * Called from tell in DpUser.php
      *
      * :WARNING: This method should normally only be called from DpUser.php.
+     *
+     * @access     private
      */
     function storeTell(&$user, $data, &$binded_environment = NULL)
     {
@@ -455,6 +475,9 @@ string to the server. This is required.<br />');
      * Tells something back to the currently connected user client
      *
      * :WARNING: This method should normally only be called from DpUser.php.
+     *
+     * @access     private
+     * @param      string    $talkback   XML string
      */
     function tellCurrentDpUserRequest($talkback)
     {
@@ -472,6 +495,8 @@ string to the server. This is required.<br />');
      * replaces the oldest one in the database. Then we obtain a random entry
      * here. This should do it for now, but your milleague might vary and the
      * situation might change as spambots get smarter.
+     *
+     * @return     int       CAPTCHA database row key
      */
     function getRandCaptcha()
     {
@@ -512,35 +537,34 @@ string to the server. This is required.<br />');
      * @param      boolean   $proxy      expirimental, ignore
      * @return     object    The newly created object
      */
-    function &newDpObject($pathname, $proxy = FALSE)
+    function &newDpObject($pathname, $sublocation = FALSE)
     {
         $unique_id = $this->mUniqueDpObjectCnt;
         $this->mUniqueDpObjectCnt++;
 
-        if (FALSE !== $proxy) {
-            require_once(DPUNIVERSE_BASE_PATH . DPUNIVERSE_STD_PATH
+        if (substr($pathname, 0, 1) != '/'
+                || ((FALSE === strpos($pathname, '://'))
+                && (strlen($pathname) < 4
+                || substr($pathname, -4) != '.php'))) {
+            require_once(DPUNIVERSE_PREFIX_PATH . DPUNIVERSE_STD_PATH
                 . 'DpPage.php');
-            $object = new DpPage($unique_id);
-            $object->setTitle('Test');
-            $object->setBody("http://www.dutchpipe.org$pathname", 'url');
-            $object->setNavigationTrail(array(DPUNIVERSE_NAVLOGO, '/'),
-                $object->getTitle());
-            $object->addProperty('is_layered', TRUE);
-        } elseif (substr($pathname, 0, 1) != '/') {
-            require_once(DPUNIVERSE_BASE_PATH . DPUNIVERSE_STD_PATH
-                . 'DpPage.php');
-            $object = new DpPage($unique_id);
+            $object = new DpPage($unique_id, time() + DPUNIVERSE_RESET_CYCLE, $pathname, FALSE);
             $object->setTitle($pathname);
             $this->__GET['location'] = $pathname;
+            if (FALSE === strpos($pathname, '://')) {
+                $object->setBody($pathname, 'file');
+                $object->setNavigationTrail(array(DPUNIVERSE_NAVLOGO, '/'));
+            }
         } else {
-            require_once(DPUNIVERSE_BASE_PATH . $pathname);
+            require_once(DPUNIVERSE_PREFIX_PATH . $pathname);
             $classname =  explode("/", $pathname);
             $classname = ucfirst(!strlen($classname[sizeof($classname) - 1]) ?
                 'index' : substr($classname[sizeof($classname) - 1], 0, -4));
-            $object = new $classname($unique_id);
+            $object = new $classname($unique_id, time() + DPUNIVERSE_RESET_CYCLE, $pathname, $sublocation);
         }
-        $object->addProperty('location', $pathname);
-        $object->addProperty('reset_time', time() + DPUNIVERSE_RESET_CYCLE);
+        if (empty($object)) {
+            return FALSE;
+        }
 
         $this->mDpObjects[] =& $object;
         $this->mDpObjectResets[] =& $object;
@@ -557,17 +581,23 @@ string to the server. This is required.<br />');
      * Most functionality can be found in  moveDpObject in DpObject.php.
      *
      * :WARNING: This method should normally only be called from DpObject.php.
+     *
+     * @access     private
+     * @param      object  &$rItem      object to move
+     * @param      mixed   &$rDest      object to move into to
      */
-    function moveDpObject(&$item, &$dest)
+    function moveDpObject(&$rItem, &$rDest)
     {
         foreach ($this->mEnvironments as $i => &$pair) {
-            if ($pair[0] === $item) {
-                $this->mEnvironments[$i][1] =& $dest;
+            if ($pair[0] === $rItem) {
+                unset($this->mEnvironments[$i]);
+                break;
+                $this->mEnvironments[$i][1] =& $rDest;
                 return;
             }
         }
 
-        $this->mEnvironments[] = array(&$item, &$dest);
+        $this->mEnvironments[] = array(&$rItem, &$rDest);
     }
 
     /**
@@ -578,30 +608,33 @@ string to the server. This is required.<br />');
      * Most functionality can be found in removeDpObject in DpObject.php.
      *
      * :WARNING: This method should normally only be called from DpObject.php.
+     *
+     * @access     private
+     * @param      object  &$rTarget    object to remove
      */
-    function removeDpObject(&$target)
+    function removeDpObject(&$rTarget)
     {
         echo dptext("removeDpObject() called in universe.\n");
         foreach ($this->mDpUsers as $i => &$u) {
-            if ($u[_DPUSER_OBJECT] === $target) {
+            if ($u[_DPUSER_OBJECT] === $rTarget) {
                 $del_user = $i;
                 break;
             }
         }
         foreach ($this->mEnvironments as $i => &$env) {
-            if ($env[0] === $target) {
+            if ($env[0] === $rTarget) {
                 $del_env = $i;
                 break;
             }
         }
         foreach ($this->mDpObjects as $i => &$ob) {
-            if ($ob === $target) {
+            if ($ob === $rTarget) {
                 $del_obj = $i;
                 break;
             }
         }
         foreach ($this->mDpObjectResets as $i => &$ob) {
-            if ($ob === $target) {
+            if ($ob === $rTarget) {
                 $del_reset = $i;
                 break;
             }
@@ -651,15 +684,24 @@ string to the server. This is required.<br />');
      * @param      boolean   $proxy      experimental, ignore
      * @return     object    Reference to instance of $pathname
      */
-    function &getDpObject($pathname, $proxy = FALSE)
+    function &getDpObject($pathname, $sublocation = FALSE)
     {
-        foreach ($this->mDpObjects as $i => &$ob) {
-            if ($pathname === $ob->getProperty('location')) {
-                return $ob;
+        if (FALSE === $sublocation) {
+            foreach ($this->mDpObjects as $i => &$ob) {
+                if ($pathname === $ob->getProperty('location')) {
+                    return $ob;
+                }
+            }
+        } else {
+            foreach ($this->mDpObjects as $i => &$ob) {
+                if ($pathname === $ob->getProperty('location')
+                        && $sublocation === $ob->getProperty('sublocation')) {
+                    return $ob;
+                }
             }
         }
 
-        return $this->newDpObject($pathname, $proxy);
+        return $this->newDpObject($pathname, $sublocation);
     }
 
     /**
@@ -670,6 +712,7 @@ string to the server. This is required.<br />');
      *
      * :WARNING: This method should normally only be called from DpObject.php.
      *
+     * @access     private
      * @param      object    &$ob        object we want to know environment of
      * @return     mixed     object reference or FALSE for no environment
      */
@@ -693,6 +736,7 @@ string to the server. This is required.<br />');
      *
      * :WARNING: This method should normally only be called from DpObject.php.
      *
+     * @access     private
      * @param      object    &$ob        object we want to know inventory of
      * @return     array     object references to objects in our inventory
      */
@@ -712,22 +756,17 @@ string to the server. This is required.<br />');
     /**
      * Checks if an object is present
      *
-     * Search an environment for an object, as specified in 'what'.
-     * If 'what' is a string the objects searched are checked for
-     * returning 1 on the call id(what).
-     *
-     * If 'where' is not specified, the inventory of the current object,
-     * and its environment (in that order), are searched for 'what'.
-     *
-     * If 'where' is specified, then only the inventory of 'where' is searched.'
+     * Search in the inventory of an object, as specified in $where, for another
+     * object, as specified in $what. If $what is a string the objects searched
+     * are checked for returning TRUE on the call isId($what).
      *
      * :WARNING: This method should normally only be called from DpObject.php.
      *
-     * @param       string|object   $what   description
-     * @param       object          $where  description
-     * @return      object|boolean  Returns the found object if 'what' was found
-     *                              Returns FALSE if 'what' was not found
-     * @see         get_environment, get_inventory
+     * @access      private
+     * @param       string|object   $what   object to search for
+     * @param       object          &$where object to search in
+     * @return      object|boolean  the found object or FALSE if not found
+     * @see         getEnvironment(), getInventory()
      */
     function &isPresent($what, &$where)
     {
@@ -813,6 +852,7 @@ string to the server. This is required.<br />');
      *
      * :WARNING: This method should normally only be called from DpObject.php.
      *
+     * @access     private
      * @param      object    &$ob        reference to object to call method in
      * @param      string    $method     name of method to call
      * @param      int d     $secs       delay in seconds
@@ -825,37 +865,80 @@ string to the server. This is required.<br />');
     }
 }
 
+/**
+ * Handles the current HTTP page or AJAX request by the user
+ *
+ * Each time a user requests a page or performs an AJAX check, an instance of
+ * this class is created by the universe object, user data is set, and methods
+ * are called in it to handle this user. After that the object is destroyed.
+ *
+ * @package    DutchPIPE
+ * @subpackage lib
+ * @author     Lennert Stock <ls@dutchpipe.org>
+ * @copyright  2006 Lennert Stock
+ * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
+ * @version    Release: @package_version@
+ * @link       http://dutchpipe.org/manual/package/DutchPIPE
+ */
 class CurrentDpUserRequest
 {
     /**
-     * References to the universe object:
+     * @var         object     Reference to the universe object
      */
     public $mrDpUniverse;
+
+    /**
+     * @var         array      User server variables
+     */
     public $__SERVER;
+
+    /**
+     * @var         array      User session variables
+     */
     public $__SESSION;
+
+    /**
+     * @var         array      User cookie variables
+     */
     public $__COOKIE;
+
+    /**
+     * @var         array      User get variables
+     */
     public $__GET;
+
+    /**
+     * @var         array      User post variables
+     */
     public $__POST;
+
+    /**
+     * @var         array      User files variables
+     */
     public $__FILES;
+
+    /**
+     * @var         object     Reference to the environment of user
+     */
     public $mrEnvironment;
 
     /**
-     * Reference to the user object in the universe
+     * @var         object     Reference to the user object in the universe
      */
     public $mrUser;
 
     /**
-     * Key to user object above in array with all users for quick lookups
+     * @var         int        Key to user object above in array with all users
      */
     public $mUserArrKey;
 
     /**
-     * Is this user request coming from a registered user?
+     * @var         boolean    Is this request coming from a registered user?
      */
     public $mIsRegistered = FALSE;
 
     /**
-     * The user name behind the current user client request
+     * @var         string     The user name behind the current client request
      */
     public $mUsername;
 
@@ -865,6 +948,8 @@ class CurrentDpUserRequest
      * We don't store the users real username and password in his cookie, but
      * something we generated and stored in the user's database entry. If the
      * cookie is stolen, the username/password isn't.
+     *
+     * @var         string     The cookie id of the current user
      */
     public $mCookieId;
 
@@ -874,37 +959,47 @@ class CurrentDpUserRequest
      * We don't store the users real username and password in his cookie, but
      * something we generated and stored in the user's database entry. If the
      * cookie is stolen, the username/password isn't.
+     *
+     * @var         string     The cookie password of the current user
      */
     public $mCookiePass;
 
     /**
-     * Something old that should be ripped out
-     *
-     * Used in the beginning to check if we needn't to pass updates on:
+     * @var         boolean    Has the user been told anything this request?
      */
     public $mToldSomething;
 
     /**
-     * True if the user tried to move but failed
-     *
      * Used if the experimental PHP runkit module is used. If for instance a
      * page object contins a syntax error and a user tries to go there, this
      * flag will be true.
+     *
+     * @var         boolean    TRUE if the user tried to move but failed
      */
     public $mMoveError;
 
     /**
      * :KLUDGE: Used as a kludge to handle user movements within this request
+     *
+     * @var         boolean    TRUE if the user moved
      */
     public $mHasMoved;
 
     /**
-     * Is this user a known search bot/spider/crawler?
+     * @var         boolean    Is this user a known search bot/spider/crawler?
      */
     public $mIsKnownBot = FALSE;
 
     /**
      * Sets up the object handling the current user request
+     *
+     * @param   array   $rDpUniverse  Reference to the universe object
+     * @param   array   $rServerVars  User server variables
+     * @param   array   $rSessionVars User session variables
+     * @param   array   $rCookieVars  User cookie variables
+     * @param   array   $rGetVars     User get variables
+     * @param   array   $rPostVars    User post variables
+     * @param   array   $rFilesVars   User files variables
      */
     function __construct(&$rDpUniverse, &$rServerVars, &$rSessionVars,
                          &$rCookieVars, &$rGetVars, &$rPostVars, &$rFilesVars)
@@ -931,6 +1026,14 @@ class CurrentDpUserRequest
         }
     }
 
+    /**
+     * Checks if the current connection can be tied to a user.
+     *
+     * Checks and possibly creates user and location objects, handles passing of
+     * variables such server, cookie and get arrays.
+     *
+     * @return  boolean TRUE for valid user request, FALSE otherwise
+     */
     function checkUser()
     {
         /* Do we have a session cookie (guest) or fixed cookie (registered)? */
@@ -1016,6 +1119,11 @@ class CurrentDpUserRequest
      *
      * Some experimental stuff is going on with search bots, so you can see
      * them crawling the site. This will later be turned into an option.
+     *
+     * FALSE is returned if the user's client didn't report a "user agent"
+     * string. This is mandatory. The guest member variables will not be set up.
+     *
+     * @return  boolean TRUE for succesful setup, FALSE otherwise
      */
     function setupGuest()
     {
@@ -1061,6 +1169,8 @@ class CurrentDpUserRequest
 
     /**
      * Checks if the given location exists
+     *
+     * @return  boolean TRUE for valid location, FALSE otherwise
      */
     function handleCleanLocation()
     {
@@ -1070,6 +1180,11 @@ class CurrentDpUserRequest
         }
 
         if (FALSE !== ($pos = strpos($this->__GET['location'], '?'))) {
+            $this->__GET['location'] =
+                substr($this->__GET['location'], 0, $pos);
+        }
+
+        if (FALSE !== ($pos = strpos($this->__GET['location'], '#'))) {
             $this->__GET['location'] =
                 substr($this->__GET['location'], 0, $pos);
         }
@@ -1085,14 +1200,21 @@ class CurrentDpUserRequest
             return TRUE;
         }
 
-        return (file_exists(DPUNIVERSE_BASE_PATH . $this->__GET['location'])
-                && is_file(DPUNIVERSE_BASE_PATH . $this->__GET['location']))
+        return (file_exists(DPUNIVERSE_PREFIX_PATH . $this->__GET['location'])
+                && is_file(DPUNIVERSE_PREFIX_PATH . $this->__GET['location']))
             || (file_exists(DPUNIVERSE_WWW_PATH . $this->__GET['location'])
                 && is_file(DPUNIVERSE_WWW_PATH . $this->__GET['location']));
     }
 
     /**
-     * Creates a new user object
+     * Creates a new user object in the universe
+     *
+     * An object to represent either a guest or a registered user in the
+     * universe is created, and added to the universe's user list. This method
+     * should only be called if the user does not exist yet in the universe,
+     * that is, the user entered the site. The user is created based on member
+     * values set in this object. After this method was called, the user object
+     * has been fully set-up, but has no environment yet.
      */
     function createUser()
     {
@@ -1138,15 +1260,27 @@ class CurrentDpUserRequest
         echo dptext("User created\n");
     }
 
+    /**
+     * Checks the location of the user currently connected.
+     *
+     * Checks if the user moved or entered the site, so the user gets a new
+     * or a first environment. Also handles pages "outside" dpuniverse and
+     * method calls from the AJAX client.
+     */
     function handleLocation()
     {
         //echo "handleLocation()\n";
         if (is_null($this->mrEnvironment)) {
             echo sprintf(dptext("Getting location %s\n"),
                 $this->__GET['location']);
-            $this->mrEnvironment = $this->mrDpUniverse->getDpObject(
-                $this->__GET['location'], isset($this->__GET['proxy'])
-                || 0 === strpos($this->__GET['location'], '/mailman2'));
+            $sublocation = !isset($this->__GET['sublocation']) ? FALSE : $this->__GET['sublocation'];
+            $tmp = $this->mrDpUniverse->getDpObject(
+                $this->__GET['location'], $sublocation);
+            if (FALSE === $tmp) {
+                $this->mrDpUniverse->getDpObject(
+                    DPUNIVERSE_PAGE_PATH . 'index.php');
+            }
+            $this->mrEnvironment = $tmp;
         }
 
         if (FALSE === ($env = $this->mrUser->getEnvironment())
@@ -1212,6 +1346,11 @@ class CurrentDpUserRequest
         $this->mToldSomething = FALSE;
     }
 
+    /**
+     * Handles this user request after we have a user object and environment
+     *
+     * Checks for waiting messages and actions performed.
+     */
     function handleUser()
     {
         if (isset($this->__GET['ajax'])) {
@@ -1268,6 +1407,12 @@ class CurrentDpUserRequest
         }
     }
 
+    /**
+     * Handles moving into objects which can't be created
+     *
+     * Used by the experimental "runtime" mechanism based on the PHP runtime
+     * module. Currently not functional, ignore.
+     */
     function handleMoverror()
     {
         if (isset($this->mMoveError)) {
@@ -1280,6 +1425,9 @@ class CurrentDpUserRequest
         }
     }
 
+    /**
+     * Handles sending '1' for AJAX if no other talkback was sent
+     */
     function handleNothingTold()
     {
         if (isset($this->__GET['ajax']) && !isset($this->__GET['method'])) {

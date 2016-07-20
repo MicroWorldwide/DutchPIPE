@@ -6,7 +6,7 @@
         <meta name="generator" content="<?php echo dptext('DutchPIPE') ?>" />
         <meta name="keywords" content="<?php echo dptext('DutchPIPE, A Dutchman\'s Persistant Interactive Page Environments, PHP, AJAX, DOM, DHTML, PHP5, PHP 5, Virtual, Multi User, Object Oriented, Persistent State, Lennert Stock, Shoutbox') ?>" />
         <meta name="description" content="<?php echo dptext('DutchPIPE stands for a Dutchman\'s Persistant Interactive Page Environments. With DutchPIPE, each page becomes an abstracted environment or location where visitors and other items on the page are visualized. This status is retained as visitors move around. A whole lot of real-time interaction is possible. DutchPIPE uses AJAX/DOM/PHP.') ?>" />
-        <link rel="stylesheet" href="/dpclient.css" type="text/css" />
+        <link rel="stylesheet" href="dpclient.css" type="text/css" />
         <script type="text/javascript" src="<?php echo DPSERVER_CLIENTJS_URL; ?>"></script>
         <noscript><?php echo dptext('Your browser must have JavaScript enabled in order to view this page.<br />') ?></noscript>
 <?php echo $dpelements ?>

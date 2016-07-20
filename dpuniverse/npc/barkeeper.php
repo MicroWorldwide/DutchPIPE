@@ -10,10 +10,11 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage dpuniverse_npc
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: barkeeper.php 22 2006-05-30 20:40:55Z ls $
+ * @version    Subversion: $Id: barkeeper.php 45 2006-06-20 12:38:26Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpNpc
  */
@@ -32,6 +33,7 @@ inherit(DPUNIVERSE_INCLUDE_PATH . 'events.php');
  * A barkeeper serving free beer
  *
  * @package    DutchPIPE
+ * @subpackage dpuniverse_npc
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
@@ -75,6 +77,9 @@ final class Barkeeper extends DpNpc
         $this->setTimeout('timeoutMakeNewBeer', 4);
     }
 
+    /**
+     * Makes new beer
+     */
     function resetDpNpc()
     {
         $this->actionShout(dptext('shout'),
@@ -82,6 +87,15 @@ final class Barkeeper extends DpNpc
         $this->timeoutMakeNewBeer();
     }
 
+    /**
+     * Checks for dropped empty glasses using EVENT_ENTERED_ENV event
+     *
+     * If an empty glass was dropped in the environment of the barkeeper,
+     * calls {@link timeoutCheckEmptyGlasses()} in 4 seconds.
+     *
+     * @param   boolean $name       name of event
+     * @see     timeoutCheckEmptyGlasses()
+     */
     function event($name)
     {
         // Do something when someone drops an empty glass on this page:
@@ -94,6 +108,14 @@ final class Barkeeper extends DpNpc
         }
     }
 
+    /**
+     * Removes empty glasses from the environment of this barkeeper
+     *
+     * Makes the barkeeper carry away empty glasses, calls
+     * {@link timeoutMakeNewBeer()} in 4 seconds.
+     *
+     * @see     event(), timeoutMakeNewBeer()
+     */
     function timeoutCheckEmptyGlasses()
     {
         if (FALSE === ($env = $this->getEnvironment())) {
@@ -120,6 +142,13 @@ final class Barkeeper extends DpNpc
         }
     }
 
+    /**
+     * Makes the barkeeper serve new beer if there aren't enough around
+     *
+     * Makes sure there are at least 4 beers in the barkeeper's environment.
+     *
+     * @see     timeoutCheckEmptyGlasses()
+     */
     function timeoutMakeNewBeer()
     {
         if (FALSE === ($env = $this->getEnvironment())) {

@@ -10,10 +10,11 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpUser.php 22 2006-05-30 20:40:55Z ls $
+ * @version    Subversion: $Id: DpUser.php 45 2006-06-20 12:38:26Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpLiving
  */
@@ -37,6 +38,7 @@ inherit(DPUNIVERSE_INCLUDE_PATH . 'title_types.php');
  * See the DpLiving class for most functionality.
  *
  * @package    DutchPIPE
+ * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
@@ -46,40 +48,54 @@ inherit(DPUNIVERSE_INCLUDE_PATH . 'title_types.php');
 class DpUser extends DpLiving
 {
     /**
-     * @var         array     Variables set by the web server or otherwise
-     *                        directly related to the execution environment of
-     *                        the current dpclient script
+     * Variables set by the web server of related to dpclient.php's environment
+     *
+     * This environment is the execution environment of the current dpclient.php
+     * script.
+     *
+     * @var         array
      */
     public $__SERVER;
 
     /**
-     * @var         array     Variables which are currently registered to a
-     *                        script's session
+     * Variables which are currently registered to a script's session
+     *
+     * @var         array
      */
     public $__SESSION;
 
     /**
-     * @var         array     Variables provided via HTTP cookies
+     * Variables provided via HTTP cookies
+     *
+     * @var         array
      */
     public $__COOKIE;
 
     /**
-     * @var         array     Variables provided via URL query string
+     * Variables provided via URL query string
+     *
+     * @var         array
      */
     public $__GET;
 
     /**
-     * @var         array     Variables provided via HTTP POST
+     * Variables provided via HTTP POST
+     *
+     * @var         array
      */
     public $__POST;
 
     /**
-     * @var         array     Variables provided via HTTP post file uploads
+     * Variables provided via HTTP post file uploads
+     *
+     * @var         array
      */
     public $__FILES;
 
     /**
-     * @var         string    Counter for AJAX events, increased with each event
+     * Counter for AJAX events, increased with each event
+     *
+     * @var         string
      */
     private $mEventCount = 0;
 
@@ -103,6 +119,13 @@ class DpUser extends DpLiving
 
     /**
      * Gets a random avatar image number in order to give guests an avatar
+     *
+     * Checks the avatar image directory for images with the format:
+     * public/avatar/user<number>.gif
+     * for possible numbers.
+     *
+     * @return  int     random avatar image number
+     * @see     _getNrOfAvatars
      */
     private function _getRandAvatarNr()
     {
@@ -114,10 +137,18 @@ class DpUser extends DpLiving
     }
 
     /**
-     * Sets PHP server, request and cookie variables
+     * Sets various PHP global variables passed on from the DutchPIPE server
      *
-     * Sets the PHP server, request and cookie variables sent by the user client
-     * at its last HTTP request.
+     * Called each time a user's browser does a normal page or AJAX request.
+     * Several variables are passed which represent their corresponding PHP
+     * global arrays: $_SERVER, $_COOKIE, etc.
+     *
+     * @param   array   &$rServerVars  User server variables
+     * @param   array   &$rSessionVars User session variables
+     * @param   array   &$rCookieVars  User cookie variables
+     * @param   array   &$rGetVars     User get variables
+     * @param   array   &$rPostVars    User post variables
+     * @param   array   &$rFilesVars   User files variables
      */
     function setVars(&$rServerVars, &$rSessionVars, &$rCookieVars, &$rGetVars,
             &$rPostVars, &$rFilesVars)

@@ -10,10 +10,11 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpPage.php 22 2006-05-30 20:40:55Z ls $
+ * @version    Subversion: $Id: DpPage.php 45 2006-06-20 12:38:26Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -27,6 +28,7 @@ inherit(DPUNIVERSE_STD_PATH . 'DpObject.php');
  * A DutchPIPE enabled web page
  *
  * @package    DutchPIPE
+ * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
@@ -88,7 +90,7 @@ class DpPage extends DpObject
      *
      * @param       array     $exits      Direction/destination pairs
      */
-    final function setExits(array $exits)
+    final function setExits($exits)
     {
         $this->mExits = array();
         foreach ($this->mExits as $direction => $destination) {
@@ -103,7 +105,6 @@ class DpPage extends DpObject
      * controlled character to wander around the site.
      *
      * @param      string    $direction   Command to use link, "home", "bar"
-     *
      * @return     string                 URL
      */
     final function getExit($direction)
@@ -154,7 +155,7 @@ class DpPage extends DpObject
      * @param      object    &$from     First object to skip
      * @param      object    &$from2    Second object to skip, etc.
      */
-    function tell($str, &$from = NULL)
+    function tell($data, &$from = NULL)
     {
         // There's nothing here:
         if (!sizeof($inv = $this->getInventory())) {
@@ -162,15 +163,15 @@ class DpPage extends DpObject
         }
 
         if (func_num_args() <= 1)  {
-            if (FALSE === is_array($str)) {
+            if (FALSE === is_array($data)) {
                 foreach ($inv as &$ob) {
-                    $ob->tell($str, $this);
+                    $ob->tell($data, $this);
                 }
             } else {
                 foreach ($inv as &$ob) {
-                    if (isset($str[$ob->getProperty('display_mode')])
+                    if (isset($data[$ob->getProperty('display_mode')])
                             && ($tmp =
-                            $str[$ob->getProperty('display_mode')])) {
+                            $data[$ob->getProperty('display_mode')])) {
                         $ob->tell($tmp, $this);
                     }
                 }
@@ -178,18 +179,18 @@ class DpPage extends DpObject
         }
         elseif (func_num_args() == 2)  {
             $from = func_get_arg(1);
-            if (FALSE === is_array($str)) {
+            if (FALSE === is_array($data)) {
                 foreach ($inv as &$ob) {
                     if ($ob !== $from) {
-                        $ob->tell($str, $this);
+                        $ob->tell($data, $this);
                     }
                 }
             } else {
                 foreach ($inv as &$ob) {
                     if ($ob !== $from
-                            && isset($str[$ob->getProperty('display_mode')])
+                            && isset($data[$ob->getProperty('display_mode')])
                             && ($tmp =
-                            $str[$ob->getProperty('display_mode')])) {
+                            $data[$ob->getProperty('display_mode')])) {
                         $ob->tell($tmp, $this);
                     }
                 }
@@ -197,18 +198,18 @@ class DpPage extends DpObject
         }
         elseif (func_num_args() > 2)  {
             $from = array_slice(func_get_args(), 1);
-            if (FALSE === is_array($str)) {
+            if (FALSE === is_array($data)) {
                 foreach ($inv as &$ob) {
                     if (FALSE === in_array($ob, $from)) {
-                        $ob->tell($str, $this);
+                        $ob->tell($data, $this);
                     }
                 }
             } else {
                 foreach ($inv as &$ob) {
                     if (FALSE === in_array($ob, $from)
-                            && isset($str[$ob->getProperty('display_mode')])
+                            && isset($data[$ob->getProperty('display_mode')])
                             && ($tmp =
-                            $str[$ob->getProperty('display_mode')])) {
+                            $data[$ob->getProperty('display_mode')])) {
                         $ob->tell($tmp, $this);
                     }
                 }

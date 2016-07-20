@@ -11,10 +11,11 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage script
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: start_dpserver.php 2 2006-05-16 00:20:42Z ls $
+ * @version    Subversion: $Id: start_dpserver.php 45 2006-06-20 12:38:26Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver.php, dpserver-ini.php, dpuniverse.php,
  *             dpuniverse-ini.php

@@ -23,19 +23,32 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage script
  * @author     Julien CROUZET <julien/ at /theoconcept.com>
  * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
+ * @copyright  2006 Julien CROUZET
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: make_captcha.php 22 2006-05-30 20:40:55Z ls $
+ * @version    Subversion: $Id: make_captcha.php 45 2006-06-20 12:38:26Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver.php, /www/captcha.php
  */
 
-error_reporting(E_ALL | E_STRICT);
+/**
+ * Gets server settings
+ */
+require_once(realpath(dirname(__FILE__) . '/../config')
+    . '/dpserver-ini.php');
 
+/**
+ * Gets universe settings
+ */
 require_once(realpath(dirname(__FILE__) . '/../config')
     . '/dpuniverse-ini.php');
+
+/* Don't touch this */
+require_once(DPSERVER_LIB_PATH . 'dptext.php');
+
+error_reporting(E_ALL | E_STRICT);
 
 mysql_pconnect(DPUNIVERSE_MYSQL_HOST, DPUNIVERSE_MYSQL_USER,
     DPUNIVERSE_MYSQL_PASSWORD)
@@ -79,83 +92,87 @@ function getstringdimensions($String, $Font, $FontSize)
 function distortion_string($String, $Font, $FontSize, $BGColor='#FFFFFF',
         $TextColor='#9999CC')
 {
-  // Font is here
-  putenv('GDFONTPATH=' . realpath(dirname($Font)));
-  $Font = basename($Font);
+    // Font is here
+    putenv('GDFONTPATH=' . realpath(dirname($Font)));
+    $Font = basename($Font);
 
-  // Image dimensions calculated from text
-  list($Width, $Height) = getstringdimensions($String, $Font, $FontSize);
+    // Image dimensions calculated from text
+    list($Width, $Height) = getstringdimensions($String, $Font, $FontSize);
 
-  // First, we create the source image with GD Image
-  $ImageRessource = imagecreatetruecolor($Width, $Height)
-    || die(dptext("Cannot Initialize new GD image stream"));
+    // First, we create the source image with GD Image
+    $ImageRessource = imagecreatetruecolor($Width, $Height);
+    if (empty($ImageRessource)) {
+        die(dptext("Cannot Initialize new GD image stream"));
+    }
 
-  // Translate color codes
-  $Hex = '[0-9A-Fa-f]';
-  if (preg_match("/^#?($Hex$Hex)($Hex$Hex)($Hex$Hex)$/", $BGColor, $Parts)) {
-    $BGColors = array(hexdec($Parts[1]), hexdec($Parts[2]), hexdec($Parts[3]));
-  } else {
-    $BGColors = array(255, 255, 255);
-  }
-  if (preg_match("/^#?($Hex$Hex)($Hex$Hex)($Hex$Hex)$/", $TextColor, $Parts)) {
-    $TextColors = array(hexdec($Parts[1]), hexdec($Parts[2]),
-        hexdec($Parts[3]));
-  } else {
-    $TextColors = array(0, 0, 0);
-  }
 
-  // Colors allocations
-  $BGColor = imagecolorallocate($ImageRessource, $BGColors[0], $BGColors[1],
+    // Translate color codes
+    $Hex = '[0-9A-Fa-f]';
+    if (preg_match("/^#?($Hex$Hex)($Hex$Hex)($Hex$Hex)$/", $BGColor, $Parts)) {
+        $BGColors = array(hexdec($Parts[1]), hexdec($Parts[2]), hexdec($Parts[3]));
+    } else {
+        $BGColors = array(255, 255, 255);
+    }
+    if (preg_match("/^#?($Hex$Hex)($Hex$Hex)($Hex$Hex)$/", $TextColor, $Parts)) {
+        $TextColors = array(hexdec($Parts[1]), hexdec($Parts[2]),
+            hexdec($Parts[3]));
+    } else {
+        $TextColors = array(0, 0, 0);
+    }
+
+    // Colors allocations
+    $BGColor = imagecolorallocate($ImageRessource, $BGColors[0], $BGColors[1],
     $BGColors[2]);
-  $TextColor = imagecolorallocate($ImageRessource, $TextColors[0],
+    $TextColor = imagecolorallocate($ImageRessource, $TextColors[0],
     $TextColors[1], $TextColors[2]);
 
-  // We set the background
-  imagefilledrectangle($ImageRessource, 0, 0, $Width, $Height, $BGColor);
+    // We set the background
+    imagefilledrectangle($ImageRessource, 0, 0, $Width, $Height, $BGColor);
 
-  // We add the string
-  imagettftext($ImageRessource, $FontSize, 0, 0, $Height - 8, $TextColor, $Font, $String);
+    // We add the string
+    imagettftext($ImageRessource, $FontSize, 0, 0, $Height - 8, $TextColor,
+        $Font, $String);
 
-  // Ad Imagick pecl extension doesn't allow to delay animated gifs (it seems)
-  // let's do it in a dirty way (binary convert tool)
+    // Ad Imagick pecl extension doesn't allow to delay animated gifs (it seems)
+    // let's do it in a dirty way (binary convert tool)
 
-  // We save in files
-  $TempFile = tempnam ("/tmp", "DISTORTION");
-  $TempFile2 = tempnam ("/tmp", "DISTORTION");
+    // We save in files
+    $TempFile = tempnam ("/tmp", "DISTORTION");
+    $TempFile2 = tempnam ("/tmp", "DISTORTION");
 
-  imagegif($ImageRessource, $TempFile);
+    imagegif($ImageRessource, $TempFile);
 
-  // We start building convert command
-  $command = "/usr/local/bin/convert -delay 25 $TempFile";
+    // We start building convert command
+    $command = "/usr/local/bin/convert -delay 25 $TempFile";
 
-  // First distortion part
-  foreach (range(10, 160, 40) as $i) {
-    $command .= " \\( -clone 0 -swirl $i \\)";
-  }
+    // First distortion part
+    foreach (range(10, 160, 40) as $i) {
+        $command .= " \\( -clone 0 -swirl $i \\)";
+    }
 
-  // The second ...
-  foreach (range(140, -160, -40) as $i) {
-    $command .= " \\( -clone 0 -swirl $i \\)";
-  }
+    // The second ...
+    foreach (range(140, -160, -40) as $i) {
+        $command .= " \\( -clone 0 -swirl $i \\)";
+    }
 
-  // The third ...
-  foreach (range(-140, 0, 40) as $i) {
-    $command .= " \\( -clone 0 -swirl $i \\)";
-  }
+    // The third ...
+    foreach (range(-140, 0, 40) as $i) {
+        $command .= " \\( -clone 0 -swirl $i \\)";
+    }
 
-  // End of the command
-  $command .= " -loop 0 $TempFile2";
+    // End of the command
+    $command .= " -loop 0 $TempFile2";
 
-  // Execute convert
-  exec ($command, $output);
+    // Execute convert
+    exec ($command, $output);
 
-  // And read the result
-  $Picture = file_get_contents($TempFile2);
+    // And read the result
+    $Picture = file_get_contents($TempFile2);
 
-  // Delete temporary files
-  //unlink($TempFile);
-  //unlink($TempFile2);
-  return($Picture);
+    // Delete temporary files
+    unlink($TempFile);
+    unlink($TempFile2);
+    return($Picture);
 }
 
 function get_rand_code()
@@ -176,7 +193,6 @@ function get_rand_code()
 
     return $code;
 }
-
 $str = distortion_string(($code = get_rand_code()), DPUNIVERSE_SCRIPT_PATH
     . 'trebuc.ttf', 30, '#FFCF0F','#000066');
 $file = "$code.gif";
@@ -207,8 +223,14 @@ if ($count > 24 && FALSE !== $oldest_file) {
     echo "Removed: $oldest_file\n";
 }
 
-$query = "SELECT captchaId, captchaFile, captchaTimestamp FROM Captcha "
-    . "ORDER BY captchaTimestamp";
+$query = "
+    SELECT
+        captchaId, captchaFile, captchaTimestamp
+    FROM
+        Captcha
+    ORDER BY
+        captchaTimestamp
+";
 $result = mysql_query($query);
 if ($result) {
     $num_rows = mysql_num_rows($result);

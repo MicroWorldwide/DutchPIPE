@@ -10,6 +10,7 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage lib
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
@@ -36,8 +37,8 @@ if (!DPSERVER_GETTEXT_ENABLED || !function_exists('gettext')) {
      * If gettext is enabled and the current domain is not equal to language of
      * the given string, a translated string will be returned if available.
      *
-     * @param      string    $message    the integer of string to check
-     * @param      mixed     $args,...   the integer of string to check
+     * @param      string    $message    the integer or string to check
+     * @param      mixed     $args,...   the integer or string to check
      * @return     string    string produced according to format and language
      */
     function dptext($message)

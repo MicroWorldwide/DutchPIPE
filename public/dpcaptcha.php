@@ -10,16 +10,28 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage public
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpcaptcha.php 22 2006-05-30 20:40:55Z ls $
+ * @version    Subversion: $Id: dpcaptcha.php 45 2006-06-20 12:38:26Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see         dpclient.php
  */
 
+/**
+ * Gets server settings
+ */
 require_once('../config/dpserver-ini.php');
+
+/**
+ * Gets universe settings
+ */
 require_once('../config/dpuniverse-ini.php');
+
+/**
+ * Gets I18N/L10 dptext functionality (if enabled)
+ */
 require_once(DPSERVER_LIB_PATH . 'dptext.php');
 
 error_reporting(DPUNIVERSE_ERROR_REPORTING);

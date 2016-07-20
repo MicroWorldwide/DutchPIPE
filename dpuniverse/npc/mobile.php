@@ -10,10 +10,11 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage dpuniverse_npc
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: mobile.php 22 2006-05-30 20:40:55Z ls $
+ * @version    Subversion: $Id: mobile.php 45 2006-06-20 12:38:26Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpNpc
  */
@@ -32,6 +33,7 @@ inherit(DPUNIVERSE_INCLUDE_PATH . 'events.php');
  * A mobile computer generated character
  *
  * @package    DutchPIPE
+ * @subpackage dpuniverse_npc
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
@@ -116,6 +118,13 @@ final class Mobile extends DpNpc
         $this->performAction($linkcommand);
     }
 
+    /**
+     * Gives the mobile a good hard kick!
+     *
+     * @param   string  $verb       the action, "kick"
+     * @param   string  $noun       who to kick, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     function actionKick($verb, $noun)
     {
         $living = get_current_dpobject();
@@ -148,12 +157,15 @@ final class Mobile extends DpNpc
             . '</h1></div></window>');
 
         // Fetch beer in a few seconds:
-        $this->setTimeout('timeoutKick', 3);
+        $this->setTimeout('timeoutKicked', 3);
 
         return TRUE;
     }
 
-    function timeoutKick()
+    /**
+     * Makes the mobile complain and take a random exit
+     */
+    function timeoutKicked()
     {
         $this->performAction(gettext(
             "say Oh, ok, I know when I'm not wanted."));

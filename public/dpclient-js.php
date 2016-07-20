@@ -1,3 +1,4 @@
+<?php
 /**
  * Client side Javascript for DutchPIPE
  *
@@ -9,6 +10,7 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage public
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
@@ -16,7 +18,10 @@
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpclient.php
  */
-<?php
+
+/**
+ * Gets server settings
+ */
 require_once(dirname(realpath($_SERVER['SCRIPT_FILENAME']  . '/..'))
     . '/config/dpserver-ini.php');
 
@@ -644,7 +649,7 @@ function start_dutchpipe(page)
                 loc = tmp;
             }
         } else {
-            loc = location.href;
+            loc = tmp2;
             standalone = true;
         }
     }

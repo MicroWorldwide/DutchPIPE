@@ -1,8 +1,12 @@
 <?php
 /**
- * Named constants with global server settings
+ * Constants with global server settings
  *
- * Change thse constants to match your desired configuration.
+ * Change these constants to match your desired configuration. These constants
+ * define the settings and behavious of {@link dpserver.php} and
+ * {@link dpclient.php}, that is, the communication between the DutchPIPE server
+ * and the user's browser. See {@link dpuniverse-ini.php} for settings dealing
+ * with the "universe".
  *
  * DutchPIPE version 0.1; PHP version 5
  *
@@ -12,28 +16,130 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage config
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpserver-ini.php 22 2006-05-30 20:40:55Z ls $
+ * @version    Subversion: $Id: dpserver-ini.php 50 2006-06-22 21:33:25Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
- * @see        dpserver.php
+ * @tutorial   DutchPIPE/DutchPIPE.pkg
+ * @see        dpserver.php, dpclient.php, dpuniverse-ini.php
  */
 
 /**
- * Host on which DutchPIPE is running, the URL part minus dpclient.php
+ * Host on which DutchPIPE is running
+ *
+ * The URL part minus the absolute path to {@link dpclient.php} (/dpclient.php
+ * by default, as defined in {@link DPSERVER_CLIENT_URL}).
+ *
+ * @see        DPSERVER_CLIENT_URL, DPSERVER_CLIENTJS_URL
  */
 define('DPSERVER_HOST_URL', 'http://www.yourdomain.com');
+//define('DPSERVER_HOST_URL', 'http://localhost');
+
+if (!defined('DPSERVER_CLIENT_URL')) {
+    /**
+     * The rest of the URL for the client PHP script, /dpclient.php by default
+     *
+     * @see        DPSERVER_HOST_URL, DPSERVER_CLIENTJS_URL
+     */
+    define('DPSERVER_CLIENT_URL', '/dpclient.php');
+}
 
 /**
- * The rest of the URL for the client PHP script, /dpclient.php by default
- */
-define('DPSERVER_CLIENT_URL', '/dpclient.php');
-
-/**
- * The rest of the URL for the client PHP script, /dpclient.php by default
+ * The rest of the URL for the client Javascript, /dpclient-js.php by default
+ *
+ * @see        DPSERVER_HOST_URL, DPSERVER_CLIENTJS_URL
  */
 define('DPSERVER_CLIENTJS_URL', '/dpclient-js.php');
+
+/**
+ * The name of the cookie DutchPIPE uses to store user information
+ */
+define('DPSERVER_COOKIE_NAME', 'dutchpipe');
+
+/**
+ * The timezone for the DutchPIPE site
+ *
+ * Use an identifier as definied by
+ * {@link http://www.php.net/manual/en/timezones.php}.
+ */
+define('DPSERVER_TIMEZONE', 'Europe/Amsterdam');
+
+/**
+ * Type of socket {@link dpserver.php} and {@link dpclient.php} use to
+ * communicate
+ *
+ * See {@link http://www.php.net/socket_create} for more information.
+ * For *NIX, use AF_UNIX, for Windows, use AF_INET. AF_UNIX is a file based
+ * socket, AF_INET uses a local connection (can be remote but that is untested).
+ * AF_UNIX is much faster but isn't supported on Windows.
+ *
+ * @see        DPSERVER_SOCKET_PATH, DPSERVER_SOCKET_ADDRESS,
+ *             DPSERVER_SOCKET_PORT, DPSERVER_MAX_SOCKET_BACKLOG,
+ *             DPSERVER_SOCKERR_MSG
+ */
+define('DPSERVER_SOCKET_TYPE', AF_UNIX);
+//define('DPSERVER_SOCKET_TYPE', AF_INET);
+
+/**
+ * Path to the file used for socket connections
+ *
+ * This file socket is used beween {@link dpserver.php} and {@link dpclient.php}
+ * for AF_UNIX type. Reads and writes to this open file to communicate.
+ *
+ * @see        DPSERVER_SOCKET_TYPE, DPSERVER_SOCKET_ADDRESS,
+ *             DPSERVER_SOCKET_PORT, DPSERVER_MAX_SOCKET_BACKLOG,
+ *             DPSERVER_SOCKERR_MSG
+ */
+define('DPSERVER_SOCKET_PATH', '/tmp/dutchpipe.sock');
+
+/**
+ * IP address for AF_INET type
+ *
+ * If you run DutchPIPE on Windows, this value will always be used in
+ * combination with {@link DPSERVER_SOCKET_PORT}. The DutchPIPE server will run
+ * on your machine using the address and port number provided.
+ *
+ * @see        DPSERVER_SOCKET_TYPE, DPSERVER_SOCKET_PATH,
+ *             DPSERVER_SOCKET_PORT, DPSERVER_MAX_SOCKET_BACKLOG,
+ *             DPSERVER_SOCKERR_MSG
+ */
+define('DPSERVER_SOCKET_ADDRESS', '127.0.0.1');
+
+/**
+ * Port number for AF_INET type
+ *
+ * If you run DutchPIPE on Windows, this value will always be used in
+ * combination with {@link DPSERVER_SOCKET_ADDRESS}. The DutchPIPE server will
+ * run on your machine using the address and port number provided. You should
+ * check if the port number is not in use by another application.
+ *
+ * @see        DPSERVER_SOCKET_TYPE, DPSERVER_SOCKET_PATH,
+ *             DPSERVER_SOCKET_ADDRESS, DPSERVER_MAX_SOCKET_BACKLOG,
+ *             DPSERVER_SOCKERR_MSG
+ */
+define('DPSERVER_SOCKET_PORT', '3333');
+
+/*
+ * If you just installed DutchPIPE, haven't changed the directory structure
+ * and just want it up and running, you're done here. Now adjust
+ * {@link dpuniverse-ini.php}. If you want multilingual support, see further
+ * below.
+ */
+
+/**
+ * The maximum of backlog incoming connections queued for processing
+ *
+ * Used by socket_listen in dpserver.php. See
+ * {@link http://www.php.net/socket_listen} for more information.
+ *
+ * You should probably leave this untouched.
+ *
+ * @see        DPSERVER_SOCKET_TYPE, DPSERVER_SOCKET_PATH,
+ *             DPSERVER_SOCKET_ADDRESS, DPSERVER_SOCKET_PORT
+ */
+define('DPSERVER_MAX_SOCKET_BACKLOG', 5);
 
 /**
  * Path to the root of the DutchPIPE installation
@@ -82,58 +188,31 @@ define('DPSERVER_DPUNIVERSECLASS_PATH', DPSERVER_LIB_PATH . 'dpuniverse.php');
  * Path to the directory with HTML templates
  *
  * Leave this untouched if the DutchPIPE directory structure wasn't changed.
- */
-define('DPSERVER_DPUNIVERSE_TEMPLATE_PATH', DPSERVER_ROOT_PATH . 'template/');
-
-/**
- * Type of socket dpserver.php and dpclient.php use to communicate
- * See http://www.php.net/socket_create for more information.
- * For *NIX, use AF_UNIX, for Windows, use AF_INET. AF_UNIX is a file based
- * socket, AF_INET uses a local connection (can be remote but that is untested).
- * AF_UNIX is much faster but isn't supported on Windows.
- */
-define('DPSERVER_SOCKET_TYPE', AF_UNIX);
-//define('DPSERVER_SOCKET_TYPE', AF_INET);
-
-/**
- * Path to the file used for socket connections beween dpserver.php and
- * dpclient.php for AF_UNIX type
- */
-define('DPSERVER_SOCKET_PATH', '/tmp/dutchpipesock');
-
-/**
- * Address and port for AF_INET type
  *
- * If you run DutchPIPE on Windows, these values will always be used.
- * The DutchPIPE server will run on your machine using the address and port
- * number provided. You should check if the port number is not in use by
- * another application.
+ * @see        DPSERVER_TEMPLATE_FILE
  */
-define('DPSERVER_SOCKET_ADDRESS', '127.0.0.1');
-define('DPSERVER_SOCKET_PORT', '3333');
+define('DPSERVER_TEMPLATE_PATH', DPSERVER_ROOT_PATH . 'template/');
+
+if (!defined('DPSERVER_TEMPLATE_FILE')) {
+    /**
+     * Filename of the default template in the {@link DPSERVER_TEMPLATE_PATH}
+     * directory
+     *
+     * @see        DPSERVER_TEMPLATE_PATH
+     */
+    define('DPSERVER_TEMPLATE_FILE', 'dpdefault.tpl');
+}
 
 /**
- * The maximum of backlog incoming connections queued for processing
+ * Enable internationalization/localization support with dynamic gettext?
  *
- * Used by socket_listen in dpserver.php. See http://www.php.net/socket_listen
- *
- * You should probably leave this untouched.
- */
-define('DPSERVER_MAX_SOCKET_BACKLOG', 5);
-
-/**
- * The name of the cookie DutchPIPE uses to store user information
- */
-define('DPSERVER_COOKIE_NAME', 'dutchpipe');
-
-/*
- * Internationalization
+ * This has a speed penalty. Set to TRUE to enable or FALSE to disable.
  *
  * Different languages are supported using GNU gettext, see
- * http://www.php.net/gettext. Because PHP is an interpreted language, gettext
- * slows things down as calls are dynamic (although it's quite fast). There are
- * some tools around to make static PHP translations, but this has not been
- * explored yet. Also, it is not yet possible to have multiple users use
+ * {@link http://www.php.net/gettext}. Because PHP is an interpreted language,
+ * gettext slows things down as calls are dynamic (although it's quite fast).
+ * There are some tools around to make static PHP translations, but this has not
+ * been explored yet. Also, it is not yet possible to have multiple users use
  * different languages on one site. It's in one language.
  *
  * Currently, standard English ("en") and Dutch ("nl_NL")  are part of the
@@ -146,29 +225,40 @@ define('DPSERVER_COOKIE_NAME', 'dutchpipe');
  * probably run into a couple of problems getting it exactly right, because
  * of presumptions made by the English language system. Please let us know
  * so this can be fixed.
- */
-
-/*
- * Enable dynamic gettext? This will slow things down. Set to TRUE to enable,
- * or FALSE to disable.
+ *
+ * @see        DPSERVER_GETTEXT_LOCALE_PATH, DPSERVER_GETTEXT_DOMAIN,
+ *             DPSERVER_GETTEXT_ENCODING, DPSERVER_LOCALE, DPSERVER_LOCALE_FULL
  */
 define('DPSERVER_GETTEXT_ENABLED', FALSE);
 
 /**
- * Used when gettext is enabled.
  * Path to the directory with translations
+ *
+ * Used when gettext is enabled.
+ *
+ * @see        DPSERVER_GETTEXT_ENABLED, DPSERVER_GETTEXT_DOMAIN,
+ *             DPSERVER_GETTEXT_ENCODING, DPSERVER_LOCALE, DPSERVER_LOCALE_FULL
  */
 define('DPSERVER_GETTEXT_LOCALE_PATH', DPSERVER_ROOT_PATH . 'locale/');
 
 /**
- * Used when gettext is enabled.
  * Name of translation table (the "domain" in GNU gettext jargon)
+ *
+ * Used when gettext is enabled.
+ *
+ * @see        DPSERVER_GETTEXT_ENABLED, DPSERVER_GETTEXT_LOCALE_PATH,
+ *             DPSERVER_GETTEXT_ENCODING, DPSERVER_LOCALE, DPSERVER_LOCALE_FULL
  */
 define('DPSERVER_GETTEXT_DOMAIN', 'messages');
 
 /**
+ * Gettext character encoding
+ *
  * Used when gettext is enabled.
  * DutchPIPE uses UTF-8 but I'm not sure how this works for other languages
+ *
+ * @see        DPSERVER_GETTEXT_ENABLED, DPSERVER_GETTEXT_LOCALE_PATH,
+ *             DPSERVER_GETTEXT_DOMAIN, DPSERVER_LOCALE, DPSERVER_LOCALE_FULL
  */
 define('DPSERVER_GETTEXT_ENCODING', 'UTF-8');
 
@@ -176,7 +266,7 @@ define('DPSERVER_GETTEXT_ENCODING', 'UTF-8');
  * Used when gettext is enabled, defines a "locale" supported by DutchPIPE
  *
  * Different systems have different naming schemes for locales, see
- * http://www.php.net/setlocale
+ * {@link setlocale}.
  *
  * Use the '0' string to leave the locale settings untouched and use the
  * default language (English in the standard distribution of DutchPIPE).
@@ -184,22 +274,30 @@ define('DPSERVER_GETTEXT_ENCODING', 'UTF-8');
  * To use one of the translations included in the standard DutchPIPE
  * distribution, outcomment the first define which sets DPSERVER_LOCALE to '0',
  * and remove comment characters from the language in the list below.
+ *
+ * @see        DPSERVER_GETTEXT_ENABLED, DPSERVER_GETTEXT_LOCALE_PATH,
+ *             DPSERVER_GETTEXT_DOMAIN, DPSERVER_GETTEXT_ENCODING,
+ *             DPSERVER_LOCALE_FULL
  */
 define('DPSERVER_LOCALE', '0');
 //define('DPSERVER_LOCALE', 'nl_NL');
 
-/* You probably don't need to touch this */
+/**
+ * You probably don't need to touch this
+ *
+ * @see        DPSERVER_GETTEXT_ENABLED, DPSERVER_GETTEXT_LOCALE_PATH,
+ *             DPSERVER_GETTEXT_DOMAIN, DPSERVER_GETTEXT_ENCODING,
+ *             DPSERVER_LOCALE
+ */
 define('DPSERVER_LOCALE_FULL', DPSERVER_LOCALE == '0'
     ? '0' : DPSERVER_LOCALE . '.' . DPSERVER_GETTEXT_ENCODING);
 
-/* Don't touch this */
-require_once(DPSERVER_LIB_PATH . 'dptext.php');
-
 /**
- * The timezone we're in using an identifier as definied by
- * http://www.php.net/manual/en/timezones.php
+ * Don't touch this
+ *
+ * @access     private
  */
-define('DPSERVER_TIMEZONE', 'Europe/Amsterdam');
+require_once(DPSERVER_LIB_PATH . 'dptext.php');
 
 /**
  * The maximum number of seconds the server can stay up, 0 for no limit
@@ -207,42 +305,115 @@ define('DPSERVER_TIMEZONE', 'Europe/Amsterdam');
 define('DPSERVER_MAXUPTIME', 0);
 
 /**
- * The message shown in case of a socket error (this usually means the server is
- * down)
+ * The message shown in case of a socket error
+ *
+ * This usually means the server is down.
+ *
+ * @see        DPSERVER_SOCKET_TYPE, DPSERVER_SOCKET_PATH,
+ *             DPSERVER_SOCKET_ADDRESS, DPSERVER_SOCKET_PORT,
+ *             DPSERVER_MAX_SOCKET_BACKLOG
  */
 define('DPSERVER_SOCKERR_MSG', dptext('The DutchPIPE server is down'));
 
 /**
- * Which errors to report according to
- * http://www.php.net/manual/en/ref.errorfunc.php#errorfunc.constants
+ * Error reporting level
+ *
+ * Which PHP errors to report, according to
+ * {@link http://www.php.net/manual/en/ref.errorfunc.php#errorfunc.constants}
  *
  * By default all messages including "strict" messages are shown.
+ *
+ * @see        DPSERVER_DEBUG_TYPE
  */
 define('DPSERVER_ERROR_REPORTING', E_ALL | E_STRICT);
 
 /**
- * What kind of debug information should the server echo to the shell when
- * running? Change the DPSERVER_DEBUG_TYPE with one of the constants listed
- * here (don't change these). DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE and
- * DPSERVER_DEBUG_TYPE_GETRUSAGE makes dpserver show a line with information
- * at intervals. They don't work under Windows.
+ * Debug information modifier - don't show debug information
+ *
+ * Used by {@link DPSERVER_DEBUG_TYPE}. Don't change this.
+ *
+ * @see        DPSERVER_DEBUG_TYPE, DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE,
+ *             DPSERVER_DEBUG_TYPE_GETRUSAGE
  */
 define('DPSERVER_DEBUG_TYPE_NONE', 1);
+
+/**
+ * Debug information modifier - show info line with memory and object counters
+ *
+ * *NIX only, doesn't work under Windows.
+ * Used by {@link DPSERVER_DEBUG_TYPE}. Don't change this.
+ *
+ * @see        DPSERVER_DEBUG_TYPE, DPSERVER_DEBUG_TYPE_NONE,
+ *             DPSERVER_DEBUG_TYPE_GETRUSAGE
+ */
 define('DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE', 2);
+
+/**
+ * Debug information modifier - show info based on *nix getrusage
+ *
+ * *NIX only, doesn't work under Windows.
+ * Used by {@link DPSERVER_DEBUG_TYPE}. Don't change this.
+ *
+ * @see        DPSERVER_DEBUG_TYPE, DPSERVER_DEBUG_TYPE_NONE,
+ *             DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE
+ */
 define('DPSERVER_DEBUG_TYPE_GETRUSAGE', 3);
+
+/**
+ * Debug information settings
+ *
+ * What kind of debug information should the server echo to the CLI/shell when
+ * running? The DPSERVER_DEBUG_TYPE must be one of:
+ *
+ * - {@link DPSERVER_DEBUG_TYPE_NONE}<br>
+ *   Don't show debug information. You must use this under Windows.
+ * - {@link DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE}<br>
+ *   Show info line with memory and object counters. *NIX only, doesn't work
+ *   under Windows.
+ * - {@link DPSERVER_DEBUG_TYPE_GETRUSAGE}<br>
+ *   Show info based on *nix getrusage. *NIX only, doesn't work under Windows.
+ *
+ * @see        DPSERVER_DEBUG_TYPE_NONE, DPSERVER_DEBUG_TYPE_MEMORY_GET_USAGE,
+ *             DPSERVER_DEBUG_TYPE_GETRUSAGE, DPSERVER_ERROR_REPORTING
+ */
 define('DPSERVER_DEBUG_TYPE', DPSERVER_DEBUG_TYPE_NONE);
 
 /**
- * Maximum number of bytes dpclient.php can read from dpserver.php per chunk
+ * Use base64_encode/decode on dpclient -> dpserver communication?
+ *
+ * If you are getting "unserialize" errors, set to TRUE. This has a small speed
+ * penalty.
+ *
+ * @see        DPSERVER_BASE64_SERVER2CLIENT
+ */
+define('DPSERVER_BASE64_CLIENT2SERVER', FALSE);
+
+/**
+ * Use base64_encode/decode on dpserver -> dpclient communication?
+ *
+ * This has a small speed penalty.
+ *
+ * @see        DPSERVER_BASE64_CLIENT2SERVER
+ */
+define('DPSERVER_BASE64_SERVER2CLIENT', FALSE);
+
+/**
+ * Maximum number of bytes {@link dpclient.php} can read from
+ * {@link dpserver.php} per chunk
  *
  * You should probably leave this untouched.
+ *
+ * @see        DPSERVER_SERVER_CHUNK
  */
 define('DPSERVER_CLIENT_CHUNK', 2048);
 
 /**
- * Maximum number of bytes dpserver.php can read from dpclient.php per chunk
+ * Maximum number of bytes {@link dpserver.php} can read from
+ * {@link dpclient.php} per chunk
  *
  * You should probably leave this untouched.
+ *
+ * @see        DPSERVER_CLIENT_CHUNK
  */
 define('DPSERVER_SERVER_CHUNK', 2048);
 ?>

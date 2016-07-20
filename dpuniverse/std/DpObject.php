@@ -10,37 +10,39 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpObject.php 22 2006-05-30 20:40:55Z ls $
+ * @version    Subversion: $Id: DpObject.php 46 2006-06-20 12:55:45Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  */
 
 /**
  * Gets moving constants
  */
-require_once(DPUNIVERSE_BASE_PATH . '/include/move.php');
+inherit(DPUNIVERSE_INCLUDE_PATH . 'move.php');
 
 /**
  * Gets events constants
  */
-require_once(DPUNIVERSE_BASE_PATH . '/include/events.php');
+inherit(DPUNIVERSE_INCLUDE_PATH . 'events.php');
 
 /**
  * Gets action constants
  */
-require_once(DPUNIVERSE_BASE_PATH . '/include/actions.php');
+inherit(DPUNIVERSE_INCLUDE_PATH . 'actions.php');
 
 /**
  * Gets title type constants
  */
-require_once(DPUNIVERSE_BASE_PATH . '/include/title_types.php');
+inherit(DPUNIVERSE_INCLUDE_PATH . 'title_types.php');
 
 /**
  * The standard object which is built upon by all other objects
  *
  * @package    DutchPIPE
+ * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
@@ -50,67 +52,97 @@ require_once(DPUNIVERSE_BASE_PATH . '/include/title_types.php');
 class DpObject
 {
     /**
-     * @var         string    Unique internal id for this object, 'object#628'
-     * @access      private
+     * Unique internal id for this object, 'object#628'
+     *
+     * @var        string
+     * @access     private
      */
     private $mUniqueId;
 
     /**
-     * @var         array     Public ids for this object, 'beer', 'cool beer'
-     * @access      private
+     * Public ids for this object, 'beer', 'cool beer'
+     *
+     * @var        array
+     * @access     private
      */
     private $mIds = array();
 
     /**
-     * @var         string    Title for this object, 'Cool, fresh beer'
-     * @access      private
+     * Path to non-default template file for this object, if any
+     *
+     * @var        string
+     * @access     private
+     */
+    private $mTemplateFile;
+
+    /**
+     * Title for this object, 'Cool, fresh beer'
+     *
+     * @var        string
+     * @access     private
      */
     private $mTitle;
 
     /**
-     * @var         string    Definite title, 'The cool, fresh beer'
-     * @access      private
+     * Definite title, 'The cool, fresh beer'
+     *
+     * @var        string
+     * @access     private
      */
     private $mTitleDefinite;
 
     /**
-     * @var         string    Indefinite title, 'A cool, fresh beer'
-     * @access      private
+     * Indefinite title, 'A cool, fresh beer'
+     *
+     * @var        string
+     * @access     private
      */
     private $mTitleIndefinite;
 
     /**
-     * @var         int       Type of title, 'A beer', 'The beer', etc.
-     * @access      private
+     * Type of title, 'A beer', 'The beer', etc.
+     *
+     * @var        int
+     * @access     private
      */
     private $mTitleType = DPUNIVERSE_TITLE_TYPE_INDEFINITE;
 
     /**
-     * @var         string    Path to the avatar or object image
-     * @access      private
+     * Path to the avatar or object image
+     *
+     * @var        string
+     * @access     private
      */
     private $mTitleImg = NULL;
 
     /**
-     * @var         mixed     The long description or page content
-     * @access      private
+     * The long description or page content
+     *
+     * @var        mixed
+     * @access     private
      */
     private $mBody;
 
     /**
-     * @var         array     Actions defined by this object, see addAction
-     * @access      private
+     * Actions defined by this object, see addAction
+     *
+     * @var        array
+     * @access     private
      */
     private $mActions = array();
 
     /**
-     * @var         array     Aliases used for actions, e.g. 'exa' for 'examine'
-     * @access      private
+     * Aliases used for actions, e.g. 'exa' for 'examine'
+     *
+     * @var        array
+     * @access     private
      */
     private $mActionAliases = array();
 
     /**
-     * @var         type      Generic property array for dynamic, simple vars
+     * Generic property array for dynamic, simple vars
+     *
+     * @var         type
      * @access      private
      */
     private $mProperties = array();
@@ -118,32 +150,27 @@ class DpObject
     /**
      * Creates this object
      *
-     * Calls the method 'createDpObject' in this object, if it exists.
+     * Calls {@link createDpObject()} in the inheriting class.
      *
      * :WARNING: Use get_current_dpuniverse()->newDpObject only to create
      * objects, do not use 'new'. DpUniverse will pass a unique id for this
      *
      * :WARNING: it is unlikely you need to call this function directly
      *
-     * @param   string  $unique_id  A unique id for this object
+     * @access     private
+     * @param      string    $unique_id  A unique id for this object
+     * @see        createDpObject
      */
-    function __construct($unique_id)
+    final function __construct($unique_id, $reset_time, $location, $sublocation = FALSE)
     {
-        if (0) {
-        /* I18N support */
-        $language = "nl_NL";
-        putenv("LANGUAGE=$language");
-        putenv("LANG=$language");
-        setlocale(LC_ALL, $language);
-
-        /* Set the text domain as 'messages' */
-        $domain = 'messages';
-        bindtextdomain($domain, "/home/ls/dutchpipe/locale");
-        textdomain($domain);
-        }
         /* This method may only be called once, at creation time */
         if (FALSE !== $this->getProperty('creation_time')) {
             return;
+        }
+        $this->addProperty('reset_time', $reset_time);
+        $this->addProperty('location', $location);
+        if (FALSE !== $sublocation) {
+            $this->addProperty('sublocation', $sublocation);
         }
 
         /* Standard setup calls to set some default values */
@@ -155,9 +182,7 @@ class DpObject
         $this->addProperty('creation_time', time());
 
         /* Call CreateDpObjects for objects that extend on this object */
-        if (method_exists($this, 'createDpObject')) {
-            $this->createDpObject();
-        }
+        $this->createDpObject();
 
         if (!isset($this->mTitle)) {
             $this->setTitle(dptext('initialized object'));
@@ -167,11 +192,85 @@ class DpObject
     }
 
     /**
-     * Destructs the object
+     * Sets this object up at the time it is created
+     *
+     * An empty function which can be redefined by the class extending on
+     * DpObject. When the object is created, it has no title, HTML body, etc.,
+     * so in this function function like $this->setTitle() are called.
+     * Building blocks extending on DpObject may define their own create
+     * function. For example, DpPage defines createDpPage.
+     *
+     * @see        resetDpObject
+     */
+    function createDpObject()
+    {
+    }
+
+    /**
+     * Resets this object
+     *
+     * Called by the universe object at regular intervals as defined in
+     * {@link dpuniverse-ini.php}. Calls the method 'resetDpObject' in this
+     * object. You can redefine that function to periodically do stuff such as
+     * alter the state of this object.
+     *
+     * @access     private
+     * @see        resetDpObject
+     */
+    final function __reset()
+    {
+        $this->resetDpObject();
+    }
+
+    /**
+     * Resets this object
+     *
+     * Called by this object at regular intervals as defined in
+     * dpuniverse-ini.php. An empty function which can be redefined by the
+     * class extending on DpObject. To be used to periodically do stuff such as
+     * alter the state of this object.
+     *
+     * @see        createDpObject
+     */
+    function resetDpObject()
+    {
+    }
+
+    /**
+     * Called by PHP when this object is destroyed, handles events
+     *
+     * Called by PHP when this object is destroyed. removeDpObject should be
+     * called in this object to remove it from the universe. Don't use
+     * unset to remove objects. On a PHP level, __destruct will then be called
+     * in this object.
+     *
+     * Calls the event method in this object and its environment, if any, when
+     * defined, using constants from events.php.
+     *
+     * Triggers the EVENT_LEFT_INV event in the environment of this object with
+     * "from" ($this) and "to" (0) parameters:
+     * $environment->event(EVENT_LEFT_INV, $this, 0);
+     *
+     * Triggers the EVENT_CHANGED_ENV event in this object with "from" (the
+     * environment) and "to" (0) parameters:
+     * $this->event(EVENT_CHANGED_ENV, $environment, 0);
+     *
+     * If the object had no environment, the above two events are not called,
+     * instead the EVENT_CHANGED_ENV event is triggered in this object with only
+     * a "from" (0) parameter:
+     * $this->event(EVENT_CHANGED_ENV, 0);
+     *
+     * Last, the EVENT_DESTROYING_OBJ event is triggered in this object:
+     * $this->event(EVENT_DESTROYING_OBJ);
+     *
+     * @see        removeDpObject, events.php
      */
     function __destruct()
     {
-        echo dptext("__destruct() called in object.\n");
+        echo sprintf(dptext("__destruct() called in object %s (%s).\n"),
+            $this->getUniqueId(),
+            $this->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE));
+
         if (FALSE !== ($env = $this->getEnvironment())) {
             if (method_exists($env, 'event')) {
                 $env->event(EVENT_LEFT_INV, $this, 0);
@@ -187,26 +286,19 @@ class DpObject
         if (method_exists($this, 'event')) {
             $this->event(EVENT_DESTROYING_OBJ);
         }
-        /* TODO: Move all users somewhere so they don't get destroyed */
+        /* :TODO: Move all users somewhere so they don't get destroyed */
         $inv = $this->getInventory();
     }
 
     /**
-     * Resets the object
+     * Removes this object from the universe
      *
-     * Calls the method 'resetDpObject' in this object, if it exists.
-     */
-    function __reset()
-    {
-        if (method_exists($this, 'resetDpObject')) {
-            $this->resetDpObject();
-        }
-    }
-
-    /**
-     * Removes this object
+     * The object is destroyed and no longer part of the universe. Don't use
+     * unset to remove objects. Removes the object from browsers viewing the
+     * same environment. On a PHP level, __destruct will then be called in this
+     * object.
      *
-     * The object is destroyed and no longer part of the universe.
+     * @see        __destruct
      */
     function removeDpObject()
     {
@@ -225,9 +317,9 @@ class DpObject
     /**
      * Moves this object into the inventory of another object
      *
-     * @param   mixed   $target_ob  path or object to move into to
+     * @param   mixed   &$target_ob path or object to move into to
      * @param   boolean $simple     skip some checks
-     * @return  int                 FALSE for success, an error code for failure
+     * @return  int     FALSE for success, an error code for failure
      */
     function moveDpObject(&$target_ob, $simple = FALSE)
     {
@@ -388,7 +480,7 @@ class DpObject
      * this object.
      *
      * @param      mixed     $what       string (id) or object to search for
-     * @return     boolean   TRUE if $what is in our inventory, false otherwise
+     * @return     boolean   TRUE if $what is in our inventory, FALSE otherwise
      */
     function isPresent($what)
     {
@@ -425,7 +517,7 @@ class DpObject
      * method is called. Also note that the actual delay is not exact science.
      *
      * @param      string    $method     name of method to call in this object
-     * @param      int d     $secs       delay in seconds
+     * @param      int       $secs       delay in seconds
      */
     function setTimeout($method, $secs)
     {
@@ -436,7 +528,6 @@ class DpObject
      * Tells data (message, window, location, ...) to this object
      *
      * Tells a message to this object, for instance a chat line. Handled by
-     * tell() in DpUser.php and DpNpc.php, so other objects do not hear anything
      * by default.
      *
      * @param      string    $data      message string
@@ -455,7 +546,10 @@ class DpObject
      *
      * WARNING: Don't call this method. Only __construct should call it.
      *
+     * @access     private
      * @param      string    $id         uique internal id for this object
+     * @see        getUniqueId(), setIds(), addId(), removeId(), getIds(),
+     *             isId()
      */
     private function setUniqueId($id)
     {
@@ -466,6 +560,7 @@ class DpObject
      * Gets the unique id for this object
      *
      * @return     string    the unique id for this object
+     * @see        setIds(), addId(), removeId(), getIds(), isId()
      */
     function getUniqueId()
     {
@@ -479,6 +574,7 @@ class DpObject
      * into lowercase.
      *
      * @param      array     $ids        array of name strings
+     * @see        addId(), removeId(), getIds(), isId(), getUniqueId(),
      */
     function setIds($ids)
     {
@@ -495,8 +591,9 @@ class DpObject
      * or multiple arguments can be given (strings or array of strings).
      *
      * @param      string|array  $id     name string or array of name strings
+     * @see        setIds(), removeId(), getIds(), isId(), getUniqueId(),
      */
-    function AddId($id)
+    function addId($id)
     {
         if ($sz = func_num_args()) {
             for ($i = 0; $i < $sz; $i++) {
@@ -523,8 +620,9 @@ class DpObject
      * or multiple arguments can be given (strings or array of strings).
      *
      * @param      string|array  $id     name string or array of name strings
+     * @see        setIds(), addId(), getIds(), isId(), getUniqueId(),
      */
-    function RemoveId($id)
+    function removeId($id)
     {
         if ($sz = func_num_args()) {
             for ($i = 0; $i < $sz && sizeof($this->mIds); $i++) {
@@ -545,9 +643,10 @@ class DpObject
     }
 
     /**
-     * Returns the array of ids for this object, or an empty array for no ids
+     * Gets the array of ids for this object, or an empty array for no ids
      *
      * @return     array     array of name strings
+     * @see        setIds(), addId(), removeId(), isId(), getUniqueId(),
      */
     function getIds()
     {
@@ -559,6 +658,7 @@ class DpObject
      *
      * @param      string    $id         name string to check
      * @return     bool      TRUE if the id is valid, FALSE otherwise
+     * @see        setIds(), addId(), removeId(), getIds(), getUniqueId(),
      */
     function isId($id)
     {
@@ -568,8 +668,31 @@ class DpObject
     }
 
     /**
-     * Sets the title for this object used as object labels, page titles, etc.
+     * Sets a non-default XHTML template file for this object
      *
+     * @param      string    $templateFile Path to a template file
+     * @see        getTemplateFile()
+     */
+    function setTemplateFile($templateFile)
+    {
+        $this->mTemplateFile = $templateFile;
+    }
+
+    /**
+     * Gets a non-default XHTML template file for this object, if set
+     *
+     * @return     string    Path to a template file, or FALSE for not set
+     * @see        setTemplateFile()
+     */
+    function getTemplateFile()
+    {
+        return $this->mTemplateFile;
+    }
+
+    /**
+     * Sets the title for this object, "beer", used as for object labels, etc.
+     *
+     * This title is used for object labels, page titles, messages, et cetera.
      * Objects are visualized using two mechanisms: the object's "title" and
      * the object's "body". The title is used when the object is nearby, for
      * instance in the environment of a user that sees it. The body is used
@@ -605,6 +728,8 @@ class DpObject
     public function setTitle($title, $titleType = FALSE, $titleImg = FALSE)
     {
         $this->mTitle = $title;
+        unset($this->mTitleDefinite);
+        unset($this->mTitleInDefinite);
 
         if (FALSE !== $titleType) {
             $this->mTitleType = $titleType;
@@ -691,9 +816,9 @@ class DpObject
     }
 
     /**
-     * Sets URL to the avatar or other image represeting this object
+     * Sets URL for the avatar or other image representing this object
      *
-     * @param      string    $titleImg   URL to avatar or object image
+     * @param      string    $titleImg   URL for avatar or object image
      */
     public function setTitleImg($titleImg)
     {
@@ -701,11 +826,11 @@ class DpObject
     }
 
     /**
-     * Gets URL to the avatar or other image representing this object
+     * Gets URL for the avatar or other image representing this object
      *
      * Returns NULL if no image was set for this object.
      *
-     * @return     string    URL to the image representing this object or NULL
+     * @return     string    URL for the image representing this object or NULL
      */
     public function getTitleImg()
     {
@@ -723,6 +848,8 @@ class DpObject
      * $ob->setTitleDefinite(dptext('the beer'));
      * This way the system can replace 'the beer' with the proper translation.
      * Some languages have multiple words or other means for "the".
+     *
+     * Must be called after setTitle, which resets the definite title.
      *
      * @param      string    $title      short definite description, "the beer"
      */
@@ -756,7 +883,9 @@ class DpObject
      * This way the system can replace 'a beer' with the proper translation.
      * Some languages have just a single word or other means for "a" and "an".
      *
-     * @param      string    $title      short definite description, "the beer"
+     * Must be called after setTitle, which reset the indefinite title.
+     *
+     * @param      string    $title      short indefinite description, "a beer"
      */
     public function setTitleIndefinite($title)
     {
@@ -774,7 +903,11 @@ class DpObject
     }
 
     /**
-     * Sets the HTML content of this object.
+     * Sets the HTML content of this object
+     *
+     * If this is a page, this defines the page content. For other objects, it
+     * defines what you see when examining the object or moving into the object
+     * (which makes the object behave like a page).
      *
      * When a single argument is given, sets the HTML content to the given text.
      *
@@ -782,8 +915,9 @@ class DpObject
      * the second argument the type, and the first the data (what the data is
      * depends on the type).
      *
-     * Types are: string (default, raw data), file (read content of given
-     * filename)
+     * Types are:
+     * string (default, raw data)
+     * file (read content of given filename)
      *
      * Examples:
      * $this->setBody('Hello world');
@@ -791,9 +925,9 @@ class DpObject
      * $this->setBody('Prefix', 'string', 'helloworld.html', 'file', 'Postfix',
      *     'string')
      *
-     * @param       string    $str        Content data
-     * @param       string    $type       Content type
-     * @see         getBody, getBaseLong
+     * @param       string    $body       content data
+     * @param       string    $type       content type
+     * @see         getBody()
      */
     public function setBody($body, $type = 'text')
     {
@@ -813,6 +947,7 @@ class DpObject
      * Gets the HTML content of this object
      *
      * @return     string    HTML content of this object
+     * @see        setBody()
      */
     public function getBody()
     {
@@ -831,7 +966,7 @@ class DpObject
                     && file_exists(DPSERVER_GETTEXT_LOCALE_PATH
                     . DPSERVER_LOCALE . $data)
                     ? DPSERVER_GETTEXT_LOCALE_PATH . DPSERVER_LOCALE
-                    : DPUNIVERSE_BASE_PATH)
+                    : DPUNIVERSE_PREFIX_PATH)
                     . $data);
 
                 if (FALSE !== $tmp) {
@@ -935,9 +1070,9 @@ class DpObject
         $titlebar = '';
         if (0 === $level) {
             if (TRUE === $displayTitlebar) {
+                $navtrail = $this->getNavigationTrailHtml();
                 if (FALSE === $user) {
-                    $titlebar = '<div id="titlebar">'
-                        . $this->getNavigationTrailHtml() . '</div>';
+                    $titlebar = $navtrail;
                 } else {
                     $login_link = FALSE === $user->getProperty("is_registered")
                         ? '<a href="' . DPSERVER_CLIENT_URL . '?location='
@@ -950,8 +1085,8 @@ class DpObject
                         . 'style="padding-left: 4px">' . dptext('Logout')
                         . '</a>';
                     $bottom = dptext('Go to Bottom');
-                    $titlebar = '<div id="titlebar"><div id="titlebarleft">' .
-                        $this->getNavigationTrailHtml() . '</div><div id='
+                    $titlebar = '<div id="titlebarleft">' .
+                        $navtrail . '</div><div id='
                         . '"titlebarright">&#160;'. sprintf(
                         dptext('Welcome %s'), '<span id="username">'
                         . $user->getTitle() . '</span>')
@@ -961,11 +1096,11 @@ class DpObject
                         . 'align="absbottom" width="11" height="11" border="0" '
                         . 'alt="' . $bottom . '" title="' . $bottom . '" '
                         . 'onClick="_gel(\'action\').focus(); '
-                        . 'scroll(0, 999999)" /></div></div>';
+                        . 'scroll(0, 999999)" /></div>';
                 }
             }
             $body = '<div id="' . $elementId . '"><div id="' . $elementId
-                . '_inner1">' . $titlebar . '<div class="' . $elementId
+                . '_inner1"><div id="titlebar">' . $titlebar . '</div><div class="' . $elementId
                 . '_inner2">' . ($displayTitlebar === -1 ? ''
                 : $this->getBody() . '<br />');
 
@@ -1061,8 +1196,8 @@ class DpObject
      * Sets the value of the property to TRUE if no value was given, or
      * to the given value.
      *
-     * @param      array     &$propertyName  name of the property to add
-     * @param      array     &$propertyValue value of the property to add
+     * @param      array     $propertyName  name of the property to add
+     * @param      array     $propertyValue value of the property to add
      */
     public function addProperty($propertyName)
     {
@@ -1076,8 +1211,8 @@ class DpObject
      * Sets the value of the properties to TRUE if no array with values was
      * given, or with each corresponding value in the given array of values.
      *
-     * @param      array     &$propertyNames  names of the properties to add
-     * @param      array     &$propertyValues values of the properties to add
+     * @param      array     $propertyNames  names of the properties to add
+     * @param      array     $propertyValues values of the properties to add
      */
     public function setProperties($propertyNames)
     {
@@ -1097,7 +1232,7 @@ class DpObject
     /**
      * Removes a property with the given name, if it exists
      *
-     * @param      string    &$propertyName name of the property to remove
+     * @param      string    $propertyName name of the property to remove
      */
     public function removeProperty($propertyName)
     {
@@ -1113,7 +1248,7 @@ class DpObject
      * value, or a value if it was set with a value. Returns FALSE if the
      * property does not exist.
      *
-     * @param      string    &$propertyName name of the property
+     * @param      string    $propertyName name of the property
      * @return     mixed     value of property, FALSE if it doesn't exist
      */
     public function getProperty($propertyName)
@@ -1292,6 +1427,8 @@ class DpObject
     }
 
     /**
+     * Gets actions which can be performed on this object, for action menu
+     *
      * Gets an array with actions which can be performed on this object, so
      * we can make a menu when hovering over the object image with the mouse.
      * This includes actions that are defined by other objects but appear in
@@ -1355,15 +1492,16 @@ class DpObject
     /**
      * Gets actions that can be performed an a given object by a given user
      *
-     * An array is returned with each element of pair consisting of:
-     * verb => array(menulabel, operant)
+     * An array is returned with each element a pair consisting of:
+     *     verb => array(menulabel, operant)
      * with operant one of DP_ACTION_OPERANT_ from
      * dpuniverse/include/actions.php, for example:
      * 'read' => array('read me!', DP_ACTION_OPERANT_MENU)
      *
+     * @access     private
      * @param      object    &$ob        target of actions
      * @param      object    &$user      performer of actions
-     * @return     boolean   array with actions, can be empty
+     * @return     array   array with actions, can be empty
      */
     function &_getTargettedActions(&$ob, &$user)
     {

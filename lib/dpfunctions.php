@@ -10,10 +10,11 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage lib
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpfunctions.php 15 2006-05-18 21:50:46Z ls $
+ * @version    Subversion: $Id: dpfunctions.php 46 2006-06-20 12:55:45Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php
  */
@@ -79,9 +80,9 @@ function &get_current_dpuniverse()
  * Includes universe object
  *
  * This is a wrapper around require_once. You can only inherit in
- * DPUNIVERSE_BASE_PATH (dpuniverse/ in the standard distribution), which is the
- * top directory for this function. Use the constants from config/dpuniverse.ini
- * to form paths.
+ * DPUNIVERSE_PREFIX_PATH (dpuniverse/ in the standard distribution), which is
+ * the top directory for this function. Use the constants from
+ * config/dpuniverse.ini to form paths.
  *
  * Examples (from dpuniverse/page/login.php):
  * inherit(DPUNIVERSE_STD_PATH . 'DpPage.php');
@@ -91,7 +92,7 @@ function &get_current_dpuniverse()
  */
 function inherit($path)
 {
-    require_once(DPUNIVERSE_BASE_PATH . $path);
+    require_once(DPUNIVERSE_PREFIX_PATH . $path);
 }
 
 /**

@@ -1,0 +1,339 @@
+CONTENTS
+
+    Requirements for using and installing DutchPIPE
+    Instructions for installing DutchPIPE on Linux, BSD, UNIX, ...
+    Instructions for installing DutchPIPE on Windows 2000, XP, ...
+
+REQUIREMENTS FOR USING AND INSTALLING DUTCHPIPE
+
+    Skill Requirements:
+
+    1. PHP 5
+
+       Knowledge of PHP 5 and in particular PHP 5 objects. However, if
+       you have PHP 4 experience only, DutchPIPE is an excellent
+       project to learn more about PHP 5.
+
+    2. Javascript/AJAX
+
+       If you like more magic to happen than the current library
+       provides, Javascript/AJAX knowledge is required. As with PHP 5,
+       DutchPIPE is a great project to get skilled with AJAX.
+
+    Software Requirements:
+
+    1. A *NIX or Windows platform
+
+       DutchPIPE was developed and tested on FreeBSD 6. You must have
+       full access to a computer or server to run DutchPIPE. I also
+       installed it successfully on a Windows XP box, using
+       http://www.wampserver.com/en/ to install Apache, PHP and MySQL.
+
+    2. A web server
+
+       DutchPIPE.org runs on Apache 2.2, I haven't been able to test
+       on other servers yet.
+
+    3. PHP 5 with the extensions: simple_xml and sockets (both for the
+       web server and "on the command line")
+
+       DutchPIPE.org has been using PHP 5.1+. The simple_xml extension
+       is supported by default on PHP 5.
+
+    4. MySQL
+
+       Used to store registered users. There are just a few queries,
+       more databases will be supported later. If you don't have MySQL
+       you can still test DutchPIPE if you rip some queries out, you
+       just can't register.
+
+    5. An AJAX capable web browser
+
+       Currently Firefox, IE6 and IE7 beta 2 are supported 100%. Opera
+       and Safari will be supported as soon as possible. If you can
+       help test on Safari, please contact me.
+
+INSTRUCTIONS FOR INSTALLING DUTCHPIPE ON LINUX, BSD, UNIX, ...
+
+    1. Obtain the DutchPIPE software
+
+       Download the DutchPIPE distribution from:
+
+       http://download.dutchpipe.org/
+
+       You can either download the packed .zip or .tgz file.
+
+    2. Unpack the DutchPIPE software
+
+       Unpack to the directory of your choice. In this example
+       installation, we unpack to:
+
+       /path/to/dutchpipe
+
+       Relative paths in the remainder of these instructions are from
+       the top of this path.
+
+    3. Configure the DutchPIPE software
+
+       You must patch these settings files:
+
+       config/dpserver-ini.php
+       config/dpuniverse-ini.php
+
+       Follow the instructions in these files or see the manual
+       entries for dpserver-ini.php and dpuniverse-ini.php.
+
+       Make sure the first line of
+
+       script/start_dpserver.php
+
+       refers to the PHP command line installation. Make sure this
+       file is executable (see man chmod under *NIX).
+
+    4. Setup MySQL
+
+       Create a database called
+
+       dutchpipe
+
+       and import the following SQL:
+
+       config/setupmysql.sql
+
+    5. Configure your web server
+
+       If you already have a location to test DutchPIPE, you can skip
+       step 5 and 6.
+
+       Decide on what URL you want to host your DutchPIPE
+       installation. You need to let your web server know where to
+       find the directory with the DutchPIPE public files.
+
+       There are many ways to add DutchPIPE, this is just one of them.
+       In the example case, we added the following to the vhosts
+       configuration file of Apache 2.2 in our FreeBSD 6 installation:
+
+       /usr/local/etc/apache22/extra/httpd-vhosts.conf
+
+       <VirtualHost *:80>
+           ServerAdmin webmaster@yourdomain.com
+           DocumentRoot /path/to/dutchpipe/public
+           ServerName www.yourdomain.com
+           <Directory "/path/to/dutchpipe/public">
+               DirectoryIndex dpclient.php
+               Options All
+               AllowOverride All
+               AddType application/x-httpd-php .php
+               Order allow,deny
+               Allow from all
+           </Directory>
+       </VirtualHost>
+
+    6. Restart your web server
+
+       For the example case:
+
+       /usr/local/etc/rc.d/apache22.sh restart
+
+    7. Start the DutchPIPE server
+
+       For the example case:
+
+       cd scripts
+       ./start_dpserver.php
+
+       It will output some memory and debug information, so you might
+       want to try, for example:
+
+       ./start_dpserver.php > mylog &
+
+       to throw everything in a log file called mylog and run the
+       process in the background.
+
+       There is no proper restart script yet. Simply kill the process
+       and start the script again to restart the server.
+
+    8. Browse to your DutchPIPE public installation
+
+       In the example case: http://demo.dutchpipe.org/
+
+       You should now see an example DutchPIPE installation in your
+       browser.
+
+INSTRUCTIONS FOR INSTALLING DUTCHPIPE ON WINDOWS 2000, XP, ...
+
+    These instructions are for use in combination with WAMP5, a
+    software distribution that installs the Apache web server, MySQL
+    and PHP 5 for Windows.
+
+    However, you can also install DutchPIPE with separate or other web
+    server, MySQL and PHP 5 installations. This procedure just uses
+    WAMP5 as an example and because of its fast, user friendly set-up.
+
+    1. Obtain the DutchPIPE software
+
+       Download the DutchPIPE distribution from:
+
+       http://download.dutchpipe.org/
+
+       You can either download the packed .zip or .tgz file.
+
+    2. Unpack the DutchPIPE software
+
+       Extract the files in c:\ so you now have the directory:
+
+       c:\dutchpipe
+
+    3. Download and Install WAMP5
+
+       Download WAMP5 from:
+
+       http://www.wampserver.com/en/download.php
+
+       Launch what you have downloaded to start the installation
+       process.
+
+       You can choose the installation folder. This step-by-step guide
+       uses the default choice:
+
+       c:\wamp
+
+       You can choose to auto launch WAMP5 at startup, we didn't do
+       that.
+
+       You can choose, if this is your first WAMP5 install, what
+       directory contains your DocumentRoot. Choose:
+
+       c:\dutchpipe\public
+
+       You can choose whether you want to start WAMP5. Choose yes.
+
+    4. Configure WAMP5
+
+       Now WAMP5 is running, an icon appeared on your tray bar at the
+       bottom right of your screen.
+
+       Click on the WAMP5 tray bar icon and select:
+
+       PHP extensions -> php_sockets
+
+       so that php_sockets is enabled.
+
+       Click on the WAMP5 tray bar icon and select:
+
+       Config files -> httpd.conf
+
+       Notepad or your text editor is launched. Search for the line:
+
+       DirectoryIndex index.php index.php3 index.html index.htm index.html.var
+
+       and change it to
+
+       DirectoryIndex dpclient.php index.php index.php3 index.html index.htm index.html.var
+
+       Save the file.
+
+    5. Configure DutchPIPE
+
+       Open the following file in a text editor (notepad for example):
+
+       c:\dutchpipe\config\setupmysql.sql
+
+       and select & copy all text.
+
+       Click on the WAMP5 tray bar icon and select:
+
+       MySQL -> MySQL console
+
+       Your password is still empty if this is your first install,
+       press RETURN.
+
+       Click on the top left part of the console window, and select
+       from the menu:
+
+       Edit -> Paste
+
+       You can now close the MySQL console window.
+
+       Edit the following file:
+
+       c:\dutchpipe\config\dpserver-ini.php
+
+       Change the first pair of define's:
+
+       define('DPSERVER_HOST_URL', 'http://www.yourdomain.com');
+       //define('DPSERVER_HOST_URL', 'http://localhost');
+
+       to this:
+
+       //define('DPSERVER_HOST_URL', 'http://www.yourdomain.com');
+       define('DPSERVER_HOST_URL', 'http://localhost');
+
+       Change these two lines:
+
+       define('DPSERVER_SOCKET_TYPE', AF_UNIX);
+       //define('DPSERVER_SOCKET_TYPE', AF_INET);
+
+       into:
+
+       //define('DPSERVER_SOCKET_TYPE', AF_UNIX);
+       define('DPSERVER_SOCKET_TYPE', AF_INET);
+
+       Check if the DPSERVER_SOCKET_PORT is a free port on your
+       machine (3333 by default):
+
+       define('DPSERVER_SOCKET_PORT', '3333');
+
+       Change the port number if necessary.
+
+       Save the file.
+
+       Edit the following file:
+
+       c:\dutchpipe\config\dpuniverse-ini.php
+
+       Change these two lines:
+
+       define('DPUNIVERSE_MYSQL_USER', '<youruser>');
+       define('DPUNIVERSE_MYSQL_PASSWORD', '<yourpass>');
+
+       into:
+
+       define('DPUNIVERSE_MYSQL_USER', 'root');
+       define('DPUNIVERSE_MYSQL_PASSWORD', '');
+
+       You should later secure MySQL by running the DutchPIPE database
+       with another user and a password, but we're now just quickly
+       getting up DutchPIPE locally.
+
+       Save the file.
+
+    6. Restart WAMP5
+
+       Click on the WAMP5 tray bar icon and select at the bottom:
+
+       Restart All Services
+
+    7. Start the DutchPIPE Server
+
+       Select at the bottom left of your screen:
+
+       Start -> Run...
+
+       and enter the following line:
+
+       c:\wamp\php\php.exe -c c:\wamp\apache2\bin c:\dutchpipe\script\start_dpserver.php
+
+       The DutchPIPE server is now running in a Command Prompt window.
+
+    8. Done
+
+       Launch your web browser and go to:
+
+       http://localhost/
+
+       You should see the standard DutchPIPE environment, exactly like
+       the demo on:
+
+       http://demo.dutchpipe.org/
+

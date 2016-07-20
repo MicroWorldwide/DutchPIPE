@@ -10,10 +10,11 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpLiving.php 22 2006-05-30 20:40:55Z ls $
+ * @version    Subversion: $Id: DpLiving.php 45 2006-06-20 12:38:26Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -27,6 +28,7 @@ inherit(DPUNIVERSE_STD_PATH . 'DpObject.php');
  * An object which is "alive", common code shared between users and NPCs
  *
  * @package    DutchPIPE
+ * @subpackage dpuniverse_std
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
@@ -37,28 +39,42 @@ inherit(DPUNIVERSE_STD_PATH . 'DpObject.php');
 class DpLiving extends DpObject
 {
     /**
-     * @var         string    Message shown when an action fails, can be set by actions
+     * Message to be shown when an action fails, can be set by actions
+     *
+     * @var         string
      * @access      private
+     * @see         setActionFailure(), getActionFailure(),
+     *              $mActionDefaultFailure
      */
     private $mActionFailure = DPUNIVERSE_ACTION_DEFAULT_FAILURE;
 
     /**
-     * @var         string    Default message shown when an action fails
+     * Default message to be shown when an action fails
+     *
+     * @var         string
      * @access      private
+     * @see         setActionDefaultFailure(), getActionDefaultFailure(),
+     *              $mActionFailure
      */
     private $mActionDefaultFailure = DPUNIVERSE_ACTION_DEFAULT_FAILURE;
 
     /**
-     * Creates this living
+     * Creates this living object
      *
-     * Adds standard actions which can be performed by this object, usually a
-     * user or a computer controlled character.
+     * Called by DpObject when this object is created. Adds standard actions
+     * which can be performed by this object, usually a user or a computer
+     * controlled character.
      *
-     * Calls createDpLiving in the inheriting class (if defined)
+     * Calls {@link createDpLiving()} in the inheriting class.
      *
-     * Starts a "heartbeat", see timeoutHeartBeat.
+     * Adds a "is_living" property to this object, set to TRUE.
+     *
+     * Starts a "heartbeat", see {@link timeoutHeartBeat()}.
+     *
+     * @access     private
+     * @see        createDpLiving(), timeoutHeartBeat()
      */
-    function createDpObject()
+    final function createDpObject()
     {
         $this->addProperty('is_living');
         $this->setBody(dptext("This description hasn't been set yet.<br />"));
@@ -92,29 +108,61 @@ class DpLiving extends DpObject
         /* Actions for admin only */
         $this->addAction(dptext('svars'), dptext('svars'), 'actionSvars', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
         $this->addAction(dptext('force'), dptext('force'), 'actionForce', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
-
-        if (method_exists($this, 'createDpLiving')) {
-            $this->createDpLiving();
-        }
-
+        $this->addAction(dptext('move!'), dptext('move!'), 'actionMove', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
         $this->setTimeout('timeoutHeartBeat', 2);
+
+        $this->createDpLiving();
     }
 
     /**
-     * Resets this living
+     * Sets this living object up at the time it is created
      *
-     * Periodically calls resetDpLiving in the inheriting class (if defined)
+     * An empty function which can be redefined by the living class extending
+     * on DpLiving. When the object is created, it has no title, HTML body, et
+     * cetera, so in this method methods like {@link DpObject::setTitle()} are
+     * called. Building blocks extending on DpLiving may define their own create
+     * function. For example, DpNpc defines {@link DpNpc:createDpNpc}.
+     *
+     * @see        resetDpLiving()
      */
-    function resetDpObject()
+    function createDpLiving()
     {
-        if (method_exists($this, 'resetDpLiving')) {
-            $this->resetDpLiving();
-        }
     }
 
     /**
-     * Calls itself every 'heartbeat'. Mask this method to make timed stuff
-     * happen.
+     * Resets this living object
+     *
+     * Called by DpObject at regular intervals as defined in dpuniverse-ini.php.
+     * Calls the method 'resetDpLiving' in this living object. You can redefine
+     * that function to periodically do stuff such as alter the state of this
+     * living object.
+     *
+     * @access     private
+     * @see        resetDpLiving()
+     */
+    final function resetDpObject()
+    {
+        $this->resetDpLiving();
+    }
+
+    /**
+     * Resets this living object
+     *
+     * Called by this living object at regular intervals as defined in
+     * dpuniverse-ini.php. An empty function which can be redefined by the
+     * living class extending on DpLiving. To be used to periodically do stuff
+     * such as alter the state of the living object.
+     *
+     * @see        createDpLiving()
+     */
+    function resetDpLiving()
+    {
+    }
+
+    /**
+     * Calls itself every "heartbeat"
+     *
+     * Redefine this method to make timed stuff happen.
      */
     function timeoutHeartBeat()
     {
@@ -126,12 +174,15 @@ class DpLiving extends DpObject
      *
      * Searches the DPUNIVERSE_AVATAR_PATH directory for files ending with
      * "_body.gif".
+     *
+     * @access  private
+     * @return  int     the number of available avatar images
      */
     static function _getNrOfAvatars()
     {
         $entries = 0;
         $d = dir(DPUNIVERSE_AVATAR_PATH);
-        while (false !== ($entry = $d->read())) {
+            while (false !== ($entry = $d->read())) {
             if ($entry !== '.' && $entry !== '..' && strlen($entry) > 13
                     && substr($entry, -9) == '_body.gif') {
                 $entries++;
@@ -143,33 +194,47 @@ class DpLiving extends DpObject
     /**
      * Sets the message shown to the user when an action fails
      *
-     * When the user performs an action but the action fails, there are two
-     * ways for the method implementing the action to communicate the failure
-     * to the user.
+     * Call this method from action methods, for example actionFoo(). When the
+     * user performs an action but the action fails, there are two ways for the
+     * method implementing the action to communicate the failure to the user.
      *
-     * 1. Call tell in the user and return TRUE:
+     * <ol>
+     * <li>
+     * Call {@link DpUser:tell()} in the user and return TRUE, for
+     * example:<br><br>
+     * <code>
+     *$user->tell('Action foo failed because of bar.');
+     *return TRUE;
+     * </code>
+     * <br>
+     * The action system will stop looking for other ways to perform the
+     * action.<br><br>
+     * </li>
+     * <li>
+     * Call this setActionFailure method in the user and return FALSE. This
+     * failure setup is used when different objects can have the same actions
+     * implemented with addAction - if one fails, another might still
+     * succeed. Example:<br><br>
+     * <code>
+     *$user->setActionFailure('Action foo failed because of bar.');
+     *return FALSE;
+     * </code>
+     * <br>
+     * The action system will continue looking for other ways to perform
+     * the action. If it doesn't find any, the previously set failure message
+     * is communicated to the user. Otherwise, the next method implementing
+     * the action takes over. The action system will continue looking for
+     * object/methods implementing the action, until TRUE is returned or no
+     * more implementations are found. In that case, the last set action
+     * failure is returned. If no action failure was set, the default failure
+     * message is shown, see {@link setActionDefaultFailure()}.
+     * </li>
+     * </ol>
      *
-     *        $user->tell('Action foo failed because of bar.');
-     *        return TRUE;
-     *
-     *    The action system will stop looking for other ways to perform the
-     *    action.
-     *
-     * 2. Call setActionFailure in the user and return FALSE. This failure setup
-     *    is used when different objects can have the same actions implemented
-     *    with addAction - if one fails, another might still succeed.
-     *
-     *        $user->setActionFailure('Action foo failed because of bar.');
-     *        return FALSE;
-     *
-     *    The action system will continue looking for other ways to perform the
-     *    action. If it doesn't find any, the previously set failure message is
-     *    communicated to the user. Otherwise, the next method implementing the
-     *    action takes over. The action system will continue looking for
-     *    object/methods implementing the action, until TRUE is returned or no
-     *    more implementations are found. In that case, the last set action
-     *    failure is returned. If no action failure was set, the default failure
-     *    message is shown (see setActionDefaultFailure).
+     * @param   string  $actionFailure message to be shown when an action fails
+     * @example /home/ls/dev.dutchpipe/dpuniverse/obj/note.php A readable note
+     * @see     getActionFailure(), setActionDefaultFailure(),
+     *          getActionDefaultFailure()
      */
     final public function setActionFailure($actionFailure)
     {
@@ -177,7 +242,11 @@ class DpLiving extends DpObject
     }
 
     /**
-     * Gets the last set message set by a failing user action
+     * Gets the message to be shown when an action fails
+     *
+     * @return  string  message to be shown when an action fails
+     * @see     setActionFailure(), setActionDefaultFailure(),
+     *          getActionDefaultFailure()
      */
     final public function getActionFailure()
     {
@@ -185,10 +254,14 @@ class DpLiving extends DpObject
     }
 
     /**
-     * Sets the default message shown to the user when an action fails, for
-     * example "What?".
+     * Sets the default message shown to the user when an action fails
      *
-     * Used when no message was set with setActionFailure
+     * Used when no message was set with setActionFailure, for example "What?".
+     *
+     * @param   string  $actionDefaultFailure default message to be shown when
+     *                                        an action fails
+     * @see     setActionFailure(), getActionFailure(),
+     *          getActionDefaultFailure()
      */
     final public function setActionDefaultFailure($actionDefaultFailure)
     {
@@ -196,10 +269,13 @@ class DpLiving extends DpObject
     }
 
     /**
-     * Gets the default message shown to the user when an action fails, for
-     * example "What?".
+     * Gets the default message shown to the user when an action fails
      *
-     * Used when no message was set with setActionFailure
+     * Used when no message was set with setActionFailure, for example "What?".
+     *
+     * @return  string  default message to be shown when an action fails
+     * @see     setActionFailure(), getActionFailure(),
+     *          setActionDefaultFailure()
      */
     final public function getActionDefaultFailure()
     {
@@ -207,7 +283,26 @@ class DpLiving extends DpObject
     }
 
     /**
-     * Tries to perform the action given by the living
+     * Tries to perform the action given by the living object
+     *
+     * Called by the system to handle both actions performed by clicking on
+     * menus and actions from the input area. The first method will result in an
+     * $action parameter such as "take object#242" (using an unique object id).
+     * With the second method, $action will contain what the user typed, such as
+     * "take beer".
+     *
+     * Searches and calls for the right method linked to the action, which could
+     * be in another object. Handles failure messages when the action failed.
+     *
+     * This method can also be used to force living objects to perform actions.
+     *
+     * @param   string  $action     the action given by the living object
+     * @return  boolean TRUE for success, FALSE for unsuccessful action
+     * @see     setActionFailure(), getActionFailure(), setActionDefaultFailure(),
+     *          getActionDefaultFailure(), DpObject::addAction(),
+     *          DpObject::getActions(), DpObject::getActionsMenu(),
+     *          DpObject::getTargettedActions(),
+     *          DpObject::performActionSubject()
      */
     final public function performAction($action)
     {
@@ -237,11 +332,11 @@ class DpLiving extends DpObject
     }
 
     /**
-     * Makes this living examine an object
+     * Makes this living object examine an object
      *
      * @param   string  $verb       the action, "examine"
      * @param   string  $noun       what to examine, could be empty
-     * @return  int                 TRUE for action completed, FALSE otherwise
+     * @return  boolean TRUE for action completed, FALSE otherwise
      */
     function actionExamine($verb, $noun)
     {
@@ -280,11 +375,11 @@ class DpLiving extends DpObject
     }
 
     /**
-     * Makes this living take an object
+     * Makes this living object take an object
      *
      * @param   string  $verb       the action, "take"
      * @param   string  $noun       what to take, could be empty
-     * @return  int                 TRUE for action completed, FALSE otherwise
+     * @return  boolean TRUE for action completed, FALSE otherwise
      */
     function actionTake($verb, $noun)
     {
@@ -343,6 +438,10 @@ class DpLiving extends DpObject
 
     /**
      * Drops an object in the user's environment
+     *
+     * @param   string  $verb       the action, "drop"
+     * @param   string  $noun       what to drop, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
      */
     function actionDrop($verb, $noun, $silently = FALSE)
     {
@@ -398,6 +497,13 @@ class DpLiving extends DpObject
         return TRUE;
     }
 
+    /**
+     * Shows this living object a list of objects it is carrying
+     *
+     * @param   string  $verb       the action, "inventory"
+     * @param   string  $noun       empty string
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     function actionInventory($verb, $noun)
     {
         if (FALSE === ($env = $this->getEnvironment())) {
@@ -414,6 +520,13 @@ class DpLiving extends DpObject
         return TRUE;
     }
 
+    /**
+     * Makes this living object say something
+     *
+     * @param   string  $verb       the action, "say"
+     * @param   string  $noun       what to say, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     function actionSay($verb, $noun)
     {
         if (empty($noun)) {
@@ -429,22 +542,31 @@ class DpLiving extends DpObject
         return TRUE;
     }
 
-    function actionGiveOperant($menuon)
+    /**
+     * Completes the give action performed by clicking on an object
+     *
+     * Called by the action system when someone clicks on an object and selects
+     * "give...". Returns something like "beer to", which allows the system to
+     * fill the input area with "give beer to " using the title of the object
+     * which was clicked on.
+     *
+     * @param   string  $verb       the action, "give"
+     * @return  string  a string such as "beer to "
+     * @see     actionGive()
+     */
+    function actionGiveOperant($menuobj)
     {
-        $title = strtolower($menuon->getTitle());
-        /*
-        if (strlen($title) > 4 && substr($title, 0, 4) == 'the ') {
-            $title = substr($title, 4);
-        } elseif (strlen($title) > 3 && substr($title, 0, 3) == 'an ') {
-            $title = substr($title, 3);
-        } elseif (strlen($title) > 2 && substr($title, 0, 2) == 'a ') {
-            $title = substr($title, 2);
-        }
-        */
-
-        return sprintf(dptext('%s to '), $title);
+        return sprintf(dptext('%s to '), strtolower($menuobj->getTitle()));
     }
 
+    /**
+     * Makes this living object give an object to another living object
+     *
+     * @param   string  $verb       the action, "give"
+     * @param   string  $noun       what and who to give, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     * @see     actionGiveOperant()
+     */
     function actionGive($verb, $noun)
     {
         if (empty($noun)) {
@@ -485,6 +607,13 @@ class DpLiving extends DpObject
         return TRUE;
     }
 
+    /**
+     * Makes this living object tell something to another living object
+     *
+     * @param   string  $verb       the action, "tell"
+     * @param   string  $noun       who and what to tell, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     function actionTell($verb, $noun)
     {
         if (empty($noun)) {
@@ -497,8 +626,7 @@ class DpLiving extends DpObject
         }
         $who = substr($noun, 0, $pos);
         $what = substr($noun, $pos + 1);
-        if (FALSE === ($who_ob = get_current_dpuniverse()->findUser($who,
-                $this))) {
+        if (FALSE === ($who_ob = get_current_dpuniverse()->findUser($who))) {
             $this->tell(sprintf(dptext('User %s was not found.<br />'), $who));
             return TRUE;
         }
@@ -511,6 +639,13 @@ class DpLiving extends DpObject
         return TRUE;
     }
 
+    /**
+     * Makes this living object shout something to everyone on the site
+     *
+     * @param   string  $verb       the action, "shout"
+     * @param   string  $noun       what to shout, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     function actionShout($verb, $noun)
     {
         if (empty($noun)) {
@@ -535,6 +670,13 @@ class DpLiving extends DpObject
         return TRUE;
     }
 
+    /**
+     * Shows this living object a window with help information
+     *
+     * @param   string  $verb       the action, "help"
+     * @param   string  $noun       empty string
+     * @return  boolean TRUE
+     */
     function actionHelp($verb, $noun)
     {
         $this->tell("<window><div id=\"helptext\">"
@@ -558,6 +700,13 @@ Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to g
         return TRUE;
     }
 
+    /**
+     * Shows this living object source code of environment or of another object
+     *
+     * @param   string  $verb       the action, "source"
+     * @param   string  $noun       what to show source of, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     function actionSource($verb, $noun)
     {
         if (!strlen($noun)) {
@@ -582,6 +731,13 @@ Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to g
         return TRUE;
     }
 
+    /**
+     * Shows this living a list of links in its environment or in another object
+     *
+     * @param   string  $verb       the action, "links"
+     * @param   string  $noun       what to take, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     function actionLinks($verb, $noun)
     {
         if (!strlen($noun)) {
@@ -618,11 +774,20 @@ Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to g
         return TRUE;
     }
 
+    /**
+     * Shows this living object a list of users on the site
+     *
+     * @param   string  $verb       the action, "who"
+     * @param   string  $noun       empty string
+     * @return  boolean TRUE
+     */
     function actionWho($verb, $noun)
     {
         $users = get_current_dpuniverse()->getUsers();
         if (0 === count($users)) {
-            return '<b>' . dptext('No one is on this site.') . '</b><br />';
+           $this->tell('<window><b>' . dptext('No one is on this site.')
+            . '</b></window>');
+            return TRUE;
         }
 
         $tell = '<b>' . dptext('People currently on this site:') . '</b><br />';
@@ -644,6 +809,13 @@ Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to g
         return TRUE;
     }
 
+    /**
+     * Makes this living object smile happily
+     *
+     * @param   string  $verb       the action, "smile"
+     * @param   string  $noun       empty string
+     * @return  boolean TRUE
+     */
     function actionSmile($verb, $noun)
     {
         $this->tell(dptext('You smile happily.<br />'));
@@ -654,6 +826,13 @@ Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to g
         return TRUE;
     }
 
+    /**
+     * Makes this living object grin evilly
+     *
+     * @param   string  $verb       the action, "grin"
+     * @param   string  $noun       empty string
+     * @return  boolean TRUE
+     */
     function actionGrin($verb, $noun)
     {
         $this->tell(dptext('You grin evilly.<br />'));
@@ -664,6 +843,13 @@ Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to g
         return TRUE;
     }
 
+    /**
+     * Makes this living object fall down on the floor laughing
+     *
+     * @param   string  $verb       the action, "laugh"
+     * @param   string  $noun       empty string
+     * @return  boolean TRUE
+     */
     function actionLaugh($verb, $noun)
     {
         $this->tell(dptext('You fall down on the floor laughing.<br />'));
@@ -675,6 +861,13 @@ Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to g
         return TRUE;
     }
 
+    /**
+     * Makes this living object shrug
+     *
+     * @param   string  $verb       the action, "laugh"
+     * @param   string  $noun       empty string
+     * @return  boolean TRUE
+     */
     function actionShrug($verb, $noun)
     {
         $this->tell(dptext('You shrug.<br />'));
@@ -685,16 +878,24 @@ Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to g
         return TRUE;
     }
 
+    /**
+     * Makes this living object pat another living object on the head
+     *
+     * @param   string  $verb       the action, "pat"
+     * @param   string  $noun       who to pat, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     function actionPat($verb, $noun)
     {
         if (FALSE === ($env = $this->getEnvironment()) ||
                 ($noun && !($dest_ob = $env->isPresent($noun)))) {
-            $this->tell(sprintf(dptext("Couldn't find: %s<br />"), $noun));
-            return TRUE;
+            $this->setActionFailure(sprintf(dptext("Couldn't find: %s<br />"),
+                $noun));
+            return FALSE;
         }
         if (!isset($dest_ob)) {
-            $this->tell(dptext('Pat who?<br />'));
-            return TRUE;
+            $this->setActionFailure(dptext('Pat who?<br />'));
+            return FALSE;
         }
         $this->tell(sprintf(
             dptext('You pat %s on the head with a bone-crushing sound.<br />'),
@@ -711,16 +912,24 @@ Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to g
         return TRUE;
     }
 
+    /**
+     * Makes this living object slap a high-five with another living object
+     *
+     * @param   string  $verb       the action, "high5"
+     * @param   string  $noun       who to high5, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     function actionHighFive($verb, $noun)
     {
         if (FALSE === ($env = $this->getEnvironment()) ||
                 ($noun && !($dest_ob = $env->isPresent($noun)))) {
-            $this->tell(sprintf(dptext("Couldn't find: %s<br />"), $noun));
-            return TRUE;
+            $this->setActionFailure(sprintf(dptext("Couldn't find: %s<br />"),
+                $noun));
+            return FALSE;
         }
         if (!isset($dest_ob)) {
-            $this->tell(dptext('High5 who?<br />'));
-            return TRUE;
+            $this->setActionFailure(dptext('High5 who?<br />'));
+            return FALSE;
         }
         $this->tell(sprintf(
             dptext('You jump up, and slap a thundering high-five with %s.<br />'),
@@ -737,16 +946,24 @@ Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to g
         return TRUE;
     }
 
+    /**
+     * Makes this living object hug another living object
+     *
+     * @param   string  $verb       the action, "hug"
+     * @param   string  $noun       who to hug, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     function actionHug($verb, $noun)
     {
         if (FALSE === ($env = $this->getEnvironment()) ||
                 ($noun && !($dest_ob = $env->isPresent($noun)))) {
-            $this->tell(sprintf(dptext("Couldn't find: %s<br />"), $noun));
-            return TRUE;
+            $this->setActionFailure(sprintf(dptext("Couldn't find: %s<br />"),
+                $noun));
+            return FALSE;
         }
         if (!isset($dest_ob)) {
-            $this->tell(dptext('Hug who?<br />'));
-            return TRUE;
+            $this->setActionFailure(dptext('Hug who?<br />'));
+            return FALSE;
         }
         $this->tell(sprintf(dptext('You hug %s.<br />'),
             $dest_ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
@@ -760,16 +977,24 @@ Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to g
         return TRUE;
     }
 
+    /**
+     * Makes this living object give another living object a passionate kiss
+     *
+     * @param   string  $verb       the action, "kiss"
+     * @param   string  $noun       who to kiss, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     function actionKiss($verb, $noun)
     {
         if (FALSE === ($env = $this->getEnvironment()) ||
                 ($noun && !($dest_ob = $env->isPresent($noun)))) {
-            $this->tell(sprintf(dptext("Couldn't find: %s<br />"), $noun));
-            return TRUE;
+            $this->setActionFailure(sprintf(dptext("Couldn't find: %s<br />"),
+                $noun));
+            return FALSE;
         }
         if (!isset($dest_ob)) {
-            $this->tell(dptext('Kiss who?<br />'));
-            return TRUE;
+            $this->setActionFailure(dptext('Kiss who?<br />'));
+            return FALSE;
         }
         $this->tell(sprintf(
             dptext('You give %s a deep and passionate kiss... It seems to last forever...<br />'),
@@ -786,16 +1011,24 @@ Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to g
         return TRUE;
     }
 
+    /**
+     * Makes this living object take another living object for a dance
+     *
+     * @param   string  $verb       the action, "dance"
+     * @param   string  $noun       who to dance with, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     function actionDance($verb, $noun)
     {
         if (FALSE === ($env = $this->getEnvironment()) ||
                 ($noun && !($dest_ob = $env->isPresent($noun)))) {
-            $this->tell(sprintf(dptext("Couldn't find: %s<br />"), $noun));
-            return TRUE;
+            $this->setActionFailure(sprintf(dptext("Couldn't find: %s<br />"),
+                $noun));
+            return FALSE;
         }
         if (!isset($dest_ob)) {
-            $this->tell(dptext('Dance with who?<br />'));
-            return TRUE;
+            $this->setActionFailure(dptext('Dance with who?<br />'));
+            return FALSE;
         }
         $this->tell(sprintf(
             dptext('You take %s for a dance... The tango!<br />'),
@@ -812,11 +1045,21 @@ Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to g
         return TRUE;
     }
 
+    /**
+     * Makes this living object communicate a custom message to its environment
+     *
+     * @param   string  $verb       the action, "emote"
+     * @param   string  $noun       string to "emote"
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     function actionEmote($verb, $noun)
     {
+        if (FALSE === ($env = $this->getEnvironment())) {
+            return FALSE;
+        }
         if (!strlen($noun)) {
-            $this->tell(dptext('Try: emote <i>text</i><br />'));
-            return TRUE;
+            $this->setActionFailure(dptext('Try: emote <i>text</i><br />'));
+            return FALSE;
         }
         $this->tell(ucfirst($this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))
             . " $noun<br />");
@@ -825,6 +1068,14 @@ Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to g
         return TRUE;
     }
 
+    /**
+     * Shows this living object a window with settings
+     *
+     * @param   string  $verb       the action, "settings"
+     * @param   string  $noun       empty string
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     * @see     setSettings()
+     */
     function actionSettings($verb, $noun)
     {
         $this->tell('<script>
@@ -890,6 +1141,16 @@ function rcv_settings()
         return TRUE;
     }
 
+    /**
+     * Applies settings from the settings menu obtained with actionSettings()
+     *
+     * Called from the Javascript that goes with the menu that pops up after the
+     * settings action has been performed. Applies avatar and dispay mode
+     * settings, based on the DpUser::_GET variable in this living object.
+     *
+     * @see     actionSettings
+     * @todo    save settings for registered users in the database
+     */
     function setSettings()
     {
         if (!isset($this->_GET['avatar_nr'])
@@ -922,6 +1183,13 @@ function rcv_settings()
             . '</changeDpElement>'), $this);
     }
 
+    /**
+     * Shows this administrator various PHP/server information about a user
+     *
+     * @param   string  $verb       the action, "svars"
+     * @param   string  $noun       who to show info of, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     function actionSvars($verb, $noun)
     {
         if (!strlen($noun)) {
@@ -951,6 +1219,13 @@ function rcv_settings()
         return TRUE;
     }
 
+    /**
+     * Makes this administrator force another living object to perform an action
+     *
+     * @param   string  $verb       the action, "force"
+     * @param   string  $noun       who and what to force
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     function actionForce($verb, $noun)
     {
         if (!strlen($noun = trim($noun))
@@ -985,6 +1260,88 @@ function rcv_settings()
             $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))));
 
         $who_ob->performAction($what);
+        return TRUE;
+    }
+
+    /**
+     * Makes this administrator move an object to another environment
+     *
+     * @param   string  $verb       the action, "move"
+     * @param   string  $noun       what and where to move
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
+    function actionMove($verb, $noun)
+    {
+        if (!strlen($noun = trim($noun))
+                || FALSE === ($pos = strpos($noun, ' '))) {
+            $this->setActionFailure(
+                dptext('Syntax: move <i>what where</i>.<br />'));
+            return FALSE;
+        }
+
+        $what = substr($noun, 0, $pos);
+        if (FALSE === ($what_ob = $this->isPresent($what))) {
+            if (FALSE !== ($env = $this->getEnvironment())) {
+                $what_ob = $env->isPresent($what);
+            }
+            if (FALSE === $what_ob) {
+                $what_ob = get_current_dpuniverse()->findUser($what);
+            }
+        }
+        if (FALSE === $what_ob) {
+            $this->setActionFailure(sprintf(
+                dptext('Object to move %s not found.<br />'), $what));
+            return FALSE;
+        }
+
+        $where = substr($noun, $pos + 1);
+        $env = $this->getEnvironment();
+        if ('!' === $where) {
+            $where_ob = $this->getEnvironment();
+            if (FALSE === $where_ob) {
+                $this->setActionFailure(sprintf(
+                    dptext("Can't move object %s to this location: you have no environment.<br />"),
+                    $what));
+            }
+        }
+        elseif ('me' === $where) {
+            $where_ob = $this;
+        }
+        elseif (FALSE === ($where_ob = $this->isPresent($where))) {
+            if (FALSE !== $env) {
+                $where_ob = $env->isPresent($where);
+            }
+            if (FALSE === $where_ob) {
+                $where_ob = get_current_dpuniverse()->findUser($where);
+            }
+        }
+        if (FALSE === $where_ob) {
+            $this->setActionFailure(sprintf(
+                dptext('Target %s not found.<br />'), $where));
+            return FALSE;
+        }
+
+        if ($this === $what_ob && $this === $where_ob) {
+            $this->setActionFailure(
+                dptext('You cannot move yourself into yourself.<br />'));
+            return FALSE;
+        }
+
+        $this->tell(sprintf(
+            dptext('You give %s the old "Jedi mind-trick" stink eye.<br />'),
+            $what_ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
+        if (FALSE !== $env) {
+            $env->tell(ucfirst(sprintf(
+                dptext('%s gives %s the old "Jedi mind-trick" stink eye.<br />'),
+                $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
+                $what_ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))),
+                $this, $what_ob);
+            }
+        $what_ob->tell(ucfirst(sprintf(
+            dptext('%s gives you the old "Jedi mind-trick" stink eye.<br />'),
+            $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))));
+
+        $what_ob->moveDpObject($where_ob);
         return TRUE;
     }
 }

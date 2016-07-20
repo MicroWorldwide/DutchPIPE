@@ -16,16 +16,22 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage lib
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpclient.php 22 2006-05-30 20:40:55Z ls $
+ * @version    Subversion: $Id: dpclient.php 45 2006-06-20 12:38:26Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver-ini.php, dpserver.php, dpclient.css
  */
 
-require_once(dirname(realpath($_SERVER['SCRIPT_FILENAME']  . '/..'))
-    . '/config/dpserver-ini.php');
+/**
+ * Gets server settings
+ */
+if (!defined('DPSERVER_HOST_URL')) {
+    require_once(dirname(realpath($_SERVER['SCRIPT_FILENAME']  . '/..'))
+        . '/config/dpserver-ini.php');
+}
 
 error_reporting(DPSERVER_ERROR_REPORTING);
 
@@ -37,10 +43,10 @@ $gLastErrorMsg = NULL;
 /* Deal with AJAX requests and normal page requests */
 if (isset($_GET) && (isset($_GET['ajax']) || isset($_GET['method']))) {
     /* Output XML or '1' to "keep-alive" */
-    handle_ajax_request(talk2server(DPSERVER_SOCKET_PATH));
+    handle_ajax_request(talk2server());
 } else {
     /* Output XHTML */
-    handle_normal_request(talk2server(DPSERVER_SOCKET_PATH));
+    handle_normal_request(talk2server());
 }
 
 /**
@@ -48,7 +54,7 @@ if (isset($_GET) && (isset($_GET['ajax']) || isset($_GET['method']))) {
  *
  * @return      string    output from the DutchPIPE server
  */
-function talk2server($socketPath)
+function talk2server()
 {
     global $gLastErrorMsg, $header_data;
 
@@ -61,7 +67,7 @@ function talk2server($socketPath)
                 socket_last_error(), socket_strerror(socket_last_error()));
             return FALSE;
         }
-        if (FALSE === @socket_connect($socket, $socketPath)) {
+        if (FALSE === @socket_connect($socket, DPSERVER_SOCKET_PATH)) {
             $gLastErrorMsg = '<h1>' . DPSERVER_SOCKERR_MSG . '</h1>'
                 . sprintf(dptext(
                 "socket_create(): unable to connect [%u]: %s\n"),
@@ -98,8 +104,12 @@ function talk2server($socketPath)
     }
 
     /* Serialize $_SERVER, $_SESSION, ... variables so they can be sent */
-    $in = '<vars>' . serialize(array($_SERVER, $_SESSION, $_COOKIE, $_GET,
-        $_POST, $_FILES)) . "</vars>\r\nquit\r\n";
+    $in = serialize(array($_SERVER, $_SESSION, $_COOKIE, $_GET, $_POST,
+        $_FILES));
+    if (TRUE === DPSERVER_BASE64_CLIENT2SERVER) {
+        $in = base64_encode($in);
+    }
+    $in = "<vars>$in</vars>\r\nquit\r\n";
 
     socket_write($socket, $in, strlen($in));
 
@@ -108,28 +118,35 @@ function talk2server($socketPath)
     $cookie_set = $remove_guest_cookie = $remove_registered_cookie = FALSE;
 
     for ($output = ''; $buf = socket_read($socket, DPSERVER_CLIENT_CHUNK); ) {
+        $output .= $buf;
+    }
+
+    $arroutput = explode(chr(0), $output);
+    $output = '';
+    foreach ($arroutput as $buf) {
         if (!strlen($buf) || isset($newlocation)) {
             continue;
         }
-
-        elseif (strlen($buf) > 11 && substr($buf, 0, 11) == "Set-Login: ") {
-            $cookie_data = substr($buf, 11);
-            setcookie(DPSERVER_COOKIE_NAME, $cookie_data);
+        $bufdec = TRUE === DPSERVER_BASE64_SERVER2CLIENT ? base64_decode($buf)
+            : $buf;
+        if (strlen($bufdec) > 11 && substr($bufdec, 0, 11) == "Set-Login: ") {
+            $cookie_data = substr($bufdec, 11);
+            setcookie(DPSERVER_COOKIE_NAME, $cookie_data, FALSE, '/');
             $cookie_set = TRUE;
         }
 
-        elseif (strlen($buf) > 17 && FALSE !== ($pos1 = strpos($buf,
-                "<header><![CDATA[")) && FALSE !== ($pos2 = strpos($buf,
+        elseif (strlen($bufdec) > 17 && FALSE !== ($pos1 = strpos($bufdec,
+                "<header><![CDATA[")) && FALSE !== ($pos2 = strpos($bufdec,
                 "]]></header>")) && $pos2 > $pos1 + 12) {
-            $header_data = substr($buf, 0, $pos2);
+            $header_data = substr($bufdec, 0, $pos2);
             $header_data = substr($header_data, $pos1 + 17);
             header($header_data);
         }
 
-        elseif (strlen($buf) > 17 && FALSE !== ($pos1 = strpos($buf,
-                "<cookie><![CDATA[")) && FALSE !== ($pos2 = strpos($buf,
+        elseif (strlen($bufdec) > 17 && FALSE !== ($pos1 = strpos($bufdec,
+                "<cookie><![CDATA[")) && FALSE !== ($pos2 = strpos($bufdec,
                 "]]></cookie>")) && $pos2 > $pos1 + 12) {
-            $cookie_data = substr($buf, 0, $pos2);
+            $cookie_data = substr($bufdec, 0, $pos2);
             $cookie_data = substr($cookie_data, $pos1 + 17);
             if ($cookie_data == 'removeguest') {
                 $remove_guest_cookie = TRUE;
@@ -138,23 +155,22 @@ function talk2server($socketPath)
                 $remove_registered_cookie = TRUE;
             }
             else {
-                setcookie(DPSERVER_COOKIE_NAME, $cookie_data, time() + 630720000);
+                setcookie(DPSERVER_COOKIE_NAME, $cookie_data, time() + 630720000, '/');
                 $cookie_set = TRUE;
             }
         }
 
-        elseif (strlen($buf) > 19 && FALSE !== ($pos1 = strpos($buf,
-                "<location><![CDATA[")) && FALSE !== ($pos2 = strpos($buf,
+        elseif (strlen($bufdec) > 19 && FALSE !== ($pos1 = strpos($bufdec,
+                "<location><![CDATA[")) && FALSE !== ($pos2 = strpos($bufdec,
                 "]]></location>")) && $pos2 > $pos1 + 14) {
-            $buf = substr($buf, 0, $pos2);
-            $buf = substr($buf, $pos1 + 19);
-            $newlocation = $buf;
-            $output = "<location><![CDATA[$buf]]></location>";
+            $bufdec = substr($bufdec, 0, $pos2);
+            $bufdec = substr($bufdec, $pos1 + 19);
+            $newlocation = $bufdec;
+            $output = "<location><![CDATA[$bufdec]]></location>";
             continue;
         }
-
         else {
-            $output .= $buf;
+            $output .= TRUE === DPSERVER_BASE64_SERVER2CLIENT ? base64_decode($buf) : $buf;
         }
     }
 
@@ -163,10 +179,10 @@ function talk2server($socketPath)
 
     if (FALSE === $cookie_set) {
         if (FALSE !== $remove_guest_cookie) {
-            setcookie(DPSERVER_COOKIE_NAME, FALSE);
+            setcookie(DPSERVER_COOKIE_NAME, FALSE, FALSE, '/');
         }
         if (FALSE !== $remove_registered_cookie) {
-            setcookie(DPSERVER_COOKIE_NAME, FALSE, time() - 3600);
+            setcookie(DPSERVER_COOKIE_NAME, FALSE, time() - 3600, '/');
         }
     }
 
@@ -184,6 +200,8 @@ function talk2server($socketPath)
 
 /**
  * Handles AJAX requests from dpclient-js.php
+ *
+ * @param   string  $output     The output from talk2server()
  */
 function handle_ajax_request($output)
 {
@@ -202,6 +220,8 @@ function handle_ajax_request($output)
 
 /**
  * Sets cookies transmitted with the xml we got from the server
+ *
+ * @param   string  &$xml       XML of the output from talk2server()
  */
 function handle_cookies(&$xml)
 {
@@ -237,10 +257,10 @@ function handle_cookies(&$xml)
             if (!isset($domain)) {
                 if (!isset($path)) {
                     if (!isset($expire)) {
-                        setcookie($name, $cookie);
+                        setcookie($name, $cookie, FALSE, '/');
                         $cookie_debug = "setcookie($name, $cookie)";
                     } else {
-                        setcookie($name, $cookie, $expire);
+                        setcookie($name, $cookie, $expire, '/');
                         $cookie_debug = "setcookie($name, $cookie, $expire)";
                     }
                 } else {
@@ -269,6 +289,8 @@ function handle_cookies(&$xml)
 
 /**
  * Handles a normal page request
+ *
+ * @param   string  $output     The output from talk2server()
  */
 function handle_normal_request($output)
 {
@@ -283,7 +305,7 @@ function handle_normal_request($output)
 
         /* Otherwise serve the page with the retrieved content in it */
         echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-        require_once(DPSERVER_DPUNIVERSE_TEMPLATE_PATH . 'dpdefault.tpl');
+        require_once(DPSERVER_TEMPLATE_PATH . DPSERVER_TEMPLATE_FILE);
         exit;
     }
     $xml = simplexml_load_string($str = '<?xml version="1.0" encoding="UTF-8" '
@@ -296,8 +318,7 @@ function handle_normal_request($output)
     handle_cookies($xml);
 
     $messages = $windows = array();
-    $body = '';
-    $dpelements = '';
+    $body = $dpelements = $html = '';
     $closetext = dptext('close');
 
     foreach ($xml->event as $e) {
@@ -320,6 +341,9 @@ function handle_normal_request($output)
                 break;
             case 'div':
                 $body .= $data;
+                break;
+            case 'xhtml':
+                $html .= $data;
                 break;
             case 'window':
                 $windows[] = '<div class="dpwindow_default" id="dpwindow">'
@@ -354,6 +378,10 @@ function handle_normal_request($output)
 
     /* Otherwise serve the page with the retrieved content in it */
     echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-    require_once(DPSERVER_DPUNIVERSE_TEMPLATE_PATH . 'dpdefault.tpl');
+    if (strlen($html)) {
+        echo $html;
+    } else {
+        require_once(DPSERVER_TEMPLATE_PATH . DPSERVER_TEMPLATE_FILE);
+    }
 }
 ?>

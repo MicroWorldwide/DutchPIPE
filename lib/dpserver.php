@@ -10,10 +10,11 @@
  * license@dutchpipe.org, in which case you will be mailed a copy immediately.
  *
  * @package    DutchPIPE
+ * @subpackage lib
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpserver.php 22 2006-05-30 20:40:55Z ls $
+ * @version    Subversion: $Id: dpserver.php 45 2006-06-20 12:38:26Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpclient.php, dpuniverse.php
  */
@@ -34,6 +35,7 @@ error_reporting(E_ALL | E_STRICT);
  * DbUniverse object, where the real processing takes place.
  *
  * @package    DutchPIPE
+ * @subpackage lib
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
@@ -44,25 +46,32 @@ error_reporting(E_ALL | E_STRICT);
 final class DpServer
 {
     /**
-     * The socket the server has opened to a client
+     * @var         resource  The socket the server has opened to a client
+     * @access      private
      */
-    private $mMsgsock;
+     private $mMsgsock;
 
     /**
-     * Used to show server status info on the command line, shows a header once
-     * in a while
+     * @var         resource  Used to show server status info on the command line
+     * @access      private
      */
     private $mShowedStatusHeader = 0;
 
     /**
-     * Used to show server status info based on getrusage, start 'user' time of
+     * Used to show server status info based on getrusage, start "user" time of
      * script
+     *
+     * @var         resource  Start 'user' time of script
+     * @access      private
      */
     private $mUtimeBefore;
 
     /**
-     * Used to show server status info based on getrusage, start 'system' time
+     * Used to show server status info based on getrusage, start "system" time
      * of script
+     *
+     * @var         resource  Start "system" time of script
+     * @access      private
      */
     private $mStimeBefore;
 
@@ -101,7 +110,7 @@ final class DpServer
      *
      * Also see: http://www.php.net/sockets
      *
-     * @param       object    $universe   An instance of DpUniverse
+     * @param       object    &$universe   An instance of DpUniverse
      */
     function runDpServer(&$universe)
     {
@@ -244,11 +253,16 @@ final class DpServer
                  */
                 $vars = substr($allbuf, 0, $pos2);
                 $vars = substr($vars, $pos1 + 6);
+                if (TRUE === DPSERVER_BASE64_CLIENT2SERVER) {
+                    $vars = base64_decode($vars);
+                }
                 $tmp = unserialize($vars);
                 if (FALSE === $tmp) {
                     //$handle = fopen('/tmp/dpserver.log', 'a');
-                    //fwrite($handle, "No unserialize: $vars\n");
+                    //fwrite($handle, sprintf(dptext("No unserialize: %s\n"),
+                    //$vars));
                     //fclose($handle);
+                    echo sprintf(dptext("No unserialize: %s\n"), $vars);
                     $__SERVER = $__SESSION = $__COOKIE = $__GET = $__POST =
                         $__FILES = array();
                 }
@@ -289,10 +303,17 @@ final class DpServer
      */
     function tellCurrentDpUserRequest($talkback)
     {
-        if (0 === ($len = strlen($talkback))) {
+        if (0 === strlen($talkback)) {
             return;
         }
-        if (FALSE === socket_write($this->mMsgsock, $talkback, $len)) {
+
+        if (TRUE === DPSERVER_BASE64_SERVER2CLIENT) {
+            $talkback = base64_encode($talkback);
+        }
+        $talkback .= chr(0);
+
+        if (FALSE === socket_write($this->mMsgsock, $talkback,
+                strlen($talkback))) {
             echo sprintf(dptext("socket_write(): failure [%u]: %s\n"),
                 socket_last_error(), socket_strerror(socket_last_error()));
         }
@@ -301,7 +322,7 @@ final class DpServer
     /**
      * Shows some server info on the command line
      *
-     * @param       object    $universe   An instance of DpUniverse
+     * @param       object    &$universe  An instance of DpUniverse
      */
     private function _showStatus(&$universe)
     {
@@ -314,6 +335,8 @@ final class DpServer
 
     /**
      * Shows a line with memory and universe info
+     *
+     * @param       object    &$universe  An instance of DpUniverse
      */
     private function _showStatusMemoryGetUsage(&$universe)
     {
@@ -332,6 +355,8 @@ final class DpServer
 
     /**
      * Shows a line with getrusage info, see man getrusage
+     *
+     * @param       object    &$universe  An instance of DpUniverse
      */
     private function _showStatusMemoryGetrusage(&$universe)
     {
