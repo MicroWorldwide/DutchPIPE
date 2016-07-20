@@ -1,0 +1,144 @@
+BUILDING A PAGE
+    You can build a page in two ways:
+    1) Make a new instance of DpPage and call methods in it to set it
+    up. This is especially useful for automated page generation, such
+    as pages generated from a CMS. For example:
+
+    > inherit(DPUNIVERSE_STD_PATH . 'DpPage.php');
+    >
+    > $mypage = get_current_dpuniverse()->newDpObject(DPUNIVERSE_STD_PATH
+    >     . 'DpPage.php');
+    > $mypage->setTitle('Test page');
+    > $mypage->setBody('Hello world');
+    > $mypage->addProperty('location', '/page/test');
+
+    2) My making a custom class that extends on DpPage. This is
+    currently the default method of building pages.
+
+    File: dpuniverse/page/testpage.php
+    > inherit(DPUNIVERSE_STD_PATH . 'DpPage.php');
+    >
+    > final class Testpage extends DpPage
+    > {
+    >     public function createDpPage()
+    >     {
+    >        $this->setTitle('Test page');
+    >        $this->setBody('Hello world');
+    >    }
+    >}
+
+    The class name should be the same as the filename, with the first
+    letter capitalized.
+
+    Note that because of PHP namespace limitations, currently the
+    classname must be unique in your universe. We plan on supporting
+    auto-class names.
+
+    There are various methods you can call (like setTitle) or define
+    (like createDpPage) which will be discussed next.
+
+DPOBJECT
+    First of all, DpPage.php inherits DpObject.php which implements
+    common object functionality, so all definable methods and callable
+    methods made available by DpObject are also available when
+    creating a page.
+
+    If you haven't done so, you should first read the DpObject
+    documentation.
+
+DEFINABLE METHODS
+    When you create a page with the second option, the following
+    methods are called by the system when you have implemented them:
+
+    - public function createDpPage()
+
+    Called when the page is created. You should use this to call the
+    setup methods instead of __construct or createDpObject
+
+CALLABLE METHODS
+    /**
+     * Adds an "exit" out of this page
+     *
+     * Exits are links that can be typed on the command line or used by computer
+     * controlled character to wander around the site.
+     *
+     * @param       string    $direction    Command to use link, "home", "bar"
+     * @param       string    $destination  URL
+     */
+    final function addExit($direction, $destination)
+
+    /**
+     * Sets all "exits" out of this page at once
+     *
+     * Exits are links that can be typed on the command line or used by computer
+     * controlled character to wander around the site.
+     *
+     * @param       array     $exits      Direction/destination pairs
+     */
+    final function setExits(array $exits)
+
+    /**
+     * Gets URL of "exit" out of this page
+     *
+     * Exits are links that can be typed on the command line or used by computer
+     * controlled character to wander around the site.
+     *
+     * @param      string    $direction   Command to use link, "home", "bar"
+     *
+     * @return     string                 URL
+     */
+    final function getExit($direction)
+
+    /**
+     * Gets all "exits" out of this page
+     *
+     * Exits are links that can be typed on the command line or used by computer
+     * controlled character to wander around the site.
+     *
+     * @return     array                 Direction/destination pairs
+     */
+    final function getExits()
+
+    /**
+     * Sends a message to all objects in this page, "makes sound or movement"
+     *
+     * Calls the tell method in all objects in this page with the message.
+     * One or more extra arguments can be given to specify objects which should
+     * be skipped. For example:
+     *
+     *     $user->tell('You smile happily.<br />';
+     *     $user->getEnvironment()->tell(ucfirst(
+     *         $user->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))
+     *         . ' smiles happily.<br />', $user);
+     *
+     * @param      string    $data      message string
+     * @param      object    &$from     First object to skip
+     * @param      object    &$from2    Second object to skip, etc.
+     */
+    function tell($str, &$from = NULL)
+
+    /**
+     * Sets data to later generate a HTML navigation trail for this page
+     *
+     * Each item is either a string with the element's title for the last
+     * tiem in the navigation trail, or an array with each key such a title,
+     * and each value the destination path within dpuniverse.
+     *
+     * @param      mixed     $navitem   string or string/destination pairs
+     */
+    function setNavigationTrail()
+
+    /**
+     * Gets data for the navigation trail for this page, if any
+     *
+     * @return  array           navigation trail elements
+     */
+    function getNavigationTrail()
+
+    /**
+     * Gets HTML with a navigation trail for this page
+     *
+     * @return  string          HTML for navigation trail
+     */
+    function getNavigationTrailHtml()
+

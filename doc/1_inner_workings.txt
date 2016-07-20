@@ -1,0 +1,44 @@
+How does DutchPIPE work?
+------------------------
+
+When a browser makes a connection to the DutchPIPE site, for example:
+http://dutchpipe.org/dpclient.php
+then lib/dpclient.php on its turn makes a socket connection to
+lib/dpserver.php to retreive the page and return it to the browser.
+
+dpserver.php is a PHP script that runs all the time, waiting for
+connections from dpclient.php. It hardly uses resources when no one
+is around. By running all the time, objects such as users and pages
+are stored in memory, even after the http request of our example
+user has long finished, allowing for a "universe" to be constructed.
+
+When dpserver and dpclient connect, dpclient first passes PHP variables
+such as $_GET, $_PUT and $_SERVER to dpserver, then dpserver passes the
+request on to dpuniverse, where all objects reside. dpuniverse returns
+the HTML to dpserver, representing the page the user is requesting, the
+home page in the example. dpserver passes it to dpclient which returns it
+to the browser.
+
+In the meantime, dpuniverse created a user object and a page object, and
+because the script keeps running, they remain in memory. If another user
+enters that page, dpuniverse notices the previous user object and page,
+and returns HTML which also contains the avatar of the other user.
+
+The two users we now have, both have public/dpclient.js running in their
+browsers. This script makes a connection every 2 seconds (depending on your
+settings) to dpclient.php, to ask if anything happened. If nothing happened,
+'1' is returned.
+
+But in the example another user entered the page, so dpclient.php passes
+some XML over to dpclient.js/the browser, and the original user gets the
+message the other user enters the page, and sees his avatar.
+
+dpclient.js does a couple of things:
+It passes actions from the user to dpclient.php
+It asks dpclient.php for updates
+It parses the response from actions and updates, and inserts, updates or
+deletes elements in the page.
+
+It will retreive responses in (pseudo) XML format to show messages, pop up
+those yellow windows, add or delete avatars and objects, and so on.
+

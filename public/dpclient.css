@@ -1,0 +1,178 @@
+body { background-color: #cecede; margin: 10px; margin-left: 6px; margin-right: 8px; text-align: center }
+td { text-align: left }
+body, td, input { font-family: arial,helvetica; font-size: 12px; color: #000066 }
+.bodycol { background-color: #ffffff }
+#dppage { background-color: #ffffff; width: 100%; text-align: left; padding: 0px; border-right: solid 1px #bebec8; border-left: solid 1px #bebec8 }
+#dppage_inner1 { width: 100%; float: left }
+.dppage_inner2 { position: relative; margin: 15px; margin-top: 12px; margin-bottom: 0px }
+#dpobinv { width: 100%; text-align: left; padding: 0px }
+#dpobinv_inner1 { width: 100%; float: left }
+.dpobinv_inner2 { position: relative }
+#titlebar { height: 15px; background-color: #555585; color: white; font-weight: bold; padding: 2px; padding-left: 10px; padding-right: 9px }
+#titlebarleft { position: relative; float: left }
+#titlebarright { position: relative; float: right }
+#titlebarright a:link { color: #fff; font-weight: normal }
+#titlebarright a:hover { color: #fff; font-weight: normal }
+#titlebarright a:visited { color: #fff; font-weight: normal }
+#titlebarright a:active { color: #fff; font-weight: normal }
+.dpobject { background-color: #ffe0e0; width: 190px; padding: 10px; margin-top: 10px; margin-right: 10px; margin-bottom: 0px; float: left }
+.title_img, .title_img_me { text-align: center; width: 100px; height: 126px; font-size: 10px; font-family: verdana,arial,helvetica; margin-top: 1px; margin-right: 10px; margin-bottom: 0px; float: left }
+.title_img_me { font-weight: bold }
+.imgtxt { font-size: 10px; font-family: verdana,arial,helvetica }
+.dpobject2 { background-color: #e0ffe0; width: 72px; padding: 5px; margin-top: 10px; margin-right: 10px; float: left }
+#navigation { }
+#messages { float: left; margin-top: 0px; margin-bottom: 0px }
+#dpmessagearea { width: 100%; text-align: center; background-color: #ffffff; padding: 0px; border-bottom: solid 1px #8080b0; border-right: solid 1px #bebec8; border-left: solid 1px #bebec8 }
+#dpmessagearea_inner { margin-left: 15px; margin-right: 11px; margin-top: 0px; margin-bottom: 0px; text-align: left; }
+#box, #helpbox { border: solid 1px #000066; padding: 10px }
+#helpbox { float: left; margin-bottom: 5px }
+#helpbox tt { color: #0000CC }
+#lh { line-height: 16px; font-size: 16px; clear: both }
+#actionform, ul { margin-bottom: 0px }
+#actionform { margin: 0px; float: left; width: 99%; display: block }
+#action { width: 100%; background-color: #f7f7fc; border: solid 1px #c9c9f0 ; padding-left: 2px; padding-right: 2px }
+form { display: inline; margin-top: 0px }
+h1, h2, h3 { margin: 0px }
+h1 { font-size: 18px }
+h2 { font-size: 16px }
+h3 { font-size: 14px }
+a:link { color: #000066 }
+a:visited { color: #000066 }
+a.menu { font-weight: bold }
+a.navtrail:link { color: #ffffff }
+a.navtrail:visited { color: #ffffff }
+.boxh { color: #c0c0c0; font-size: 22px; font-weight: normal; margin-bottom: 4px }
+.arr { display: block; float: left; margin-right: 4px; margin-top: 2px }
+.arr2 { margin-right: 4px; margin-top: 2px }
+.block { display: block; float: left; margin-right: 5px; margin-top: 2px }
+.block2 { display: block; float: left; margin-right: 5px; margin-top: 5px }
+#navlink {position: relative; float: left }
+.arrnav { display: block; float: left; margin-left: 6px; margin-right: 6px; margin-top: 2px }
+.notop { margin-top: 0px }
+.newsh { font-weight: bold }
+.newsd { font-size: 11px }
+#helptext tt { color: #0000CC }
+.me { font-weight: bold; }
+#footer { float: left; font-size: 10px; font-family: verdana; margin-left: 5px; margin-top: 4px; color: #8e8e9f }
+#footer a { color: #8e8e9f }
+.smalltext1 { font-size: 10px; font-family: verdana }
+#butbottom, #buttop { cursor: pointer }
+#butbottom { margin-bottom: 2px }
+#buttop { margin-top: 3px }
+#dltable td { background-color: #e0e0e0 }
+#dlreq { margin-top: 0px; margin-bottom: 0px }
+#dlreq li { margin-top: 5px }
+.actionwindow
+{
+    display: none;
+    cursor: pointer;
+    position: absolute;
+    font-weight: normal;
+    text-align: left;
+    width: 90px;
+    background-color: #eeeeee;
+    border: solid 1px black;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    display: block;
+/*@cc_on @*/
+/*@if (@_win32)
+    filter: alpha(opacity=95);
+/*@end @*/
+    opacity: 0.95;
+    -moz-opacity: 0.95;
+    z-index: 5;
+}
+.action_menu_selected, .action_menu { padding-left: 4px; padding-right: 4px; font-size: 11px; font-family: arial,helvetica }
+.action_menu_selected { background-color: #000066; color: #fff }
+.action_menu { background-color: transparent; color: #000066 }
+.dpwindow_default, .dpwindow_drink, .dpwindow_error, .dpwindow_todo, .dpwindow_src
+{
+    display: none;
+    position: absolute;
+    cursor: move;
+    text-align: left;
+}
+.dpwindow_default {
+    left: 75px;
+    top: 50px;
+    width: 382px;
+    background-color: #ffcc00;
+    border: solid 1px black;
+    padding: 15px;
+    display: block;
+/*@cc_on @*/
+/*@if (@_win32)
+    filter: alpha(opacity=95);
+/*@end @*/
+    opacity: 0.95;
+    -moz-opacity: 0.95;
+    z-index: 5;
+}
+.dpwindow_drink {
+    left: 75px;
+    top: 50px;
+    width: 300px;
+    background-color: #ff9999;
+    border: solid 1px black;
+    padding: 15px;
+    display: block;
+/*@cc_on @*/
+/*@if (@_win32)
+    filter: alpha(opacity=90);
+/*@end @*/
+    opacity: 0.90;
+    -moz-opacity: 0.90;
+    z-index: 5;
+}
+.dpwindow_error {
+    left: 75px;
+    top: 50px;
+    width: 300px;
+    background-color: #ff6666;
+    border: solid 1px black;
+    padding: 15px;
+    display: block;
+/*@cc_on @*/
+/*@if (@_win32)
+    filter: alpha(opacity=97);
+/*@end @*/
+    opacity: 0.97;
+    -moz-opacity: 0.97;
+    z-index: 5;
+}
+.dpwindow_todo {
+    left: 40px;
+    top: 35px;
+    width: 560px;
+    background-color: #00ccff;
+    border: solid 1px black;
+    padding: 15px;
+    display: block;
+/*@cc_on @*/
+/*@if (@_win32)
+    filter: alpha(opacity=94);
+/*@end @*/
+    opacity: 0.94;
+    -moz-opacity: 0.94;
+    z-index: 5;
+}
+.dpwindow_src {
+    left: 20px;
+    top: 10px;
+    width: 650px;
+    background-color: #CFD5E0;
+    border: solid 1px black;
+    padding: 15px;
+    display: block;
+/*@cc_on @*/
+/*@if (@_win32)
+    filter: alpha(opacity=97);
+/*@end @*/
+    opacity: 0.97;
+    -moz-opacity: 0.97;
+    z-index: 5;
+}
+

@@ -1,0 +1,6 @@
+It is currently not possible to have multiple windows opened at DutchPIPE.org.
+DutchPIPE will support this as an option in the near future in the form of a
+"Clone of <your name>" avatar or something similar.
+
+If you get this message BUT YOU HAVEN'T GOT MULTIPLE WINDOWS OPENED, please
+let us know at bugs@dutchpipe.org. Thanks!

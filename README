@@ -1,0 +1,265 @@
+WELCOME TO DUTCHPIPE
+
+    With open source DutchPIPE software, web developers can make
+    virtual multi-user environments. Each web page becomes an
+    abstracted environment or location where visitors and other items
+    on the page are visualized. This status is retained as visitors
+    move around. A lot of real-time interaction is possible. The
+    result: Persistent Interactive Page Environments. DutchPIPE uses
+    AJAX and the DOM for the browser - it works without Java, Flash,
+    plugin or firewall adjustments. On the server, PHP 5 is used.
+
+WARNING
+
+    This is unfinished software in alpha status. It is not for the
+    faint of heart. Both code and documentation are in alpha status.
+    This is the work of one man, in three months, after work. There
+    will be bugs, issues, and even plain unfinished parts. Some parts
+    are quite clean, others still the result of organic growth. This
+    release is ment for those interested to play around with, to
+    increase interest, get bug reports, attract contributors, and all
+    that.
+
+    You should be aware that DutchPIPE is not secure yet, if there is
+    such a thing. For example, the AJAX engine uses lazy GETs all over
+    the place, even when POSTs should be used, and the consequences of
+    tinkering these requests have not been fully explored or closed
+    yet. In other words: Only use this alpha software if you know what
+    you are doing. Try this on a test machine, not your public company
+    server with other sites or anything like that.
+
+REQUIREMENTS
+
+    Skills:
+
+    1. Knowledge of PHP 5 and in particular PHP 5 objects.
+
+    2. If you like more magic to happen than the current library
+    provides, Javascript/AJAX knowledge is required.
+
+    Hardware and software requirements:
+
+    1. A *NIX or Windows platform
+    DutchPIPE was developed and tested on FreeBSD 6. You must have
+    full access to a computer or server to run DutchPIPE. I also
+    installed it successfully on a Windows XP box, using
+    http://www.wampserver.com/en/ to install Apache, PHP and MySQL.
+
+    2. A webserver
+    DutchPIPE.org runs on Apache 2.2, I haven't been able to test on
+    other servers yet.
+
+    3. PHP 5 with the extensions: simple_xml and sockets (both for the
+    web server and "on the command line")
+    DutchPIPE.org has been using PHP 5.1+. The simple_xml extension is
+    supported by default on PHP 5.
+
+    4. MySQL
+    Used to store registered users. There are just a few queries, more
+    databases will be supported later. If you don't have MySQL you can
+    still test DutchPIPE if you rip some queries out, you just can't
+    register.
+
+    5. An AJAX capable web browser
+    Currently Firefox, IE6 and IE7 beta 2 are supported 100%. Opera and
+    Safari will be supported as soon as possible. If you can help test
+    on Safari, please contact me.
+
+GETTING STARTED/INSTALLATION
+
+    1. Obtain the software from http://dutchpipe.org/
+
+    2. Unpack the software in the directory of your choice
+
+    3. Configure your installation by patching:
+    config/dpserver-ini.php
+    config/dpuniverse-ini.php
+    public/dpclient.js (the dphost_url variable)
+    Follow the instructions in these files.
+
+    Make sure the first line of:
+    script/start_dpserver.php
+    refers to the php command line installation. Make sure this file
+    is executable (see man chmod under *NIX).
+
+    4. Create a database 'dutchpipe' and import the following SQL:
+    config/setupmysql.sql
+
+    5. Configure your web server
+    If you already have a location to test DutchPIPE, you can skip
+    step 5 and 6.
+
+    Decide on what URL you want to host your DutchPIPE installation.
+    You need to let your web server know where to find the directory
+    with the DutchPIPE public files.
+
+    There are many ways to add DutchPIPE, this is just one of them.
+    For Apache 2.2, I added the following to the vhosts configuration
+    file, located at /usr/local/etc/apache22/extra/httpd-vhosts.conf
+    in my FreeBSD 6 installation:
+
+    <VirtualHost *:80>
+        ServerAdmin webmaster@yourdomain.com
+        DocumentRoot /path/to/dutchpipe/public
+        ServerName www.yourdomain.com
+        <Directory "/path/to/dutchpipe/public">
+            DirectoryIndex dpclient.php
+            Options All
+            AllowOverride All
+            AddType application/x-httpd-php .php
+            Order allow,deny
+            Allow from all
+        </Directory>
+    </VirtualHost>
+
+    6. Restart your web server
+    In my case: /usr/local/etc/rc.d/apache22.sh restart
+    Or on Windows I simply restart Apache from the tray bar.
+
+    7. Run the DutchPIPE server
+    In my case:
+    cd scripts
+    ./start_dpserver.php
+    On Windows I used: c:\wamp\php\php.exe start_dpserver.php
+
+    It will output some memory and debug information, so you might
+    want to try:
+    ./start_dpserver.php > mylog
+    to throw everything in a log file.
+
+    There is no proper restart script yet. I simply kill the process
+    and start the script again to restart the server.
+
+    8. Browse to your DutchPIPE public installation
+    In my case: http://dutchpipe.org/
+    On Windows I tested locally and I went to: http://localhost
+
+    You should now see an example DutchPIPE installation in your
+    browser.
+
+    See the doc/ directory and the DutchPIPE site for further
+    information how to go on from here and how to start building
+    your own pages and objects. There isn't much yet, so don't worry
+    if you find yourself scratching your head, it isn't your fault.
+    The examples are the best way to start, and I promise (really) if
+    you come back later you'll find more documentation and more to
+    work with.
+
+DIRECTORY LAYOUT
+
+    Although this will most likely change in the near future,
+    currently DutchPIPE has the following directory structure:
+
+    config/ - Configuration files
+    doc/ - Documentation files
+    dpuniverse/ - Your "universe", you can build a site inside this
+    directory without worrying much of what goes on beyond it
+    lib/ - The DutchPIPE server/engine and other DutchPIPE components
+    public/ - Web enabled and publicly reachable directory
+    script/ - DutchPIPE server startup script
+    template/ - Templates for building XHTML pages
+
+TROUBLESHOOTING/GETTING HELP/GIVING FEEDBACK
+
+    I'll try to test usage on as many platforms as possible to allow
+    for painless installation, but obviously I didn't have much time
+    for that yet. Since this is all new and tested on a limited number
+    of platforms, with lack of documentation, feel welcome to share
+    your experiences or particular pains and problems with the
+    DutchPIPE installation.
+
+    See the DEVELOPERS LOUNGE, MAILING LISTS and THE AUTHOR sections
+    below for contact details. If you solved a particular installation
+    problem, or installed it succesfully in a previously untested
+    platform, please also let me know, so I can update the
+    documentation.
+
+HOMEPAGE
+
+    For the latest releases, news, et cetera, see the DutchPIPE
+    website at:
+    http://dutchpipe.org/
+
+DEVELOPERS LOUNGE
+
+    If you're experiencing problems, want to share ideas or just want
+    to lay back and sip on hot coffee, visit the developers lounge at:
+    http://dutchpipe.org/dpclient.php?location=/page/lounge.php
+
+MAILING LISTS
+
+    There are a number of DutchPIPE mailing lists, for instance to
+    talk about DutchPIPE or to discuss installation problems. For an
+    overview and to (un)subscribe, browse to:
+    http://dutchpipe.org/mailman/
+
+    If you're a serious developer, dutchpipe-talk is the best way to
+    discuss issues.
+
+THE AUTHOR
+
+    DutchPIPE was made by Lennert Stock. Feel free to send comments
+    and bug reports to the author at:
+    ls@dutchpipe.org
+
+ROADMAP
+
+    Well there isn't exactly a roadmap yet, but here are just -a few-
+    of the things on the wishlist.
+
+    First of all I must spend some time on non-coding issues so I can
+    properly start this project up. Provide proper documentation so
+    people can, ehm, actually use it, provide the usual tools such as
+    bug trackers and subversion access, and market the thing if
+    necessary, although I'm hoping you pass the word though.
+
+    The interface is still crude and must be made more user friendly.
+    The verb noun commands should only remain for power users and
+    under the hood, input fields for communications should pop up or
+    whatever.
+
+    Debugging and making DutchPIPE more secure.
+
+    Moveable or even animated objects.
+
+    Debugging and adhancements on running DutchPIPE on .html pages.
+    Making it possible to run DutchPIPE on pages on another server.
+    For this we need a proxy script to forward AJAX requests as AJAX
+    cannot be used across domains for security reasons.
+
+    Make options to let visitors make their own objects and "area".
+
+    Distributed DutchPIPE: Make it possible for DutchPIPE sites to
+    see, communicate and switch to other DutchPIPE sites, making it
+    one big, sprawling universe.
+
+    Better dpuniverse/std library. The library provided for the
+    universe is very basic now, and lots of functionality will be
+    added
+
+    More showcases.
+
+    Learn English/learn how to spell.
+
+    Et cetera, et cetera. Of course this can't be done by one man, so
+    if you'd like any of the above or any other ideas implemented,
+    please read on...
+
+CONTRIBUTING
+
+    DutchPIPE is a brand new, fresh open source project. If you'd like
+    to contribute in any way, be it code, bugs, documentation, or open
+    source experience such as project setup and management, please
+    mail ls@dutchpipe.org. The DutchPIPE "noosphere" is huge and for the
+    taking. This will be a free project in any sense, if you shine at
+    some particular skill or knowledge, you'll be able to pretty much
+    give it shape any way you please. Again, this project is fresh.
+    If you like established projects with all the tools firmly in
+    place, DutchPIPE is not for you. However, if you're full of
+    inspiration and just like to code, no one is in your way, no one
+    has done it yet and probably no one is even planning it. You keep
+    the copyright of your OS licensed contributions and are fully
+    credited for your efforts. Also, if you disliked certain things or
+    setups in other projects which appear to be written in stone, this
+    is your change to make your mark and make your experience count.
+

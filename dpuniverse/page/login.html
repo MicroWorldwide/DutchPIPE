@@ -1,0 +1,102 @@
+<script>
+var validate_obj = null;
+
+function send_existing()
+{
+    validate_obj = get_http_obj();
+    if (validate_obj) {
+        validate_obj.onreadystatechange = rcv_validate;
+        validate_obj.open("GET", (str = "/dpclient.php?location=/page/login.php?loginrand="+Math.round(Math.random()*9999)
+            + "&method=validateExisting"
+            + "&username="+_gel('eusername').value
+            + "&password="+_gel('epassword').value), true);
+        validate_obj.send(null);
+    } else {
+        alert("Could not establish connection with server.");
+    }
+    return false;
+}
+
+function send_validate()
+{
+    validate_obj = get_http_obj();
+    if (validate_obj) {
+        validate_obj.onreadystatechange = rcv_validate;
+        validate_obj.open("GET", (str = "/dpclient.php?location=/page/login.php?loginrand="+Math.round(Math.random()*9999)
+            + "&method=validateNewUser"
+            + "&username="+_gel('nusername').value
+            + "&password="+_gel('npassword').value
+            + "&password2="+_gel('npassword2').value), true);
+        validate_obj.send(null);
+    } else {
+        alert("Could not establish connection with server.");
+    }
+    return false;
+}
+
+function send_captcha(captcha_id)
+{
+    validate_obj = get_http_obj();
+    if (validate_obj) {
+        validate_obj.onreadystatechange = rcv_validate;
+        validate_obj.open("GET", (str = "/dpclient.php?location=/page/login.php?loginrand="+Math.round(Math.random()*9999)
+            + "&method=validateCaptcha"
+            + "&username="+_gel('nusername').value
+            + "&password="+_gel('npassword').value
+            + "&password2="+_gel('npassword2').value
+            + "&givencode="+_gel('givencode').value
+            + "&captcha_id="+captcha_id), true);
+        validate_obj.send(null);
+    } else {
+        alert("Could not establish connection with server.");
+    }
+    return false;
+}
+
+function rcv_validate()
+{
+    if (validate_obj.readyState != 4) {
+        return;
+    }
+    if (validate_obj.status == 200) {
+        handle_response(validate_obj);
+    }
+    validate_obj = null;
+}
+</script>
+<h1>Login/register</h1><br />
+Here you can register a username or login if you are a returning user.<br /><br />
+<table width="580" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td width="48%" valign="top">
+    <div id="box">
+    <div class="boxh">existing users</div>
+    <div style="white-space: nowrap; margin-bottom: 3px"><b>Enter your username and password</b></div>
+    <form id="formexisting" method="post" onsubmit="return send_existing()">
+        <table cellpadding="0" cellspacing="0" border="0" style="height: 100px">
+            <tr><td style="padding-right: 10px" nowrap="nowrap">Username:</td><td><input id="eusername" name="eusername" type="text" size="15" maxlength="30" value="" /></td></tr>
+            <tr><td style="padding-right: 10px">Password:</td><td><input id="epassword" name="epassword" type="password" size="15" maxlength="30" value="" /></td></tr>
+            <tr><td>&#160;</td><td><input type="submit" name="submitexisting" value="Login" style="margin-top: 5px; margin-bottom: 5px" /></td></tr>
+            <tr><td colspan="2"><a href="mailto:ls@gate99.nl">I forgot my username and/or password</a></td></tr>
+        </table>
+    </form>
+    </div>
+</td>
+<td width="2%">&#160;&#160;&#160;&#160;&#160;</td>
+<td width="54%" valign="top">
+    <div id="box">
+    <div class="boxh">new users</div>
+    <div style="white-space: nowrap; margin-bottom: 3px"><b>Choose your username and password</b></div>
+    <form id="formnew" method="post" onsubmit="return send_validate()">
+        <input type="hidden" name="captcha" id="captcha" value="" />
+        <table cellpadding="0" cellspacing="0" border="0" style="height: 100px">
+            <tr><td style="padding-right: 10px">Username:</td><td><input id="nusername" name="nusername" type="text" size="15" maxlength="30" value="" /></td></tr>
+            <tr><td style="padding-right: 10px">Password:</td><td><input id="npassword" name="npassword" type="password" size="15" maxlength="30" value="" /></td></tr>
+            <tr><td style="padding-right: 10px" nowrap="nowrap">Repeat password:</td><td><input id="npassword2" name="npassword2" type="password" size="15" maxlength="30" value="" /></td></tr>
+            <tr><td>&#160;</td><td><input type="submit" name="submitnew" value="Register &amp; login" style="margin-top: 5px" /></td></tr>
+        </table>
+    </form>
+    </div>
+</td>
+</tr>
+</table>
