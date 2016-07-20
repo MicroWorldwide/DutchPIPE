@@ -1,0 +1,98 @@
+<table border="0" cellpadding="0" cellspacing="0" style="width: 98%">
+  <tr valign="top">
+    <td class="menu">
+                        <br />
+            <br />
+              <div class="package">
+                    <a href="../ric_INSTALL.html">INSTALL</a>&nbsp;|
+                    <a href="../ric_LICENSE.html">LICENSE</a>&nbsp;|
+                    <a href="../ric_README.html">README</a>&nbsp;|
+                    <a href="../todolist.html">Todo List</a>&nbsp;|
+        <a href="../classtrees_DutchPIPE.html">Class Tree</a>&nbsp;|
+        <a href="../elementindex_DutchPIPE.html">Index</a>
+        </div>
+    </td>
+    <td>
+      <table cellpadding="10" cellspacing="0" width="100%" border="0"><tr><td valign="top">
+<span id="gototop" style="position:absolute;z-index:100"><a href="javascript:window.scrollTo(0,0)"><img id="buttop" src="/images/top.gif" width="11" height="11" border="0" alt="Go to Top" title="Go to Top" /></a></span>
+<script src="/jumptop.js"></script>
+<h1>Source for file dpcaptcha.php</h1>
+<p>Documentation is available at <a href="../DutchPIPE/public/_public---dpcaptcha.php.html">dpcaptcha.php</a></p>
+<div class="src-code"><span class="php">
+<ol class="src-bg"><li class="src-li"><div class="src-line"><a name="a1"></a><span class="src-php">&lt;?php</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a2"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a3"></a><span class="src-doc">&nbsp;*&nbsp;Shows&nbsp;a&nbsp;CAPTCHA&nbsp;code&nbsp;image&nbsp;for&nbsp;a&nbsp;given&nbsp;database&nbsp;Id.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a4"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a5"></a><span class="src-doc">&nbsp;*&nbsp;DutchPIPE&nbsp;version&nbsp;0.1;&nbsp;PHP&nbsp;version&nbsp;5</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a6"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a7"></a><span class="src-doc">&nbsp;*&nbsp;LICENSE:&nbsp;This&nbsp;source&nbsp;file&nbsp;is&nbsp;subject&nbsp;to&nbsp;version&nbsp;1.0&nbsp;of&nbsp;the&nbsp;DutchPIPE&nbsp;license.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a8"></a><span class="src-doc">&nbsp;*&nbsp;If&nbsp;you&nbsp;did&nbsp;not&nbsp;receive&nbsp;a&nbsp;copy&nbsp;of&nbsp;the&nbsp;DutchPIPE&nbsp;license,&nbsp;you&nbsp;can&nbsp;obtain&nbsp;one&nbsp;at</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a9"></a><span class="src-doc">&nbsp;*&nbsp;http://dutchpipe.org/license/1_0.txt&nbsp;or&nbsp;by&nbsp;sending&nbsp;a&nbsp;note&nbsp;to</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a10"></a><span class="src-doc">&nbsp;*&nbsp;license@dutchpipe.org,&nbsp;in&nbsp;which&nbsp;case&nbsp;you&nbsp;will&nbsp;be&nbsp;mailed&nbsp;a&nbsp;copy&nbsp;immediately.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a11"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a12"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@package</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;DutchPIPE</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a13"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@subpackage</span><span class="src-doc">&nbsp;public</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a14"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@author</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lennert&nbsp;Stock&nbsp;&lt;ls@dutchpipe.org&gt;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a15"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@copyright</span><span class="src-doc">&nbsp;&nbsp;2006&nbsp;Lennert&nbsp;Stock</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a16"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@license</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;http://dutchpipe.org/license/1_0.txt&nbsp;&nbsp;DutchPIPE&nbsp;License</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a17"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@version</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;Subversion:&nbsp;$Id:&nbsp;dpcaptcha.php&nbsp;67&nbsp;2006-06-30&nbsp;22:43:03Z&nbsp;ls&nbsp;$</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a18"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@link</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://dutchpipe.org/manual/package/DutchPIPE</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a19"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dpclient.php</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a20"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a21"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a22"></a><span class="src-var">$config_dir&nbsp;</span>=&nbsp;<a href="http://www.php.net/realpath">realpath</a><span class="src-sym">(</span><a href="http://www.php.net/dirname">dirname</a><span class="src-sym">(</span>isset<span class="src-sym">(</span><span class="src-var">$_SERVER</span><span class="src-sym">[</span><span class="src-str">'SCRIPT_FILENAME'</span><span class="src-sym">]</span><span class="src-sym">)</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a23"></a>&nbsp;&nbsp;&nbsp;&nbsp;?&nbsp;<span class="src-var">$_SERVER</span><span class="src-sym">[</span><span class="src-str">'SCRIPT_FILENAME'</span><span class="src-sym">]&nbsp;</span>:&nbsp;__FILE__<span class="src-sym">)&nbsp;</span>.&nbsp;<span class="src-str">'/../config'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a24"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a25"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a26"></a><span class="src-doc">&nbsp;*&nbsp;Gets&nbsp;server&nbsp;settings</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a27"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a28"></a><span class="src-inc">require_once</span><span class="src-sym">(</span><span class="src-var">$config_dir&nbsp;</span>.&nbsp;<span class="src-str">'/dpserver-ini.php'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a29"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a30"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a31"></a><span class="src-doc">&nbsp;*&nbsp;Gets&nbsp;universe&nbsp;settings</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a32"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a33"></a><span class="src-inc">require_once</span><span class="src-sym">(</span><span class="src-var">$config_dir&nbsp;</span>.&nbsp;<span class="src-str">'/dpuniverse-ini.php'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a34"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a35"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a36"></a><span class="src-doc">&nbsp;*&nbsp;Gets&nbsp;I18N/L10&nbsp;dptext&nbsp;functionality&nbsp;(if&nbsp;enabled)</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a37"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a38"></a><span class="src-inc">require_once</span><span class="src-sym">(</span><span class="src-id">DPSERVER_LIB_PATH&nbsp;</span>.&nbsp;<span class="src-str">'dptext.php'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a39"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a40"></a><a href="http://www.php.net/error_reporting">error_reporting</a><span class="src-sym">(</span><span class="src-id"><a href="../DutchPIPE/config/_config---dpuniverse-ini.php.html#defineDPUNIVERSE_ERROR_REPORTING">DPUNIVERSE_ERROR_REPORTING</a></span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a41"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a42"></a><a href="http://www.php.net/mysql_pconnect">mysql_pconnect</a><span class="src-sym">(</span><span class="src-id"><a href="../DutchPIPE/config/_config---dpuniverse-ini.php.html#defineDPUNIVERSE_MYSQL_HOST">DPUNIVERSE_MYSQL_HOST</a></span><span class="src-sym">,&nbsp;</span><span class="src-id"><a href="../DutchPIPE/config/_config---dpuniverse-ini.php.html#defineDPUNIVERSE_MYSQL_USER">DPUNIVERSE_MYSQL_USER</a></span><span class="src-sym">,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a43"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-id"><a href="../DutchPIPE/config/_config---dpuniverse-ini.php.html#defineDPUNIVERSE_MYSQL_PASSWORD">DPUNIVERSE_MYSQL_PASSWORD</a></span><span class="src-sym">)</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a44"></a>&nbsp;&nbsp;&nbsp;&nbsp;||&nbsp;<span class="src-key">die</span><span class="src-sym">(</span><a href="http://www.php.net/sprintf">sprintf</a><span class="src-sym">(</span><a href="../DutchPIPE/lib/_lib---dptext.php.html#functiondptext">dptext</a><span class="src-sym">(</span><span class="src-str">'Could&nbsp;not&nbsp;connect:&nbsp;%s&lt;br&nbsp;/&gt;'</span><span class="src-sym">)</span><span class="src-sym">,&nbsp;</span><a href="http://www.php.net/mysql_error">mysql_error</a><span class="src-sym">(</span><span class="src-sym">)))</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a45"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a46"></a><a href="http://www.php.net/mysql_select_db">mysql_select_db</a><span class="src-sym">(</span><span class="src-id"><a href="../DutchPIPE/config/_config---dpuniverse-ini.php.html#defineDPUNIVERSE_MYSQL_DB">DPUNIVERSE_MYSQL_DB</a></span><span class="src-sym">)</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a47"></a>&nbsp;&nbsp;&nbsp;&nbsp;||&nbsp;<span class="src-key">die</span><span class="src-sym">(</span><a href="http://www.php.net/sprintf">sprintf</a><span class="src-sym">(</span><a href="../DutchPIPE/lib/_lib---dptext.php.html#functiondptext">dptext</a><span class="src-sym">(</span><span class="src-str">'Failed&nbsp;to&nbsp;select&nbsp;database:&nbsp;%s&lt;br&nbsp;/&gt;'</span><span class="src-sym">,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a48"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-id"><a href="../DutchPIPE/config/_config---dpuniverse-ini.php.html#defineDPUNIVERSE_MYSQL_DB">DPUNIVERSE_MYSQL_DB</a></span><span class="src-sym">)))</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a49"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a50"></a><span class="src-key">if&nbsp;</span><span class="src-sym">(</span><span class="src-sym">!</span>isset<span class="src-sym">(</span><span class="src-var">$_GET</span><span class="src-sym">)&nbsp;</span>||&nbsp;<span class="src-sym">!</span>isset<span class="src-sym">(</span><span class="src-var">$_GET</span><span class="src-sym">[</span><span class="src-str">'captcha_id'</span><span class="src-sym">]</span><span class="src-sym">)</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a51"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;||&nbsp;<span class="src-sym">!</span><span class="src-sym">(</span><span class="src-var">$result&nbsp;</span>=&nbsp;<a href="http://www.php.net/mysql_query">mysql_query</a><span class="src-sym">(</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a52"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-str">&quot;SELECT&nbsp;captchaFile&nbsp;FROM&nbsp;Captcha&nbsp;WHERE&nbsp;captchaId='&quot;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a53"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.&nbsp;<span class="src-var">$_GET</span><span class="src-sym">[</span><span class="src-str">'captcha_id'</span><span class="src-sym">]&nbsp;</span>.&nbsp;<span class="src-str">&quot;'&quot;</span><span class="src-sym">))</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a54"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;||&nbsp;<span class="src-id">FALSE&nbsp;</span>===&nbsp;<span class="src-sym">(</span><span class="src-var">$row&nbsp;</span>=&nbsp;<a href="http://www.php.net/mysql_fetch_array">mysql_fetch_array</a><span class="src-sym">(</span><span class="src-var">$result</span><span class="src-sym">)))&nbsp;</span><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a55"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">die</span><span class="src-sym">(</span><a href="../DutchPIPE/lib/_lib---dptext.php.html#functiondptext">dptext</a><span class="src-sym">(</span><span class="src-str">'Failed&nbsp;to&nbsp;retrieve&nbsp;CAPTCHA&nbsp;image&nbsp;information.&lt;br&nbsp;/&gt;'</span><span class="src-sym">))</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a56"></a><span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a57"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a58"></a><span class="src-var">$captcha_image&nbsp;</span>=&nbsp;<a href="http://www.php.net/file_get_contents">file_get_contents</a><span class="src-sym">(</span><span class="src-id"><a href="../DutchPIPE/config/_config---dpuniverse-ini.php.html#defineDPUNIVERSE_CAPTCHA_IMAGES_PATH">DPUNIVERSE_CAPTCHA_IMAGES_PATH</a>&nbsp;</span>.&nbsp;<span class="src-var">$row</span><span class="src-sym">[</span><span class="src-num">0</span><span class="src-sym">]</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a59"></a><span class="src-key">if&nbsp;</span><span class="src-sym">(</span><span class="src-id">FALSE&nbsp;</span>===&nbsp;<span class="src-var">$captcha_image</span><span class="src-sym">)&nbsp;</span><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a60"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">die</span><span class="src-sym">(</span><a href="../DutchPIPE/lib/_lib---dptext.php.html#functiondptext">dptext</a><span class="src-sym">(</span><span class="src-str">'Failed&nbsp;to&nbsp;retrieve&nbsp;CAPTCHA&nbsp;image&nbsp;file.&lt;br&nbsp;/&gt;'</span><span class="src-sym">))</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a61"></a><span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a62"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a63"></a><a href="http://www.php.net/header">header</a><span class="src-sym">(</span><span class="src-str">'Content-Type:&nbsp;image/gif'</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a64"></a><a href="http://www.php.net/header">header</a><span class="src-sym">(</span><span class="src-str">'Cache-Control:&nbsp;no-cache,&nbsp;must-revalidate'</span><span class="src-sym">)</span><span class="src-sym">;&nbsp;</span><span class="src-comm">//&nbsp;HTTP/1.1</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a65"></a><a href="http://www.php.net/header">header</a><span class="src-sym">(</span><span class="src-str">'Expires:&nbsp;Mon,&nbsp;26&nbsp;Jul&nbsp;1997&nbsp;05:00:00&nbsp;GMT'</span><span class="src-sym">)</span><span class="src-sym">;&nbsp;</span><span class="src-comm">//&nbsp;Date&nbsp;in&nbsp;the&nbsp;past</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a66"></a>echo&nbsp;<span class="src-var">$captcha_image</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a67"></a><span class="src-php">?&gt;</span></div></li>
+</ol>
+</span></div>
+        <div class="credit">
+		    <hr class="separator" />
+		    Documentation generated on Sun, 13 Aug 2006 20:42:32 +0200 by <a href="http://www.phpdoc.org">phpDocumentor 1.3.0RC6</a>
+	      </div>
+      </td></tr></table>
+    </td>
+  </tr>
+</table>

@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpLiving.php 45 2006-06-20 12:38:26Z ls $
+ * @version    Subversion: $Id: DpLiving.php 94 2006-08-10 22:39:29Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -232,7 +232,7 @@ class DpLiving extends DpObject
      * </ol>
      *
      * @param   string  $actionFailure message to be shown when an action fails
-     * @example /home/ls/dev.dutchpipe/dpuniverse/obj/note.php A readable note
+     * @example /websites/dutchpipe.org/dpuniverse/obj/note.php A readable note
      * @see     getActionFailure(), setActionDefaultFailure(),
      *          getActionDefaultFailure()
      */
@@ -322,8 +322,7 @@ class DpLiving extends DpObject
 
                 if ($this->getProperty('is_user')
                         && $this === get_current_dpuser()) {
-                    get_current_dpuniverse()->
-                        mrCurrentDpUserRequest->mToldSomething = TRUE;
+                    get_current_dpuniverse()->setToldSomething();
                 }
             }
         }

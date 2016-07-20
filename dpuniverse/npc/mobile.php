@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: mobile.php 45 2006-06-20 12:38:26Z ls $
+ * @version    Subversion: $Id: mobile.php 88 2006-07-23 17:01:24Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpNpc
  */
@@ -90,7 +90,7 @@ final class Mobile extends DpNpc
     }
 
     /**
-     * Leave through a random link
+     * Leaves through a random link
      */
      function randomWalk()
      {
@@ -167,7 +167,7 @@ final class Mobile extends DpNpc
      */
     function timeoutKicked()
     {
-        $this->performAction(gettext(
+        $this->performAction(dptext(
             "say Oh, ok, I know when I'm not wanted."));
         $this->randomWalk();
     }

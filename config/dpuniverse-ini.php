@@ -18,7 +18,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpuniverse-ini.php 47 2006-06-20 22:37:48Z ls $
+ * @version    Subversion: $Id: dpuniverse-ini.php 90 2006-07-23 17:04:04Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php, dpserver-ini.php
  */
@@ -275,6 +275,24 @@ define('DPUNIVERSE_MIN_USERNAME_LEN', 3);
 define('DPUNIVERSE_MAX_USERNAME_LEN', 12);
 
 /**
+ * Is it mandatory for the browser to report a user agent string?
+ *
+ * Every browser reports a user agent string to the web server, such as:
+ * "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322;
+ * .NET CLR 2.0.50727)" or
+ * "Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.8.0.4) Gecko/20060508
+ * Firefox/1.5.0.4".
+ *
+ * Browsers which don't report such a string get an error message if this
+ * constant is set to TRUE.
+ *
+ * Usually, the only "browsers" with do not report a user agent string are
+ * harvest bots by spammers. However, it seems sometimes this leads to undesired
+ * effects, in which case you can set this constant to FALSE.
+ */
+define('DPUNIVERSE_USERAGENT_MANDATORY', TRUE);
+
+/**
  * Default message for invalid commands
  */
 define('DPUNIVERSE_ACTION_DEFAULT_FAILURE',
@@ -325,6 +343,12 @@ define('DPUNIVERSE_MAX_RESETS', 10);
 /**
  * Used by DutchPIPE.org in the title bar
  */
-define('DPUNIVERSE_NAVLOGO', dptext('<img src="/images/navlogo.gif"
-align="absbottom" width="73" height="15" border="0" alt="DutchPIPE" />Home'));
+define('DPUNIVERSE_NAVLOGO', sprintf(dptext('<img src="%snavlogo.gif"
+align="left" width="73" height="15" border="0" alt="DutchPIPE"
+style="margin-top: 1px" />Home'), DPUNIVERSE_IMAGE_URL));
+
+/**
+ * Administrators registered user names
+ */
+define('DPUNIVERSE_ADMINISTRATORS', 'Lennert');
 ?>

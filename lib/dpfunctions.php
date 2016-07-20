@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpfunctions.php 46 2006-06-20 12:55:45Z ls $
+ * @version    Subversion: $Id: dpfunctions.php 77 2006-07-13 20:39:04Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php
  */
@@ -33,10 +33,7 @@ function &get_current_dpuser()
 {
     global $grCurrentDpUniverse;
 
-    $rval = !isset($grCurrentDpUniverse->mrCurrentDpUserRequest)
-            || !isset($grCurrentDpUniverse->mrCurrentDpUserRequest->mrUser)
-        ? FALSE  : $grCurrentDpUniverse->mrCurrentDpUserRequest->mrUser;
-    return $rval;
+    return $grCurrentDpUniverse->getCurrentDpUser();
 }
 
 /**

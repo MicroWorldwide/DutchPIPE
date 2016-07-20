@@ -14,10 +14,10 @@
 # @author     Lennert Stock <ls@dutchpipe.org>
 # @copyright  2006 Lennert Stock
 # @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
-# @version    Subversion: $Id: setupmysql.sql 45 2006-06-20 12:38:26Z ls $
+# @version    Subversion: $Id: setupmysql.sql 73 2006-07-13 20:30:09Z ls $
 # @link       http://dutchpipe.org/manual/package/DutchPIPE
 
-CREATE DATABASE `dutchpipe`;
+CREATE DATABASE IF NOT EXISTS `dutchpipe`;
 
 USE `dutchpipe`;
 

@@ -6,7 +6,7 @@ function send_existing()
     validate_obj = get_http_obj();
     if (validate_obj) {
         validate_obj.onreadystatechange = rcv_validate;
-        validate_obj.open("GET", (str = "dpclient.php?location=/page/login.php?loginrand="+Math.round(Math.random()*9999)
+        validate_obj.open("GET", (str = "dpclient.php?location=/std/DpLogin.php?loginrand="+Math.round(Math.random()*9999)
             + "&method=validateExisting"
             + "&username="+_gel('eusername').value
             + "&password="+_gel('epassword').value), true);
@@ -22,7 +22,7 @@ function send_validate()
     validate_obj = get_http_obj();
     if (validate_obj) {
         validate_obj.onreadystatechange = rcv_validate;
-        validate_obj.open("GET", (str = "dpclient.php?location=/page/login.php?loginrand="+Math.round(Math.random()*9999)
+        validate_obj.open("GET", (str = "dpclient.php?location=/std/DpLogin.php?loginrand="+Math.round(Math.random()*9999)
             + "&method=validateNewUser"
             + "&username="+_gel('nusername').value
             + "&password="+_gel('npassword').value
@@ -39,7 +39,7 @@ function send_captcha(captcha_id)
     validate_obj = get_http_obj();
     if (validate_obj) {
         validate_obj.onreadystatechange = rcv_validate;
-        validate_obj.open("GET", (str = "dpclient.php?location=/page/login.php?loginrand="+Math.round(Math.random()*9999)
+        validate_obj.open("GET", (str = "dpclient.php?location=/std/DpLogin.php?loginrand="+Math.round(Math.random()*9999)
             + "&method=validateCaptcha"
             + "&username="+_gel('nusername').value
             + "&password="+_gel('npassword').value

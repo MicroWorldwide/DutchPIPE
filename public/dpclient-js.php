@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion $
+ * @version    Subversion: $Id: $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpclient.php
  */
@@ -47,8 +47,10 @@ var dpwindow = null;
 var has_started = false;
 var scriptid;
 var loc = '';
+var getstr = '';
 var standalone = false;
 var warned_nocookies = false;
+var seq = 0;
 
 function send_alive2server(firstcall, calltime, getdivs)
 {
@@ -61,8 +63,9 @@ function send_alive2server(firstcall, calltime, getdivs)
     if (http_obj = get_http_obj()) {
         getdivs = getdivs && getdivs != '' ? '&getdivs=' + escape(getdivs) : '';
         http_obj.onreadystatechange = rcv_alive2server;
-        http_obj.open("GET", dpclient_url + '?location=' + loc + '&scriptid='
-            + (firstcall ? 0 : scriptid) + getdivs + '&ajax='
+        http_obj.open("GET", dpclient_url + '?location=' + loc + getstr + '&scriptid='
+            + (firstcall ? 0 : scriptid) + getdivs +
+            (standalone ? '&standalone=true' : '') + '&seq=' + seq + '&ajax='
             + Math.round(Math.random() * 999999), true);
         http_obj.send(null);
     } else {
@@ -70,14 +73,15 @@ function send_alive2server(firstcall, calltime, getdivs)
     }
 }
 
-function send_action2server(action)
+function send_action2server(dpaction)
 {
     action_obj = get_http_obj();
     if (action_obj) {
         action_obj.onreadystatechange = rcv_action2server;
-        action_obj.open("GET", dpclient_url + '?location=' + loc + '&scriptid='
-            + scriptid + '&ajax=' + Math.round(Math.random() * 999999) +
-            '&action=' + escape(action), true);
+        action_obj.open("GET", dpclient_url + '?location=' + loc + getstr + '&scriptid='
+            + scriptid + (standalone ? '&standalone=true' : '')
+            + '&seq=' + seq + '&ajax=' + Math.round(Math.random() * 999999) +
+            '&dpaction=' + escape(dpaction), true);
         action_obj.send(null);
     } else {
         alert('<?php echo dptext('Could not establish connection with the DutchPIPE server.'); ?>');
@@ -172,7 +176,7 @@ function close_actions()
             _gel(actionmenu_id).style.zIndex = 1;
             actionmenu_id = null;
         }
-        _gel('action').focus();
+        _gel('dpaction').focus();
     }
 }
 
@@ -318,6 +322,7 @@ function handle_dp_event(childnode)
             olddiv.style.display = 'none';
             olddiv.parentNode.insertBefore(newdiv, olddiv);
             olddiv.parentNode.removeChild(olddiv);
+            //alert(document.body.innerHTML.substring(3200));
         }
         break;
     case 'message':
@@ -551,8 +556,8 @@ function make_dpwindow(text,autoclose,styleclass)
         body.insertBefore(dpwindow, body.firstChild);
 
         // Command line loses focus in IE. This solves most cases for now, but
-        // this should not go just to 'action', it could e.g. by a form field.
-        _gel('action').focus();
+        // this should not go just to 'dpaction', it could e.g. by a form field.
+        _gel('dpaction').focus();
     }
 }
 
@@ -561,7 +566,7 @@ function close_dpwindow()
     if (dpwindow != null || (dpwindow = _gel('dpwindow'))) {
         dpwindow.parentNode.removeChild(dpwindow);
         dpwindow = null;
-        _gel('action').focus();
+        _gel('dpaction').focus();
     }
 }
 
@@ -636,20 +641,22 @@ function start_dutchpipe(page)
         return;
 
     if (tmp != '/') {
-        var tmp2 = tmp;
+        loc = location.href;
         pos = tmp.indexOf(dpclient_url);
         if (pos != -1) {
             tmp = tmp.substring(pos + dpclient_url.length);
             pos = tmp.indexOf('?location=');
             if (pos != -1) {
                 tmp = tmp.substring(pos + 10);
-                pos = tmp.indexOf('.php');
-                if (pos != -1)
-                    tmp = tmp.substring(0, pos + 4);
+                pos = tmp.indexOf('&');
+                if (pos != -1) {
+                    getstr = tmp.substring(pos);
+                    tmp = tmp.substring(0, pos);
+                }
                 loc = tmp;
             }
-        } else {
-            loc = tmp2;
+        }
+        if (loc == location.href) {
             standalone = true;
         }
     }
@@ -661,7 +668,7 @@ function start_dutchpipe(page)
     }
     var getdivs = '';
     if (standalone) {
-        if (_gel('dpinventory') == null) {
+        if (_gel('dpinventory') == null || _gel('dpinventory').innerHTML == "") {
             getdivs += 'dpinventory#';
         }
         if (_gel('dpmessagearea') == null) {
@@ -671,9 +678,13 @@ function start_dutchpipe(page)
     if (getdivs != '')
         send_alive2server(true, curtime, getdivs);
     else {
-        setTimeout('send_alive2server(true, '+curtime+', "")',
-            (!has_started ? 10 : 2000));
-        _gel('action').focus();
+        if (standalone) {
+            send_alive2server(true, curtime, '');
+        } else {
+            setTimeout('send_alive2server(true, '+curtime+', "")',
+                (!has_started ? 10 : 2000));
+        }
+        _gel('dpaction').focus();
         // IE needs a small timeout:
         setTimeout('gototop()', 10);
         has_started = true;
@@ -687,10 +698,10 @@ function gototop()
 
 function action_dutchpipe()
 {
-    if (_gel('action').value == '')
+    if (_gel('dpaction').value == '')
         close_dpwindow();
-    send_action2server(_gel('action').value);
-    _gel('action').value = '';
+    send_action2server(_gel('dpaction').value);
+    _gel('dpaction').value = '';
     return false;
 }
 

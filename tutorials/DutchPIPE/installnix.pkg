@@ -1,0 +1,160 @@
+<refentry id="{@id}">
+    <refnamediv>
+        <refname>Installation - *NIX</refname>
+        <refpurpose>
+            INSTRUCTIONS FOR INSTALLING DUTCHPIPE ON LINUX, BSD, UNIX, ...
+        </refpurpose>
+    </refnamediv>
+    {@toc}
+    <refsect1 id="{@id step1}">
+        <title>Step 1: Obtain the DutchPIPE software</title>
+        <para>Download the DutchPIPE distribution from:</para>
+        <para>{@link http://download.dutchpipe.org/}</para>
+        <para>
+            You can either download the packed <filename>.zip</filename>
+            or <filename>.tgz</filename> file.
+        </para>
+    </refsect1>
+    <refsect1 id="{@id step2}">
+        <title>Step 2: Unpack the DutchPIPE software</title>
+        <para>
+            Unpack to the directory of your choice. In this example
+            installation, we unpack to:
+        </para>
+        <para><filename>/path/to/dutchpipe</filename></para>
+        <para>
+            Relative paths in the remainder of these instructions are
+            from the top of this path.
+        </para>
+    </refsect1>
+    <refsect1 id="{@id step3}">
+        <title>Step 3: Configure the DutchPIPE software</title>
+        <para>You must patch these settings files:</para>
+        <para>
+            <screen>
+<![CDATA[
+config/dpserver-ini.php
+config/dpuniverse-ini.php
+]]>
+            </screen>
+        </para>
+        <para>Follow the instructions in these files or see the manual
+        entries for {@link dpserver-ini.php} and
+        {@link dpuniverse-ini.php}.
+        </para>
+        <para>
+            Make sure the first line of
+        </para>
+        <filename>script/start_dpserver.php</filename>
+        <para>
+            refers to the PHP command line installation. Make sure this
+            file is executable (see <command>man chmod</command> under
+            *NIX).
+        </para>
+    </refsect1>
+    <refsect1 id="{@id step4}">
+        <title>Step 4: Setup MySQL</title>
+        <para>Create a database called</para>
+        <para><filename>dutchpipe</filename></para>
+        <para>and import the following SQL:</para>
+        <para>
+            <screen>
+<![CDATA[
+config/setupmysql.sql
+]]>
+            </screen>
+        </para>
+    </refsect1>
+    <refsect1 id="{@id step5}">
+        <title>Step 5: Configure your web server</title>
+        <para>
+            If you already have a location to test DutchPIPE, you can
+            skip step 5 and 6.
+        </para>
+        <para>
+            Decide on what URL you want to host your DutchPIPE
+            installation. You need to let your web server know where to
+            find the directory with the DutchPIPE public files.
+        </para>
+
+        <para>
+            There are many ways to add DutchPIPE, this is just one of
+            them. In the example case, we added the following to the
+            vhosts configuration file of Apache 2.2 in our FreeBSD 6
+            installation:
+        </para>
+        <para>
+            <filename>
+                /usr/local/etc/apache22/extra/httpd-vhosts.conf
+            </filename>
+        </para>
+        <programlisting>
+<![CDATA[
+<VirtualHost *:80>
+    ServerAdmin webmaster@yourdomain.com
+    DocumentRoot /path/to/dutchpipe/public
+    ServerName www.yourdomain.com
+    <Directory "/path/to/dutchpipe/public">
+        DirectoryIndex dpclient.php
+        Options All
+        AllowOverride All
+        AddType application/x-httpd-php .php
+        Order allow,deny
+        Allow from all
+    </Directory>
+</VirtualHost>
+]]>
+        </programlisting>
+    </refsect1>
+    <refsect1 id="{@id step6}">
+        <title>Step 6: Restart your web server</title>
+        <para>For the example case:</para>
+        <para>
+            <userinput>
+                /usr/local/etc/rc.d/apache22.sh restart
+            </userinput>
+        </para>
+    </refsect1>
+    <refsect1 id="{@id step7}">
+        <title>Step 7: Start the DutchPIPE server</title>
+        <para>For the example case:</para>
+        <para>
+            <screen>
+<![CDATA[
+cd scripts
+./start_dpserver.php
+]]>
+            </screen>
+        </para>
+
+        <para>
+            It will output some memory and debug information, so you
+            might want to try, for example:
+        </para>
+        <para>
+            <screen>
+<![CDATA[
+./start_dpserver.php > mylog &
+]]>
+            </screen>
+        </para>
+        <para>
+            to throw everything in a log file called
+            <filename>mylog</filename> and run the process in the
+            background.
+        </para>
+        <para>
+            There is no proper restart script yet. Simply
+            <command>kill</command> the process and start the script
+            again to restart the server.
+        </para>
+    </refsect1>
+    <refsect1 id="{@id step8}">
+        <title>Step 8: Browse to your DutchPIPE public installation</title>
+        <para> In the example case: {@link http://demo.dutchpipe.org/}</para>
+        <para>
+            You should now see an example DutchPIPE installation in your
+            browser.
+        </para>
+    </refsect1>
+</refentry>

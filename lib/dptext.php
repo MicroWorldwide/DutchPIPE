@@ -26,16 +26,16 @@ if (!DPSERVER_GETTEXT_ENABLED || !function_exists('gettext')) {
      *
      * All texts in the DutchPIPE source code should be passed through this
      * function in English. This allows DutchPIPE to return translated strings
-     * for DUtchPIPE sites in other languages.
+     * for DutchPIPE sites in other languages.
      *
      * The message can be a plain string, or a formatted string according to
      * the sprintf format, see http://www.php.net/sprintf. In the last case more
      * arguments must be given to fill in values, as seen in the sprintf
-     * documentation. If you need to translate a string and have it formatted
-     * without extra arguments, just use sprintf directly.
+     * documentation.
      *
-     * If gettext is enabled and the current domain is not equal to language of
-     * the given string, a translated string will be returned if available.
+     * If gettext is enabled and the set language is not equal to language of
+     * the given string, a translated string will be returned if available in
+     * the translation table.
      *
      * @param      string    $message    the integer or string to check
      * @param      mixed     $args,...   the integer or string to check
@@ -43,7 +43,12 @@ if (!DPSERVER_GETTEXT_ENABLED || !function_exists('gettext')) {
      */
     function dptext($message)
     {
-        return $message;
+        if (1 === func_num_args()) {
+            return $message;
+        }
+        $args = func_get_args();
+        $args = array_slice($args, 1);
+        return vsprintf($message, $args);
     }
 } else {
     if (!isset($language)) {
@@ -63,7 +68,12 @@ if (!DPSERVER_GETTEXT_ENABLED || !function_exists('gettext')) {
      */
     function dptext($message)
     {
-        return gettext($message);
+        if (1 === func_num_args()) {
+            return gettext($message);
+        }
+
+        $args = func_get_args();
+        return vsprintf(gettext($message), array_slice($args, 1));
     }
 }
 ?>

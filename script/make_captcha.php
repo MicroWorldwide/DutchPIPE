@@ -28,7 +28,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Julien CROUZET
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: make_captcha.php 45 2006-06-20 12:38:26Z ls $
+ * @version    Subversion: $Id: make_captcha.php 61 2006-06-26 08:56:53Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver.php, /www/captcha.php
  */
@@ -36,14 +36,16 @@
 /**
  * Gets server settings
  */
-require_once(realpath(dirname(__FILE__) . '/../config')
-    . '/dpserver-ini.php');
+$config_dir = realpath(dirname(isset($_SERVER['PWD'])
+    ? (substr($_SERVER['SCRIPT_FILENAME'], 0, 1) != '/' ? $_SERVER['PWD'] . '/'
+    . $_SERVER['SCRIPT_FILENAME'] : $_SERVER['SCRIPT_FILENAME']) : __FILE__)
+    . '/../config');
+require_once($config_dir . '/dpserver-ini.php');
 
 /**
  * Gets universe settings
  */
-require_once(realpath(dirname(__FILE__) . '/../config')
-    . '/dpuniverse-ini.php');
+require_once($config_dir . '/dpuniverse-ini.php');
 
 /* Don't touch this */
 require_once(DPSERVER_LIB_PATH . 'dptext.php');
@@ -193,13 +195,13 @@ function get_rand_code()
 
     return $code;
 }
-$str = distortion_string(($code = get_rand_code()), DPUNIVERSE_SCRIPT_PATH
-    . 'trebuc.ttf', 30, '#FFCF0F','#000066');
+$str = distortion_string(($code = get_rand_code()), dirname(__FILE__)
+    . '/trebuc.ttf', 30, '#FFCF0F','#000066');
 $file = "$code.gif";
 $fp = fopen(DPUNIVERSE_CAPTCHA_IMAGES_PATH . $file, 'w');
 fwrite($fp, $str);
 fclose($fp);
-chown(DPUNIVERSE_CAPTCHA_IMAGES_PATH . $file, DPUNIVERSE_FILE_OWNER);
+// chown(DPUNIVERSE_CAPTCHA_IMAGES_PATH . $file, DPUNIVERSE_FILE_OWNER);
 echo sprintf(dptext("Created %s.gif\n"), $code);
 
 $oldest_time = time() + 3600; /* Future */

@@ -20,7 +20,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpclient.php 45 2006-06-20 12:38:26Z ls $
+ * @version    Subversion: $Id: dpclient.php 97 2006-08-11 21:56:59Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver-ini.php, dpserver.php, dpclient.css
  */
@@ -188,7 +188,7 @@ function talk2server()
 
     if (isset($newlocation)) {
         $newlocation = $newlocation == '/' ? '/'
-            : "/dpclient.php?location=$newlocation";
+            : DPSERVER_CLIENT_URL . "?location=$newlocation";
         if (!isset($_GET) || !isset($_GET['ajax'])) {
             header("Location: $newlocation");
             exit;
@@ -212,6 +212,16 @@ function handle_ajax_request($output)
         echo '2';
     }
     else {
+        if (isset($_GET) && isset($GET['standalone']) && isset($GET['_seq'])
+                && $GET['_seq'] == '0') {
+            $xml2 = simplexml_load_string($str = '<?xml version="1.0" encoding="UTF-8" '
+                . 'standalone="yes" ?><dutchpipe>' . $output . '</dutchpipe>');
+
+            if (FALSE !== $xml2) {
+                handle_cookies($xml2);
+            }
+        }
+
         header('Content-Type: text/xml');
         echo "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>
 <dutchpipe>$output</dutchpipe>\n";
@@ -226,7 +236,6 @@ function handle_ajax_request($output)
 function handle_cookies(&$xml)
 {
     foreach ($xml->cookie as $id => $cookie) {
-        //echo $cookie . '<br />';
         foreach($xml->cookie->attributes() as $attname => $attval) {
             switch ($attname) {
             case 'name':
@@ -379,6 +388,10 @@ function handle_normal_request($output)
     /* Otherwise serve the page with the retrieved content in it */
     echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
     if (strlen($html)) {
+        $html = str_replace(
+            array('{$dpelements}', '{$windows}', '{$messages}',
+                '{$inputtopmargin}'),
+            array($dpelements, $windows, $messages, $inputtopmargin), $html);
         echo $html;
     } else {
         require_once(DPSERVER_TEMPLATE_PATH . DPSERVER_TEMPLATE_FILE);

@@ -1,0 +1,257 @@
+<refentry id="{@id}">
+    <refnamediv>
+        <refname>Installation - Windows</refname>
+        <refpurpose>
+            INSTRUCTIONS FOR INSTALLING DUTCHPIPE ON WINDOWS 2000, XP, ...
+        </refpurpose>
+    </refnamediv>
+    {@toc}
+    <refsect1 id="{@id introduction}">
+        <title>Introduction</title>
+        <para>
+            These instructions are for use in combination with WAMP5, a software
+            distribution that installs the Apache webserver, MySQL and PHP 5 for
+            Windows. However, you can also install DutchPIPE with seperate or
+            other web server, MySQL and PHP 5 installations (there are several).
+            This procedure just uses WAMP5 as an example and because of its
+            fast, user friendly set-up.
+        </para>
+        <para>
+            In the example setup, we'll be installing DutchPIPE in
+            <filename>c:\dutchpipe</filename>, WAMP5 in
+            <filename>c:\wamp</filename> and make DutchPIPE available at
+            http://localhost/, but you can use other locations of course.
+        </para>
+    </refsect1>
+    <refsect1 id="{@id step1}">
+        <title>Step 1: Obtain the DutchPIPE software</title>
+        <para>Download the DutchPIPE distribution from:</para>
+        <para>{@link http://download.dutchpipe.org/}</para>
+        <para>
+            You can either download the packed <filename>.zip</filename>
+            or <filename>.tgz</filename> file.
+        </para>
+    </refsect1>
+    <refsect1 id="{@id step2}">
+        <title>Step 2: Unpack the DutchPIPE software</title>
+        <para>
+            Extract the files in <filename>c:\</filename> so you now
+            have the directory:
+        </para>
+        <para><filename>c:\dutchpipe</filename></para>
+    </refsect1>
+    <refsect1 id="{@id step3}">
+        <title>Step 3: Download and Install WAMP5</title>
+        <para>Download WAMP5 from:</para>
+        <para>{@link http://www.wampserver.com/en/download.php}</para>
+        <para>
+            Launch what you have downloaded to start the installation
+            process.
+        </para>
+        <para>
+            You can choose the installation folder. This step-by-step
+            guide uses the default choice:
+        </para>
+        <para><filename>c:\wamp</filename></para>
+        <para>
+            You can choose to auto launch WAMP5 at startup, we didn't
+            do that.
+        </para>
+        <para>
+            You can choose, if this is your first WAMP5 install, what
+            directory contains your DocumentRoot. Choose:
+        </para>
+        <para>
+            <filename>c:\dutchpipe\public</filename>
+        </para>
+        <para>
+            You can choose whether you want to start WAMP5. Choose
+            <guimenuitem>yes</guimenuitem>.
+        </para>
+    </refsect1>
+    <refsect1 id="{@id step4}">
+        <title>Step 4: Configure WAMP5</title>
+        <para>
+            Now WAMP5 is running, an icon appeared on your tray bar at
+            the bottom right of your screen.
+        </para>
+        <para>
+            Click on the WAMP5 tray bar icon and select:
+        </para>
+        <para>
+            <menuchoice>
+                <guimenu>PHP extensions</guimenu> &rarr;
+                <guimenuitem>php_sockets</guimenuitem>
+            </menuchoice>
+        </para>
+        <para>
+            so that <guimenuitem>php_sockets</guimenuitem> is enabled.
+        </para>
+        <para>
+            Click on the WAMP5 tray bar icon and select:
+        </para>
+        <para>
+            <menuchoice>
+                <guimenu>Config files</guimenu> &rarr;
+                <guimenuitem>httpd.conf</guimenuitem>
+            </menuchoice>
+        </para>
+        <para>
+            Notepad or your text editor is launched.
+            Search for the line:
+        </para>
+        <programlisting>
+DirectoryIndex index.php index.php3 index.html index.htm index.html.var
+        </programlisting>
+        <para>and change it to
+        </para>
+        <programlisting>
+DirectoryIndex dpclient.php index.php index.php3 index.html index.htm index.html.var
+        </programlisting>
+        <para>Save the file.</para>
+    </refsect1>
+    <refsect1 id="{@id step5}">
+        <title>Step 5: Configure DutchPIPE</title>
+        <para>
+            Open the following file in a text editor (notepad for
+            example):
+        </para>
+        <para>
+            <filename>c:\dutchpipe\config\setupmysql.sql</filename>
+        </para>
+        <para>and select &amp; copy all text.</para>
+        <para>Click on the WAMP5 tray bar icon and select:</para>
+        <para>
+            <menuchoice>
+                <guimenu>MySQL</guimenu> &rarr;
+                <guimenuitem>MySQL console</guimenuitem>
+            </menuchoice>
+        </para>
+        <para>
+            Your password is still empty if this is your first install,
+            press <command>RETURN</command>.
+        </para>
+        <para>
+            Click on the top left part of the console window, and select
+            from the menu:
+        </para>
+        <para>
+            <menuchoice>
+                <guimenu>Edit</guimenu> &rarr;
+                <guimenuitem>Paste</guimenuitem>
+            </menuchoice>
+        </para>
+        <para>You can now close the MySQL console window.</para>
+        <para>Edit the following file:</para>
+        <para>
+            <filename>c:\dutchpipe\config\dpserver-ini.php</filename>
+        </para>
+        <para>Change the first pair of define's:</para>
+        <programlisting role="php">
+<![CDATA[
+define('DPSERVER_HOST_URL', 'http://www.yourdomain.com');
+//define('DPSERVER_HOST_URL', 'http://localhost');
+]]>
+        </programlisting>
+        <para>to this:</para>
+        <programlisting role="php">
+<![CDATA[
+//define('DPSERVER_HOST_URL', 'http://www.yourdomain.com');
+define('DPSERVER_HOST_URL', 'http://localhost');
+]]>
+        </programlisting>
+        <para>Change these two lines:</para>
+        <programlisting role="php">
+<![CDATA[
+define('DPSERVER_SOCKET_TYPE', AF_UNIX);
+//define('DPSERVER_SOCKET_TYPE', AF_INET);
+]]>
+        </programlisting>
+        <para>into:</para>
+        <programlisting role="php">
+<![CDATA[
+//define('DPSERVER_SOCKET_TYPE', AF_UNIX);
+define('DPSERVER_SOCKET_TYPE', AF_INET);
+]]>
+        </programlisting>
+        <para>
+            Check if the DPSERVER_SOCKET_PORT is a free port on your
+            machine (3333 by default):
+        </para>
+        <programlisting role="php">
+<![CDATA[
+define('DPSERVER_SOCKET_PORT', '3333');
+]]>
+        </programlisting>
+        <para>Change the port number if necessary.</para>
+        <para>Save the file.</para>
+        <para>Edit the following file:</para>
+        <para>
+            <filename>c:\dutchpipe\config\dpuniverse-ini.php</filename>
+        </para>
+        <para>Change these two lines:</para>
+        <programlisting role="php">
+<![CDATA[
+define('DPUNIVERSE_MYSQL_USER', '<youruser>');
+define('DPUNIVERSE_MYSQL_PASSWORD', '<yourpass>');
+]]>
+        </programlisting>
+        <para>into:</para>
+        <programlisting role="php">
+<![CDATA[
+define('DPUNIVERSE_MYSQL_USER', 'root');
+define('DPUNIVERSE_MYSQL_PASSWORD', '');
+]]>
+        </programlisting>
+        <para>
+            You should later secure MySQL by running the DutchPIPE
+            database with another user and a password, but we're now
+            just quickly getting up DutchPIPE locally.
+        </para>
+        <para>Save the file.</para>
+    </refsect1>
+    <refsect1 id="{@id step6}">
+        <title>Step 6: Restart WAMP5</title>
+        <para>
+            Click on the WAMP5 tray bar icon and select at the bottom:
+        </para>
+        <para>
+            <menuchoice>
+                <guimenu>Restart All Services</guimenu>
+            </menuchoice>
+        </para>
+    </refsect1>
+    <refsect1 id="{@id step7}">
+        <title>Step 7: Start the DutchPIPE Server</title>
+        <para>
+            Select at the bottom left of your screen:
+         </para>
+        <para>
+            <menuchoice>
+                <guimenu>Start</guimenu> &rarr;
+                <guimenuitem>Run...</guimenuitem>
+            </menuchoice>
+        </para>
+        <para>and enter the following line:</para>
+        <para>
+            <command>
+                c:\wamp\php\php.exe -c c:\wamp\apache2\bin
+                c:\dutchpipe\script\start_dpserver.php
+            </command>
+        </para>
+        <para>
+            The DutchPIPE server is now running in a Command Prompt
+            window.
+        </para>
+    </refsect1>
+    <refsect1 id="{@id step8}">
+        <title>Step 8: Done</title>
+        <para>Launch your web browser and go to:</para>
+        <para>{@link http://localhost/}</para>
+        <para>
+            You should see the standard DutchPIPE environment, exactly
+            like the demo on:
+        </para>
+        <para>{@link http://demo.dutchpipe.org/}</para>
+    </refsect1>
+</refentry>

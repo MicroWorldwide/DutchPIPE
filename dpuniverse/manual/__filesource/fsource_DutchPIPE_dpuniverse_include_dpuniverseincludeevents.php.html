@@ -1,0 +1,115 @@
+<table border="0" cellpadding="0" cellspacing="0" style="width: 98%">
+  <tr valign="top">
+    <td class="menu">
+                        <br />
+            <br />
+              <div class="package">
+                    <a href="../ric_INSTALL.html">INSTALL</a>&nbsp;|
+                    <a href="../ric_LICENSE.html">LICENSE</a>&nbsp;|
+                    <a href="../ric_README.html">README</a>&nbsp;|
+                    <a href="../todolist.html">Todo List</a>&nbsp;|
+        <a href="../classtrees_DutchPIPE.html">Class Tree</a>&nbsp;|
+        <a href="../elementindex_DutchPIPE.html">Index</a>
+        </div>
+    </td>
+    <td>
+      <table cellpadding="10" cellspacing="0" width="100%" border="0"><tr><td valign="top">
+<span id="gototop" style="position:absolute;z-index:100"><a href="javascript:window.scrollTo(0,0)"><img id="buttop" src="/images/top.gif" width="11" height="11" border="0" alt="Go to Top" title="Go to Top" /></a></span>
+<script src="/jumptop.js"></script>
+<h1>Source for file events.php</h1>
+<p>Documentation is available at <a href="../DutchPIPE/dpuniverse_include/_dpuniverse---include---events.php.html">events.php</a></p>
+<div class="src-code"><span class="php">
+<ol class="src-bg"><li class="src-li"><div class="src-line"><a name="a1"></a><span class="src-php">&lt;?php</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a2"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a3"></a><span class="src-doc">&nbsp;*&nbsp;Constants&nbsp;for&nbsp;the&nbsp;events&nbsp;system</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a4"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a5"></a><span class="src-doc">&nbsp;*&nbsp;For&nbsp;some&nbsp;events,&nbsp;the&nbsp;event()&nbsp;method&nbsp;is&nbsp;called&nbsp;in&nbsp;objects,&nbsp;if&nbsp;defined.&nbsp;The</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a6"></a><span class="src-doc">&nbsp;*&nbsp;first&nbsp;argument&nbsp;is&nbsp;the&nbsp;type&nbsp;of&nbsp;event,&nbsp;as&nbsp;defined&nbsp;by&nbsp;the&nbsp;constants&nbsp;in&nbsp;this</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a7"></a><span class="src-doc">&nbsp;*&nbsp;file.&nbsp;Other&nbsp;arguments&nbsp;depend&nbsp;on&nbsp;the&nbsp;type&nbsp;of&nbsp;event.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a8"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a9"></a><span class="src-doc">&nbsp;*&nbsp;DutchPIPE&nbsp;version&nbsp;0.1;&nbsp;PHP&nbsp;version&nbsp;5</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a10"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a11"></a><span class="src-doc">&nbsp;*&nbsp;LICENSE:&nbsp;This&nbsp;source&nbsp;file&nbsp;is&nbsp;subject&nbsp;to&nbsp;version&nbsp;1.0&nbsp;of&nbsp;the&nbsp;DutchPIPE&nbsp;license.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a12"></a><span class="src-doc">&nbsp;*&nbsp;If&nbsp;you&nbsp;did&nbsp;not&nbsp;receive&nbsp;a&nbsp;copy&nbsp;of&nbsp;the&nbsp;DutchPIPE&nbsp;license,&nbsp;you&nbsp;can&nbsp;obtain&nbsp;one&nbsp;at</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a13"></a><span class="src-doc">&nbsp;*&nbsp;http://dutchpipe.org/license/1_0.txt&nbsp;or&nbsp;by&nbsp;sending&nbsp;a&nbsp;note&nbsp;to</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a14"></a><span class="src-doc">&nbsp;*&nbsp;license@dutchpipe.org,&nbsp;in&nbsp;which&nbsp;case&nbsp;you&nbsp;will&nbsp;be&nbsp;mailed&nbsp;a&nbsp;copy&nbsp;immediately.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a15"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a16"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@package</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;DutchPIPE</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a17"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@subpackage</span><span class="src-doc">&nbsp;dpuniverse_include</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a18"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@author</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lennert&nbsp;Stock&nbsp;&lt;ls@dutchpipe.org&gt;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a19"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@copyright</span><span class="src-doc">&nbsp;&nbsp;2006&nbsp;Lennert&nbsp;Stock</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a20"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@license</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;http://dutchpipe.org/license/1_0.txt&nbsp;&nbsp;DutchPIPE&nbsp;License</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a21"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@version</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;Subversion:&nbsp;$Id:&nbsp;events.php&nbsp;45&nbsp;2006-06-20&nbsp;12:38:26Z&nbsp;ls&nbsp;$</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a22"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@link</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://dutchpipe.org/manual/package/DutchPIPE</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a23"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a24"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a25"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a26"></a><span class="src-doc">&nbsp;*&nbsp;An&nbsp;object&nbsp;left&nbsp;this&nbsp;object's&nbsp;inventory</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a27"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a28"></a><span class="src-doc">&nbsp;*&nbsp;When&nbsp;an&nbsp;objects&nbsp;leaves&nbsp;an&nbsp;inventory,&nbsp;the&nbsp;following&nbsp;call&nbsp;takes&nbsp;place:</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a29"></a><span class="src-doc">&nbsp;*&nbsp;$old_environment-&gt;event(EVENT_LEFT_INV,&nbsp;$object,&nbsp;$new_environment);</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a30"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a31"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EVENT_ENTERED_INV,&nbsp;EVENT_ENTERED_ENV,&nbsp;EVENT_CHANGED_ENV,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a32"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EVENT_DESTROYING_OBJ,&nbsp;DpObject::moveDpObject(),</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a33"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DpObject::removeDpObject()</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a34"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a35"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'EVENT_LEFT_INV'</span><span class="src-sym">,&nbsp;</span><span class="src-num">1</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a36"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a37"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a38"></a><span class="src-doc">&nbsp;*&nbsp;An&nbsp;object&nbsp;entered&nbsp;this&nbsp;object's&nbsp;inventory</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a39"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a40"></a><span class="src-doc">&nbsp;*&nbsp;When&nbsp;an&nbsp;objects&nbsp;enters&nbsp;a&nbsp;new&nbsp;environment,&nbsp;the&nbsp;following&nbsp;call&nbsp;takes&nbsp;place:</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a41"></a><span class="src-doc">&nbsp;*&nbsp;$new_environment-&gt;event(EVENT_ENTERED_INV,&nbsp;$object,&nbsp;$old_environment);</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a42"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a43"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EVENT_LEFT_INV,&nbsp;EVENT_ENTERED_ENV,&nbsp;EVENT_CHANGED_ENV,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a44"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EVENT_DESTROYING_OBJ,&nbsp;DpObject::moveDpObject()</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a45"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a46"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'EVENT_ENTERED_INV'</span><span class="src-sym">,&nbsp;</span><span class="src-num">2</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a47"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a48"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a49"></a><span class="src-doc">&nbsp;*&nbsp;An&nbsp;object&nbsp;entered&nbsp;this&nbsp;object's&nbsp;environment</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a50"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a51"></a><span class="src-doc">&nbsp;*&nbsp;When&nbsp;an&nbsp;objects&nbsp;enters&nbsp;a&nbsp;new&nbsp;environment,&nbsp;the&nbsp;following&nbsp;call&nbsp;takes&nbsp;place&nbsp;in</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a52"></a><span class="src-doc">&nbsp;*&nbsp;all&nbsp;objects&nbsp;in&nbsp;the&nbsp;new&nbsp;environment's&nbsp;inventory:</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a53"></a><span class="src-doc">&nbsp;*&nbsp;$inventory_object-&gt;event(EVENT_ENTERED_ENV,&nbsp;$object,&nbsp;$old_environment);</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a54"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a55"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EVENT_LEFT_INV,&nbsp;EVENT_ENTERED_INV,&nbsp;EVENT_CHANGED_ENV,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a56"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EVENT_DESTROYING_OBJ,&nbsp;DpObject::moveDpObject()</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a57"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a58"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'EVENT_ENTERED_ENV'</span><span class="src-sym">,&nbsp;</span><span class="src-num">3</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a59"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a60"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a61"></a><span class="src-doc">&nbsp;*&nbsp;An&nbsp;object's&nbsp;environment&nbsp;changed</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a62"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a63"></a><span class="src-doc">&nbsp;*&nbsp;When&nbsp;an&nbsp;objects&nbsp;enters&nbsp;a&nbsp;new&nbsp;environment,&nbsp;the&nbsp;following&nbsp;call&nbsp;takes&nbsp;place&nbsp;in</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a64"></a><span class="src-doc">&nbsp;*&nbsp;the&nbsp;object:</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a65"></a><span class="src-doc">&nbsp;*&nbsp;$object-&gt;event(EVENT_CHANGED_ENV,&nbsp;$old_environment,&nbsp;$new_environment);</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a66"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a67"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EVENT_LEFT_INV,&nbsp;EVENT_ENTERED_INV,&nbsp;EVENT_ENTERED_ENV,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a68"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EVENT_DESTROYING_OBJ,&nbsp;DpObject::moveDpObject(),</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a69"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DpObject::removeDpObject()</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a70"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a71"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'EVENT_CHANGED_ENV'</span><span class="src-sym">,&nbsp;</span><span class="src-num">4</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a72"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a73"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a74"></a><span class="src-doc">&nbsp;*&nbsp;An&nbsp;object&nbsp;is&nbsp;being&nbsp;destroyed</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a75"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a76"></a><span class="src-doc">&nbsp;*&nbsp;When&nbsp;an&nbsp;objects&nbsp;is&nbsp;being&nbsp;destroyed,&nbsp;the&nbsp;following&nbsp;call&nbsp;takes&nbsp;place&nbsp;in&nbsp;the</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a77"></a><span class="src-doc">&nbsp;*&nbsp;object:</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a78"></a><span class="src-doc">&nbsp;*&nbsp;$object-&gt;event(EVENT_DESTROYING_OBJ);</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a79"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a80"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EVENT_LEFT_INV,&nbsp;EVENT_ENTERED_INV,&nbsp;EVENT_ENTERED_ENV,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a81"></a><span class="src-doc">&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EVENT_CHANGED_ENV,&nbsp;DpObject::removeDpObject()</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a82"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a83"></a><a href="http://www.php.net/define">define</a><span class="src-sym">(</span><span class="src-str">'EVENT_DESTROYING_OBJ'</span><span class="src-sym">,&nbsp;</span><span class="src-num">5</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a84"></a><span class="src-php">?&gt;</span></div></li>
+</ol>
+</span></div>
+        <div class="credit">
+		    <hr class="separator" />
+		    Documentation generated on Sun, 13 Aug 2006 20:43:48 +0200 by <a href="http://www.phpdoc.org">phpDocumentor 1.3.0RC6</a>
+	      </div>
+      </td></tr></table>
+    </td>
+  </tr>
+</table>

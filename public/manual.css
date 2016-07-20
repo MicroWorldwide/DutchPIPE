@@ -1,0 +1,155 @@
+dd { margin-left: 0px; padding-left: 1em; }
+div.credit{ font-size: 8pt }
+div.description,div.tags{ padding-left: 15px; }
+div.header-top-right-subpackage{ background-color: #eeeeee; color: #636331; font-size: 12pt; font-weight: bold; padding: 10px; text-align: right; }
+div.long-description{ color: #000066 }
+div.long-description p { margin-top: 10px; margin-bottom: 0px }
+div.package{ padding-left: 0px; }
+div.row-padding{ padding: .5em; padding-top: 12px }
+div.short-description{ color: #000066; font-weight: bold }
+div.warning{ background-color: transparent; color: #ff0000; }
+#dppage {background-image: url("images/left-bg.png"); background-repeat: repeat-y;}
+hr{ color: #ffffff; border-color: #000066; border-style: solid; height: 1px; margin-bottom: 10px; margin-top: 10px; }
+ul.li { list-style-type: square; }
+td{ font-size: 10pt; vertical-align: top; }
+td.class-overview{ padding: 2px; padding-left: 0px; padding-bottom: 0px }
+td.code{ background-color: #ffffff; color: #000066; padding-left: 31px; padding-right: 1em; text-indent: -2em; }
+td.code-border{ background-color: #ffffff; color: #000066; }
+td.header-line{ background-color: #636331; color: #ffffff; }
+td.header-menu{ background-color: #ccc9a4; color: #636331; font-size: 8pt; padding: 2px; padding-right: 5px; text-align: right; }
+td.header-top-left{ background-color: #eeeeee; color: #636331; font-size: 16pt; font-weight: bold; padding: 10px; text-align: left; }
+td.header-top-right{ background-color: #eeeeee; color: #636331; font-size: 16pt; font-weight: bold; padding: 10px; text-align: right; }
+td.indent { padding-left: 2em; }
+td.menu{ width: 181px; padding: 2px; padding-left: 10px; padding-right: 10px; padding-top: 5px; background-color: #eeeeee; background-image: url("images/left-bg.png"); background-repeat: repeat-y; }
+td.menu, td.menu a, div.package {font-size: 11px }
+td.type,.folder-title{ font-style: italic; }
+pre {
+ white-space: pre-wrap;       /* css-3 */
+ white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+ white-space: -pre-wrap;      /* Opera 4-6 */
+ white-space: -o-pre-wrap;    /* Opera 7 */
+ word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+ul{ margin-left: 8px; padding-left: 8px; vertical-align: top; margin-top: 0px; list-style-type: square }
+.class-name { color: #000066; font-weight: bold; }
+.class-table { width: 95%; }
+.class-table-header { text-align: left; font-size: 12px }
+.const-title,.method-title{ font-weight: bold; line-height: 20px; background-color: #555585; color: #ffffff; padding: 2px; padding-left: .5em; padding-right: .5em }
+.description{ color: #000066 }
+.detail,div.top,span.smalllinenumber{ font-size: 8pt; }
+.disabled{ color: #c0c0c0 }
+.dppage_inner2 { margin-left: 0px; margin-top: 0px }
+.figure { text-align: left; float: right; margin-left: 10px }
+.figure img { border: solid 1px #000066 }
+.evenrow{ border: 1px solid #000066; color: #000066; margin-bottom: 1em }
+.include-title{ }
+.index-item-body { margin-bottom: .5em; margin-top: .5em; }
+.index-item-description { margin-top: .25em; }
+.index-item-details { font-size: 8pt; font-style: italic; font-weight: normal; }
+.index-letter { font-size: 12pt; }
+.index-letter-menu { margin: 1em; text-align: center; }
+.index-letter-section { background-color: #ccc9a4; border: 1px dotted #636331; margin-bottom: 1em; padding: .5em; }
+.index-letter-title { font-size: 12pt; font-weight: bold; }
+.info-box{ }
+.info-box-body{ border: 1px solid #000066; padding: .5em; }
+.info-box-title, .title{ color: #8B4513; font-size: 22px; font-weight: normal; }
+.info-box-title { margin-top: 0px; margin-bottom: 5px; float: left }
+.label-letter { font-size: 11px }
+.line-number, .var-name-summary { font-size: 8pt; font-weight: bold; }
+.method-definition, .method-result { font-size: 8pt }
+.method-header{ }
+.method-signature{ color: #ccc9a4; font-size: 85%; margin: .5em 0em; }
+.nav-bar{ font-size: 8pt; margin: 5px 0em 5px 1em; padding: .2em; text-align: right; float: right }
+.nav-button:active,
+.nav-button:focus,
+.nav-button:hover{ background-color: #dddddd; outline: 1px solid #999999; text-decoration: none; }
+.nav-button-disabled{ color: #999999; }
+.notes{ font-size: 8pt; font-style: italic; }
+.oddrow{ background-color: #eeeeee; border: 1px solid #000066; color: #000066; margin-bottom: 1em }
+.ol { margin-left: 5; padding-left: 18px }
+.package{ padding-left : 2em; font-size : 11pt; }
+.package-details{ font-size: 85%; }
+.package-title, div.package .package-title { font-size: 12px; font-weight: bold; }
+.page-body{ margin: auto; max-width: 800px; }
+.parameters{ list-style-type: square; margin-bottom: 0em; margin-left: 3em; margin-right: 1em; margin-top: 0em; padding-left: 0em; vertical-align: top; }
+.redefinitions{ font-size: 8pt; margin-left: 2em; padding-left: 0em; }
+.separator{ background-color: #000066; height: 1px; }
+.src-li { background-color: #eeeeee; list-style-type: square; }
+.src-code li, .php-src li, .php li, .listing li { list-style-type: decimal }
+/* This will not be executed by IE, so now we have a fix! */
+.php-src,.var-type,.var-name { font-family: 'Courier New', Courier, monospace; font-weight: normal; }
+.sub-package{ font-size: 120%; font-weight: bold; }
+.tags{ color: #636331; list-style-type: square; margin-bottom: 0em; margin-left: 3em; margin-right: 1em; margin-top: 0em; padding-left: 0em; vertical-align: top; }
+.term, .term li, li.term { margin: 0px; padding: 0px; margin-left: -2em }
+.tree dl { margin: 0px; }
+.tutorial{ border-color: #0066ff; border-width: thin; }
+.tutorial-nav-box{ background-color: #eeeeee; border: 1px solid #999999; width: 100%; }
+.var-default{ }
+.var-description{ color: #000066; font-weight: normal; }
+.var-summary-description { font-size: 8pt; font-weight: normal; color: #000066; }
+.var-list { margin: 0px; padding: 0px; margin-left: 2em }
+.var-list p { margin-top: 0px }
+.var-list li { list-style-type: none }
+.method-name,.include-name,.field { font-weight: bold; }
+.var-summary,.method-summary{ font-size: 8pt;}
+.var-type-summary{ color: #636331; font-size: 8pt; font-style: italic; padding-left: 1em; }
+.warning{ color: #ff6600; }
+
+/* Syntax highlighting */
+
+.src-code { padding: 1em; margin : 0px;
+            font-family: 'Courier New', Courier, monospace; font-weight: normal; margin-bottom: 1em }
+.src-line, .cmd-title {  font-family: 'Courier New', Courier, monospace; font-weight: normal; }
+.src-bg, .src-code { background-color: #eeeeee; }
+.src-bg { padding: 1em; padding-left: 2em; margin : 0px; margin-bottom: 1em }
+.src-comm { color: #009900 }
+.src-id {  }
+.src-inc { color: #0000FF; }
+.src-key { color: #0000FF; }
+.src-num { color: #CC0000; }
+.src-str { color: #40c0c0; }
+.src-sym { font-weight: bold; }
+.src-var { }
+
+.src-php { font-weight: bold; }
+
+.src-doc { color: #009999 }
+.src-doc-close-template { color: #0000FF }
+.src-doc-coretag { color: #0099FF; font-weight: bold }
+.src-doc-inlinetag { color: #0099FF }
+.src-doc-internal { color: #6699cc }
+.src-doc-tag { color: #0080CC }
+.src-doc-template { color: #0000FF }
+.src-doc-type { font-style: italic }
+.src-doc-var { font-style: italic }
+
+.tute-tag { color: #009999 }
+.tute-attribute-name { color: #0000FF }
+.tute-attribute-value { color: #0099FF }
+.tute-entity { font-weight: bold; }
+.tute-comment { font-style: italic }
+.tute-inline-tag { color: #636311; font-weight: bold }
+
+/* tutorial */
+
+.authors {  }
+.author { font-style: italic; font-weight: bold }
+.author-blurb { margin: .5em 0em .5em 2em; font-size: 85%; font-weight: normal; font-style: normal }
+.example { border: 1px dashed #999999; background-color: #EEEEEE; padding: .5em; }
+.glossary { margin: 0px; padding: 0px; margin-left: 2em; margin-top: 1em }
+.glossary li { list-style-type: none; margin: 0px; padding: 0px; margin-left: -2em }
+.glossdef { margin-left: 2em }
+.glossdef p { margin-top: 0px }
+.glossterm { font-weight: bold }
+.listing { border: 1px dashed #999999; background-color: #EEEEEE; padding: .5em; white-space: nowrap; }
+.release-info { font-size: 85%; font-style: italic; margin: 1em 0em }
+.ref-title-box { color: white; margin-bottom: 2em }
+.ref-title { color: #000066; font-size: 22px; margin-bottom: 10px }
+.ref-purpose { color: #000066; font-size: 11px; font-weight: normal }
+.ref-synopsis {  }
+.title { margin-top: 10px }
+.title b { font-weight: normal }
+.cmd-synopsis { margin: 1em 0em }
+.toc { margin-left: 2em; padding-left: 0em }
+
+

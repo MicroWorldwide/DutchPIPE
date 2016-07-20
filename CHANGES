@@ -1,0 +1,27 @@
+0.1.3
+-----
+Removed some debug messages/redundant code.
+Typo fix in Dutch translation table.
+New translation tables compiled, favicon added.
+Updated language tables, bug fix in lib/dptext.php, new mesagesystem tutorial.
+More template engine changes, better handling of user agents.
+Small css patches.
+Base64 encoding by default.
+More debugging for standalone pages. Better 'admin' system, no longer hardcoded
+usernames.
+Fixed typos in docs.
+Fixed bug: gettext -> dptext.
+More changes for the template system, renamed 'action' field to 'dpaction'.
+More bug patching in standalone locations.
+Debugged handling of "standalone" location types.
+Tell echoes less long debug string to shell.
+Added DutchPIPE manual to the standard distribution.
+Seperated new lib/dpcurrentrequest.php from lib/dpuniverse.php.
+Made all members in dpuniverse, dpserver and dpcurrentrequest.
+private, added methods and changed calls accordingly.
+Integrated gettext and printf into dptext.
+Turned user agent requirement into an option, turned off by default.
+'cms' system to retreive manual pages.
+DutchPIPE database only created when it does not exist.
+Documentation in docbook format for phpdoc, used to generate manual.
+

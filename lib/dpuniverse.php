@@ -16,9 +16,9 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpuniverse.php 56 2006-06-24 17:49:36Z ls $
+ * @version    Subversion: $Id: dpuniverse.php 93 2006-08-07 13:46:21Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
- * @see        dpserver.php, dpfunctions.php
+ * @see        currentdpuserrequest.php, dpserver.php, dpfunctions.php
  */
 
 /* Shows all possible errors */
@@ -57,70 +57,94 @@ define('_DPUSER_LAST_SCRIPTID', 8);    /* Script id of last AJAX request */
  * @version    Release: @package_version@
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  */
-class DpUniverse
+final class DpUniverse
 {
     /**
      * @var         array      All objects on the site
+     * @access      private
      */
-     public $mDpObjects = array();
+    private $mDpObjects = array();
 
     /**
      * @var         array      Reset queue, first element will reset first
+     * @access      private
      */
-    public $mDpObjectResets = array();
+    private $mDpObjectResets = array();
 
     /**
      * The environment of each object on the site in env => ob pairs.
      *
      * @var         array      The environments of objects
+     * @access      private
      */
-    public $mEnvironments = array();
+    private $mEnvironments = array();
 
     /**
      * All user objects on the site + data
      *
      * Each element in the array represents a user. A user is stored in another
-     * array, with the elements as defined by the _DPUNIVER_USER_ definitions.
+     * array, with the elements as defined by the _DPUNIVERSE_USER_ definitions.
      *
      * @var         array      All user objects on the site + data
+     * @access      private
      */
-    public $mDpUsers = array();
+    private $mDpUsers = array();
 
     /**
      * @var         array      All pending timeouts after use of setTimeout()
+     * @access      private
      */
-    public $mTimeouts = array();
+    private $mTimeouts = array();
 
     /**
      * Increasing guest counter used to form unique names for guests, for
      * example "Guest#8'
      *
      * @var         int        Increasing guest counter for unique guest names
+     * @access      private
      */
-    public $mGuestCnt;
+    private $mGuestCnt;
 
     /**
      * DpObject counter increased by newDpObject, used to generate unique object
      * ids
      *
      * @var         int        Used to generate unique object
+     * @access      private
      */
-    public $mUniqueDpObjectCnt = 1;
+    private $mUniqueDpObjectCnt = 1;
 
     /**
      * @var         object     The server object that called us
+     * @access      private
      */
-     public $mrDpServer;
+    private $mrDpServer;
 
     /**
      * @var         array      Info on the current HTTP user request
+     * @access      private
      */
-     public $mrCurrentDpUserRequest;
+    private $mrCurrentDpUserRequest;
+
+    /**
+     * @var         array      The key of the current users' entry in mDpUsers
+     * @access      private
+     */
+    private $mCurrentDpUserKey;
 
     /**
      * @var         boolean    Do not tell anything to the current http request?
+     * @access      private
      */
-     public $mNoDirectTell = FALSE;
+    private $mNoDirectTell = FALSE;
+
+    /**
+     * Error messages for the last new user registration attempt
+     *
+     * @var         array
+     * @access      private
+     */
+    private $mLastNewUserErrors = array();
 
     /**
      * Constructs this universe based on a universe ini file
@@ -133,6 +157,8 @@ class DpUniverse
         require_once($iniFile);
 
         $this->mGuestCnt = mt_rand(25, 75);
+
+        require_once(DPSERVER_LIB_PATH . 'dpcurrentrequest.php');
 
         /* These functions will be available for all objects */
         require_once(DPSERVER_LIB_PATH . 'dptext.php');
@@ -178,8 +204,9 @@ class DpUniverse
     {
         if (!is_null($rDpServer)) {
             $this->mrDpServer = $rDpServer;
-            $GLOBALS['grCurrentDpUniverse'] = &$this;
         }
+
+        $GLOBALS['grCurrentDpUniverse'] = &$this;
 
         /*
          * Because we don't use a 'ticks' system or something similar yet, user
@@ -188,61 +215,49 @@ class DpUniverse
         $this->handleLinkdead();
         $this->handleReset();
 
-        $this->mrCurrentDpUserRequest = new CurrentDpUserRequest($this,
+        $this->mrCurrentDpUserRequest = new DpCurrentRequest($this,
             $rServerVars, $rSessionVars, $rCookieVars, $rGetVars, $rPostVars,
             $rFilesVars);
-        if (FALSE === $this->mrCurrentDpUserRequest->checkUser()) {
-            if (!isset($rGetVars['ajax'])) {
-                $agent = dptext('Your browser did not report a User Agent
-string to the server. This is required.<br />');
+        $this->mrCurrentDpUserRequest->handleRequest();
 
+        if (FALSE === $this->mrCurrentDpUserRequest->isRegistered() && FALSE === $this->mrCurrentDpUserRequest->getUserAgent()) {
+            if (!isset($rGetVars['ajax'])) {
                 $this->tellCurrentDpUserRequest('<event><div id="dppage">'
                     . '<![CDATA['
-                    . $agent
+                    . dptext('Your browser did not report a User Agent string to the server. This is required.<br />')
                     . ']]></div></event>');
             }
             return;
         }
-        if (FALSE === $this->mrCurrentDpUserRequest->mCookieId) {
+        if (FALSE === $this->mrCurrentDpUserRequest->isCookieEnabled()) {
             $this->tellCurrentDpUserRequest('2');
             return;
         }
 
-        /*
-         * Because we don't use a 'ticks' system or something similar yet, user
-         * user requests are used to handle some generic cyclic calls
-         */
-        $this->handleRunkit();
-
-        $this->mrCurrentDpUserRequest->handleLocation();
-
-        $this->mDpUsers[$this->mrCurrentDpUserRequest->mUserArrKey]
-            [_DPUSER_TIME_LASTREQUEST] = time();
+        $user_arr_key = $this->_getCurrentDpUserKey();
+        $this->mDpUsers[$user_arr_key][_DPUSER_TIME_LASTREQUEST] = time();
 
         /*
          * scriptids are used to detect if a user has multiple browser windows
          * open. Each initiated dpclient-js.php sets such a random id
          */
         $old_scriptid =
-            $this->mDpUsers[$this->mrCurrentDpUserRequest->mUserArrKey]
-            [_DPUSER_CURRENT_SCRIPTID];
+            $this->mDpUsers[$user_arr_key][_DPUSER_CURRENT_SCRIPTID];
         $new_scriptid = is_null($rGetVars) || !isset($rGetVars['ajax'])
             || !isset($rGetVars['scriptid']) || 0 === (int)$rGetVars['scriptid']
             ? FALSE : $rGetVars['scriptid'];
 
         if (FALSE !== $old_scriptid && FALSE !== $new_scriptid
                 && $old_scriptid !== $new_scriptid) {
-            $this->mDpUsers[$this->mrCurrentDpUserRequest->mUserArrKey]
-                [_DPUSER_LAST_SCRIPTID] = FALSE;
-            $this->mDpUsers[$this->mrCurrentDpUserRequest->mUserArrKey]
-                [_DPUSER_CURRENT_SCRIPTID] = FALSE;
-            $this->mDpUsers[$this->mrCurrentDpUserRequest->mUserArrKey]
-                [_DPUSER_OBJECT]->tell('close_window');
+            $this->mDpUsers[$user_arr_key][_DPUSER_LAST_SCRIPTID] = FALSE;
+            $this->mDpUsers[$user_arr_key][_DPUSER_CURRENT_SCRIPTID] = FALSE;
+            $this->mDpUsers[$user_arr_key][_DPUSER_OBJECT]->tell(
+                'close_window');
         } else {
-            $this->mDpUsers[$this->mrCurrentDpUserRequest->mUserArrKey]
-                [_DPUSER_LAST_SCRIPTID] = $old_scriptid;
-            $this->mDpUsers[$this->mrCurrentDpUserRequest->mUserArrKey]
-                [_DPUSER_CURRENT_SCRIPTID] = $new_scriptid;
+            $this->mDpUsers[$user_arr_key][_DPUSER_LAST_SCRIPTID] =
+                $old_scriptid;
+            $this->mDpUsers[$user_arr_key][_DPUSER_CURRENT_SCRIPTID] =
+                $new_scriptid;
         }
 
         /*
@@ -252,12 +267,103 @@ string to the server. This is required.<br />');
         $this->handleTimeouts();
 
         $this->mrCurrentDpUserRequest->handleUser();
+
+        unset($this->mrCurrentDpUserRequest);
+        unset($this->mCurrentDpUserKey);
+    }
+
+    private function _getCurrentDpUserKey()
+    {
+        if (isset($this->mCurrentDpUserKey)) {
+            return $this->mCurrentDpUserKey;
+        }
+        end($this->mDpUsers);
+        return key($this->mDpUsers);
+    }
+
+    /**
+     * Adds a new, given user object to the universe
+     *
+     * :WARNING: Should normally only be called from lib/dpcurrentrequest.php.
+     *
+     * @access     private
+     * @param      object    &$user        a new DpUser object
+     * @param      string    $username     the user's username
+     * @param      string    $cookieID     the user's cookie ID
+     * @param      string    $cookiePass   the user's cookie password
+     * @param      boolean   $isRegistered TRUE for registered user, else FALSE
+     */
+    function addDpUser(&$user, $username, $cookieId, $cookiePass,
+            $isRegistered) {
+        $this->mDpUsers[] = array($user, array(), $username, $cookieId,
+            $cookiePass, $isRegistered, 0, FALSE, FALSE);
+    }
+
+    /**
+     * Gets pending messages for the current user request
+     *
+     * :WARNING: Should normally only be called from lib/dpcurrentrequest.php.
+     *
+     * @access     private
+     * @return     mixed     array with messages of FALSE for no messages
+     */
+    function &getCurrentDpUserMessages()
+    {
+        $rval = FALSE;
+
+        if (isset($this->mDpUsers[$this->mCurrentDpUserKey])) {
+            return $this->mDpUsers[$this->mCurrentDpUserKey][_DPUSER_MESSAGES];
+        }
+
+        return $rval;
+    }
+
+    /**
+     * Clears pending messages for the current user request
+     *
+     * :WARNING: Should normally only be called from lib/dpcurrentrequest.php.
+     *
+     * @access     private
+     */
+    function clearCurrentDpUserMessages()
+    {
+        $this->mDpUsers[$this->mCurrentDpUserKey][_DPUSER_MESSAGES] = array();
+    }
+
+    /**
+     * Finds if a user is on this site based on cookie data
+     *
+     * If found, sets $this->mCurrentDpUserKey to the key to the user info in
+     * the universe's user array.
+     *
+     * :WARNING: Should normally only be called from lib/dpcurrentrequest.php.
+     *
+     * @access     private
+     * @param      string    $cookieID     the user's cookie ID
+     * @param      string    $cookiePass   the user's cookie password
+     * @return     mixed     array with user info or FALSE if no user found
+     */
+    function &findCurrentDpUser($cookieid, $cookiepass)
+    {
+        $rval = FALSE;
+
+        foreach ($this->mDpUsers as $user_arr_key => &$u) {
+            if ($u[_DPUSER_COOKIEID] === $cookieid
+                    && $u[_DPUSER_COOKIEPASS] === $cookiepass) {
+                $this->mCurrentDpUserKey = $user_arr_key;
+                return $u;
+            }
+        }
+
+        return $rval;
     }
 
     /**
      * Checks if people left the site, throws them out of the universe
+     *
+     * @access     private
      */
-    function handleLinkdead()
+    private function handleLinkdead()
     {
         $cur_time = time();
 
@@ -339,7 +445,7 @@ string to the server. This is required.<br />');
     /**
      * Calls '__reset' in each object every DPUNIVERSE_RESET_CYCLE seconds
      */
-    function handleReset()
+    private function handleReset()
     {
         /* Perform a limited number of resets per cycle */
         $max_resets = DPUNIVERSE_MAX_RESETS;
@@ -368,6 +474,7 @@ string to the server. This is required.<br />');
     /**
      * Optionally uses experimental PHP runkit module to catch errors in code
      */
+     /*
     function handleRunkit()
     {
         if (FALSE !== DPUNIVERSE_RUNKIT) {
@@ -386,11 +493,12 @@ string to the server. This is required.<br />');
             }
         }
     }
+    */
 
     /**
      * Handles delayed function calls requested by objects in the universe
      */
-    function handleTimeouts()
+    private function handleTimeouts()
     {
         while (sizeof($this->mTimeouts)) {
             foreach ($this->mTimeouts as $i => $to) {
@@ -481,8 +589,9 @@ string to the server. This is required.<br />');
      */
     function tellCurrentDpUserRequest($talkback)
     {
+        // echo "Talkback: " . htmlentities($talkback) . "\n";
         $this->mrDpServer->tellCurrentDpUserRequest($talkback);
-        $this->mrCurrentDpUserRequest->mToldSomething = TRUE;
+        $this->mrCurrentDpUserRequest->setToldSomething();
     }
 
     /**
@@ -491,7 +600,7 @@ string to the server. This is required.<br />');
      * Used to seperate software robots from real people during registration.
      * Codes aren't generated on the fly and as such not really random because
      * the CPU time penalty is too high. A directory with pre-generated codes
-     * exist and a database table with info. A cronjob makes one every hour and
+     * exists and a database table with info. A cronjob makes one every hour and
      * replaces the oldest one in the database. Then we obtain a random entry
      * here. This should do it for now, but your milleague might vary and the
      * situation might change as spambots get smarter.
@@ -510,24 +619,6 @@ string to the server. This is required.<br />');
     }
 
     /**
-     * Validates a given CAPTCHA code against the code in the database
-     *
-     * @param      string    $captchaId  Captcha id given by the validation form
-     * @param      string    $captchaGivenCode  User input
-     * @return     boolean   TRUE if the given code was valid, FALSE otherwise
-     */
-    function validateCaptcha($captchaId, $captchaGivenCode)
-    {
-        $captchaId = addslashes($captchaId);
-        $captchaGivenCode = addslashes($captchaGivenCode);
-
-        $result = mysql_query("SELECT captchaId FROM Captcha WHERE "
-            . "captchaId='$captchaId' AND captchaFile='$captchaGivenCode.gif'");
-
-        return $result && mysql_num_rows($result);
-    }
-
-    /**
      * Creates a new object in the universe
      *
      * You MUST call this function to create new objects in a DutchPIPE
@@ -539,6 +630,7 @@ string to the server. This is required.<br />');
      */
     function &newDpObject($pathname, $sublocation = FALSE)
     {
+        echo "Making: $pathname, $sublocation\n";
         $unique_id = $this->mUniqueDpObjectCnt;
         $this->mUniqueDpObjectCnt++;
 
@@ -548,9 +640,9 @@ string to the server. This is required.<br />');
                 || substr($pathname, -4) != '.php'))) {
             require_once(DPUNIVERSE_PREFIX_PATH . DPUNIVERSE_STD_PATH
                 . 'DpPage.php');
-            $object = new DpPage($unique_id, time() + DPUNIVERSE_RESET_CYCLE, $pathname, FALSE);
+            $object = new DpPage($unique_id, time() + DPUNIVERSE_RESET_CYCLE,
+                $pathname, FALSE);
             $object->setTitle($pathname);
-            $this->__GET['location'] = $pathname;
             if (FALSE === strpos($pathname, '://')) {
                 $object->setBody($pathname, 'file');
                 $object->setNavigationTrail(array(DPUNIVERSE_NAVLOGO, '/'));
@@ -560,10 +652,16 @@ string to the server. This is required.<br />');
             $classname =  explode("/", $pathname);
             $classname = ucfirst(!strlen($classname[sizeof($classname) - 1]) ?
                 'index' : substr($classname[sizeof($classname) - 1], 0, -4));
-            $object = new $classname($unique_id, time() + DPUNIVERSE_RESET_CYCLE, $pathname, $sublocation);
+            $object = new $classname($unique_id,
+                time() + DPUNIVERSE_RESET_CYCLE, $pathname, $sublocation);
         }
         if (empty($object)) {
             return FALSE;
+        }
+
+        $this->__GET['location'] = $pathname;
+        if (FALSE !== $sublocation) {
+            $this->__GET['sublocation'] = $sublocation;
         }
 
         $this->mDpObjects[] =& $object;
@@ -689,6 +787,8 @@ string to the server. This is required.<br />');
         if (FALSE === $sublocation) {
             foreach ($this->mDpObjects as $i => &$ob) {
                 if ($pathname === $ob->getProperty('location')) {
+                    echo dptext("getDpObject(): returning existing object with location %s, no sublocation\n",
+                        $pathname);
                     return $ob;
                 }
             }
@@ -696,11 +796,18 @@ string to the server. This is required.<br />');
             foreach ($this->mDpObjects as $i => &$ob) {
                 if ($pathname === $ob->getProperty('location')
                         && $sublocation === $ob->getProperty('sublocation')) {
+                    echo dptext("getDpObject(): returning existing object with location %s, sublocation %s\n",
+                        $pathname, $sublocation);
                     return $ob;
                 }
             }
         }
 
+        echo FALSE == $sublocation
+            ? dptext("getDpObject(): returning new object for location %s, no sublocation\n",
+                $pathname)
+            : dptext("getDpObject(): returning new object for location %s, sublocation %s\n",
+                $pathname, $sublocation);
         return $this->newDpObject($pathname, $sublocation);
     }
 
@@ -805,6 +912,28 @@ string to the server. This is required.<br />');
     }
 
     /**
+     * Gets the current user connected to the server
+     *
+     * If a user page or AJAX request caused the current chain of execution that
+     * caused this function to be called, that user object is returned. Otherwise
+     * FALSE is returned. For example, if the chain of execution if caused by a
+     * setTimeout, this will return FALSE.
+     *
+     * :WARNING: Use the function get_current_dpuser() instead of calling this
+     * method.
+     *
+     * @access     private
+     * @return     object    Reference to user object of FALSE for no current user
+     */
+    function &getCurrentDpUser()
+    {
+        $rval = !isset($this->mrCurrentDpUserRequest) ? FALSE
+            : $this->mrCurrentDpUserRequest->getUser();
+
+        return $rval;
+    }
+
+    /**
      * Finds the user with the given user name or id.
      *
      * @param       string   $name   user name or id of player
@@ -834,7 +963,7 @@ string to the server. This is required.<br />');
 
         /*
          * :TODO: Since this will be used a lot, keep a seperate copy instead of
-         * constructing this arary each time
+         * constructing this array each time
          */
         foreach ($this->mDpUsers as &$u) {
             $users[] =& $u[_DPUSER_OBJECT];
@@ -844,7 +973,18 @@ string to the server. This is required.<br />');
     }
 
     /**
-     * Calls the given method after the given number of seconds
+     * Gets the number of users on this site
+     *
+     * @return     int       number of users on this site
+     */
+    function getNrOfUsers()
+    {
+        return sizeof($this->mDpUsers);
+    }
+
+
+    /**
+     * Calls a given method in an object after the given number of seconds
      *
      * Use this to perform delayed method calls in the given object. Note that
      * functions such as get_current_dpuser can be totally different when the
@@ -863,582 +1003,446 @@ string to the server. This is required.<br />');
             $this->mTimeouts[] = array(&$ob, $method, time() + $secs);
         }
     }
-}
-
-/**
- * Handles the current HTTP page or AJAX request by the user
- *
- * Each time a user requests a page or performs an AJAX check, an instance of
- * this class is created by the universe object, user data is set, and methods
- * are called in it to handle this user. After that the object is destroyed.
- *
- * @package    DutchPIPE
- * @subpackage lib
- * @author     Lennert Stock <ls@dutchpipe.org>
- * @copyright  2006 Lennert Stock
- * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Release: @package_version@
- * @link       http://dutchpipe.org/manual/package/DutchPIPE
- */
-class CurrentDpUserRequest
-{
-    /**
-     * @var         object     Reference to the universe object
-     */
-    public $mrDpUniverse;
 
     /**
-     * @var         array      User server variables
-     */
-    public $__SERVER;
-
-    /**
-     * @var         array      User session variables
-     */
-    public $__SESSION;
-
-    /**
-     * @var         array      User cookie variables
-     */
-    public $__COOKIE;
-
-    /**
-     * @var         array      User get variables
-     */
-    public $__GET;
-
-    /**
-     * @var         array      User post variables
-     */
-    public $__POST;
-
-    /**
-     * @var         array      User files variables
-     */
-    public $__FILES;
-
-    /**
-     * @var         object     Reference to the environment of user
-     */
-    public $mrEnvironment;
-
-    /**
-     * @var         object     Reference to the user object in the universe
-     */
-    public $mrUser;
-
-    /**
-     * @var         int        Key to user object above in array with all users
-     */
-    public $mUserArrKey;
-
-    /**
-     * @var         boolean    Is this request coming from a registered user?
-     */
-    public $mIsRegistered = FALSE;
-
-    /**
-     * @var         string     The user name behind the current client request
-     */
-    public $mUsername;
-
-    /**
-     * The 'cookie id' of the user client behind the current request
+     * Gets an array with information about the universe
      *
-     * We don't store the users real username and password in his cookie, but
-     * something we generated and stored in the user's database entry. If the
-     * cookie is stolen, the username/password isn't.
+     * The following array is returned:
      *
-     * @var         string     The cookie id of the current user
-     */
-    public $mCookieId;
-
-    /**
-     * The 'cookie password' of the user client behind the current request
+     * array(
+     *     'memory_usage'       : <int Universe memory usage in bytes>
+     *     'nr_of_objects'      : <int Number of objects in the universe>
+     *     'nr_of_users'        : <int Number of users in the universe>
+     *     'nr_of_environments' : <int Number of environments in the universe>
+     *     'nr_of_timeouts'     : <int Number of "timeouts" in the universe>
+     * );
      *
-     * We don't store the users real username and password in his cookie, but
-     * something we generated and stored in the user's database entry. If the
-     * cookie is stolen, the username/password isn't.
-     *
-     * @var         string     The cookie password of the current user
+     * @return     array     universe information
      */
-    public $mCookiePass;
-
-    /**
-     * @var         boolean    Has the user been told anything this request?
-     */
-    public $mToldSomething;
-
-    /**
-     * Used if the experimental PHP runkit module is used. If for instance a
-     * page object contins a syntax error and a user tries to go there, this
-     * flag will be true.
-     *
-     * @var         boolean    TRUE if the user tried to move but failed
-     */
-    public $mMoveError;
-
-    /**
-     * :KLUDGE: Used as a kludge to handle user movements within this request
-     *
-     * @var         boolean    TRUE if the user moved
-     */
-    public $mHasMoved;
-
-    /**
-     * @var         boolean    Is this user a known search bot/spider/crawler?
-     */
-    public $mIsKnownBot = FALSE;
-
-    /**
-     * Sets up the object handling the current user request
-     *
-     * @param   array   $rDpUniverse  Reference to the universe object
-     * @param   array   $rServerVars  User server variables
-     * @param   array   $rSessionVars User session variables
-     * @param   array   $rCookieVars  User cookie variables
-     * @param   array   $rGetVars     User get variables
-     * @param   array   $rPostVars    User post variables
-     * @param   array   $rFilesVars   User files variables
-     */
-    function __construct(&$rDpUniverse, &$rServerVars, &$rSessionVars,
-                         &$rCookieVars, &$rGetVars, &$rPostVars, &$rFilesVars)
+    function getUniverseInfo()
     {
-        $this->mrDpUniverse = $rDpUniverse;
-
-        if (!is_null($rServerVars)) {
-            $this->__SERVER = $rServerVars;
-        }
-        if (!is_null($rSessionVars)) {
-            $this->__SESSION = $rSessionVars;
-        }
-        if (!is_null($rCookieVars)) {
-            $this->__COOKIE = $rCookieVars;
-        }
-        if (!is_null($rGetVars)) {
-            $this->__GET = $rGetVars;
-        }
-        if (!is_null($rPostVars)) {
-            $this->__POST = $rPostVars;
-        }
-        if (!is_null($rFilesVars)) {
-            $this->__FILES = $rFilesVars;
-        }
+        return array(
+            'memory_usage' => memory_get_usage(),
+            'nr_of_objects' => sizeof($this->mDpObjects),
+            'nr_of_users' => sizeof($this->mDpUsers),
+            'nr_of_environments' => sizeof($this->mEnvironments),
+            'nr_of_timeouts' => sizeof($this->mTimeouts));
     }
 
     /**
-     * Checks if the current connection can be tied to a user.
-     *
-     * Checks and possibly creates user and location objects, handles passing of
-     * variables such server, cookie and get arrays.
-     *
-     * @return  boolean TRUE for valid user request, FALSE otherwise
+     * Attempts to login the given user object of a guest as a registered user
      */
-    function checkUser()
+    function validateExisting(&$user)
     {
-        /* Do we have a session cookie (guest) or fixed cookie (registered)? */
-        if (isset($this->__COOKIE)
-                && isset($this->__COOKIE[DPSERVER_COOKIE_NAME])
-                && strlen($this->__COOKIE[DPSERVER_COOKIE_NAME])
-                && strlen($cookie_data =
-                    trim($this->__COOKIE[DPSERVER_COOKIE_NAME], ';'))
-                && sizeof($cookie_data = explode(';', $cookie_data))
-                && 2 === sizeof($cookie_data)) {
-            $this->mCookieId = $cookie_data[0];
-            $this->mCookiePass = $cookie_data[1];
-            /* Is the user already on this site? */
-            foreach ($this->mrDpUniverse->mDpUsers as $user_arr_key => &$u) {
-                if ($u[_DPUSER_COOKIEID] === $this->mCookieId
-                        && $u[_DPUSER_COOKIEPASS] === $this->mCookiePass) {
-                    $this->mrUser = &$u[_DPUSER_OBJECT];
-                    $this->mUsername = $u[_DPUSER_NAME];
-                    if ($u[_DPUSER_ISREGISTERED] == '1') {
-                        $this->mrUser->addProperty('is_registered');
-                        $this->mIsRegistered = TRUE;
-                    } else {
-                        $this->mrUser->removeProperty('is_registered');
-                    }
-                    $this->mUserArrKey = $user_arr_key;
-                }
-            }
-            /* Skip Ajax database check for now, but what are the security
-               implications? */
-            if (!isset($this->mrUser)) {
-                $result = mysql_query("SELECT userUsername FROM Users WHERE "
-                    . "userCookieId='{$this->mCookieId}' and "
-                    . "userCookiePassword='{$this->mCookiePass}'");
-                if (empty($result) || !($row = mysql_fetch_array($result))) {
-                    $this->mrUser = NULL;
-                    $this->mUsername = NULL;
-                    $this->mIsRegistered = FALSE;
-                    $this->mUserArrKey = NULL;
-                } else {
-                    $this->mUsername = $row[0];
-                    $this->mIsRegistered = TRUE;
-                }
-            }
-        } else {
-            if (isset($this->__GET) && isset($this->__GET['ajax'])) {
-                $this->mCookieId = FALSE;
-                $this->mUsername = 'Cookieless';
-                echo dptext("NO COOKIE\n");
-                return TRUE;
-            }
+        $this->mLastNewUserErrors = array();
+        if (!isset($user->_GET['username'])
+                || 0 === strlen($user->_GET['username'])) {
+            $this->mLastNewUserErrors[] = '<li>'
+                . dptext('No username was given') . '</li>';
         }
-        if (!isset($this->mUsername)) {
-            if (FALSE === $this->setupGuest()) {
-                return FALSE;
-            }
+        if (0 === sizeof($this->mLastNewUserErrors)
+                && $user->_GET['username'] === $user->getTitle()) {
+            $this->mLastNewUserErrors[] = '<li>'
+                . sprintf(dptext('You are already logged in as %s'),
+                $user->getTitle()) . '</li>';
+        } elseif (!isset($user->_GET['password'])
+                || 0 === strlen($user->_GET['password'])) {
+            $this->mLastNewUserErrors[] = '<li>'
+                . dptext('No password was given') . '</li>';
         }
-        if (!isset($this->mrUser) || empty($this->mrUser)) {
-            $this->createUser();
-        }
-        if (FALSE === $this->handleCleanLocation()) {
-            $tmp = $this->mrUser->getEnvironment();
-            if (isset($this->__GET['method']) && FALSE !== $tmp) {
-                $this->__GET['location'] = $tmp->getProperty('location');
-            } elseif (isset($this->mrUser->__GET['proxy'])
-                    || (FALSE !== $tmp && (isset($this->mrUser->__GET['ajax'])
-                    || isset($this->__GET['method']))
-                    && FALSE !== $tmp->getProperty('is_layered'))) {
-                $this->__GET['location'] = $tmp->getProperty('location');
+        if (0 === sizeof($this->mLastNewUserErrors)) {
+            $username = addslashes($user->_GET['username']);
+            $result = mysql_query("SELECT userUsername, userPassword, "
+                . "userCookieId, userCookiePassword FROM Users WHERE "
+                . "userUsernameLower='" . strtolower($username) . "'");
+            if (empty($result) || !($row = mysql_fetch_array($result))) {
+                $this->mLastNewUserErrors[] =
+                    '<li>' . dptext('That username doesn\'t exist') . '</li>';
             } else {
-                $this->__GET['location'] = DPUNIVERSE_PAGE_PATH . 'index.php';
+                if ($row[1] !== $user->_GET['password']) {
+                    $this->mLastNewUserErrors[] = '<li>'
+                        . dptext('Invalid password') . '</li>';
+                }
             }
         }
-        $this->mrUser->setVars($this->__SERVER, $this->__SESSION,
-            $this->__COOKIE, $this->__GET, $this->__POST, $this->__FILES);
-        return TRUE;
-    }
 
-    /**
-     * Initializes guest variables, sets cookie
-     *
-     * Sets up a random Guest#X user name and sends a cookie to the guest to
-     * store user information.
-     *
-     * Some experimental stuff is going on with search bots, so you can see
-     * them crawling the site. This will later be turned into an option.
-     *
-     * FALSE is returned if the user's client didn't report a "user agent"
-     * string. This is mandatory. The guest member variables will not be set up.
-     *
-     * @return  boolean TRUE for succesful setup, FALSE otherwise
-     */
-    function setupGuest()
-    {
-        /* Gets the browser name of the user, a.k.a. the user agent */
-        $agent = !isset($this->__SERVER['HTTP_USER_AGENT'])
-                || 0 === strlen($this->__SERVER['HTTP_USER_AGENT'])
-            ? FALSE : $this->__SERVER['HTTP_USER_AGENT'];
-
-        /* What IP address is the user coming from? */
-        $remote_address = !isset($this->__SERVER['REMOTE_ADDR'])
-                || 0 === strlen($this->__SERVER['REMOTE_ADDR'])
-            ? FALSE : $this->__SERVER['REMOTE_ADDR'];
-
-        /*
-         * Give special guest names to some well known search bots.
-         * Otherwise the name will be Guest#<number>.
-         */
-
-        if (FALSE === $agent) {
-            echo dptext("No agent\n");
+        if (sizeof($this->mLastNewUserErrors)) {
+            $user->tell('<window styleclass="dpwindow_error"><h1>'
+                . dptext('Invalid login') . '</h1><br /><ul>'
+                . implode('', $this->mLastNewUserErrors) . '</ul></window>');
             return FALSE;
         }
-        $result = mysql_query("SELECT userAgentTitle FROM UserAgentTitles "
-            . "WHERE userAgentString='$agent'");
-        if (FALSE === $result || !($row = mysql_fetch_array($result))) {
-            $is_known_bot = FALSE;
-            $username = sprintf(dptext('Guest#%d'),
-                $this->mrDpUniverse->getGuestCnt());
-        } else {
-            $is_known_bot = TRUE;
-            $username = $row[0];
+
+        $username = $row[0];
+        $cookie_id = $row[2];
+        $cookie_pass = $row[3];
+        $user->tell('<cookie>removeguest</cookie>');
+        $user->_COOKIE[DPSERVER_COOKIE_NAME] = "$cookie_id;$cookie_pass";
+        $user->tell('<cookie>' . $user->_COOKIE[DPSERVER_COOKIE_NAME] . '</cookie>');
+        $user->_GET['username'] = $username;
+        $user->addId($user->_GET['username']);
+        $user->addId(strtolower($user->_GET['username']));
+        $user->setTitle(ucfirst($user->_GET['username']));
+        $user->addProperty('is_registered');
+        if ($user === get_current_dpuser()) {
+            $this->mrCurrentDpUserRequest->setUsername($username);
         }
 
-        $this->mUsername = $username;
-        $this->mCookieId = make_random_id();
-        $this->mCookiePass = make_random_id();
-        $this->mIsKnownBot = $is_known_bot;
-        echo "Set-Login: {$this->mCookieId};{$this->mCookiePass}\n";
-        $this->mrDpUniverse->tellCurrentDpUserRequest(
-            "Set-Login: {$this->mCookieId};{$this->mCookiePass}");
+        /* :TODO: Move admin flag to user table in db */
+        if ($user->_GET['username'] == 'Lennert') {
+            $user->addProperty('is_admin');
+        }
+        foreach ($this->mDpUsers as $user_nr => &$u) {
+            if ($u[0] === $user) {
+                $this->mDpUsers[$user_nr][2] =
+                    $user->_GET['username'];
+                $this->mDpUsers[$user_nr][3] = $cookie_id;
+                $this->mDpUsers[$user_nr][4] = $cookie_pass;
+                $this->mDpUsers[$user_nr][5] = 1;
+            }
+        }
+        $user->tell('<changeDpElement id="username">'
+            . $user->_GET['username'] . '</changeDpElement>');
+
+        $user->tell(array('abstract' => '<changeDpElement id="'
+            . $user->getUniqueId() . '"><b>'
+            . $user->getAppearance(1, FALSE) . '</b></changeDpElement>',
+            'graphical' => '<changeDpElement id="'
+            . $user->getUniqueId() . '"><b>'
+            . $user->getAppearance(1, FALSE, $user, 'graphical')
+            . '</b></changeDpElement>'));
+        $user->tell('<changeDpElement id="loginlink"><a href="'
+            . DPSERVER_CLIENT_URL . '?location=' . DPUNIVERSE_PAGE_PATH
+            . 'login.php&amp;act=logout" style="padding-left: 4px">'
+            . dptext('Logout') . '</a></changeDpElement>');
+        $user->getEnvironment()->tell(array(
+            'abstract' => '<changeDpElement id="' . $user->getUniqueId() . '">'
+            . $user->getAppearance(1, FALSE) . '</changeDpElement>',
+            'graphical' => '<changeDpElement id="'
+            . $user->getUniqueId() . '">'
+            . $user->getAppearance(1, FALSE, $user, 'graphical')
+            . '</changeDpElement>'), $user);
+        $user->tell('<window><h1>' . dptext('Welcome back') . '</h1><br />'
+            . sprintf(dptext('You are now logged in as: <b>%s</b>'),
+            $user->getTitle()) . '</window>');
+
         return TRUE;
     }
 
     /**
-     * Checks if the given location exists
-     *
-     * @return  boolean TRUE for valid location, FALSE otherwise
+     * Logs out a given registered user and turns the user into a guest
      */
-    function handleCleanLocation()
+    function logoutUser(&$user)
     {
-        if (!isset($this->__GET['location'])
-                || !strlen($this->__GET['location'])) {
-            return isset($this->__GET['getdivs']);
+        $username = sprintf(dptext('Guest#%d'), $this->getGuestCnt());
+        $cookie_id = make_random_id();
+        $cookie_pass = make_random_id();
+        $oldtitle = $user->getTitle();
+        $user->tell('<cookie>removeregistered</cookie>');
+        $user->_COOKIE[DPSERVER_COOKIE_NAME] = "$cookie_id;$cookie_pass";
+        $this->tellCurrentDpUserRequest("Set-Login: "
+            . $user->_COOKIE[DPSERVER_COOKIE_NAME]);
+        $user->_GET['username'] = $username;
+        $user->removeId($oldtitle);
+        $user->addId($username);
+        $user->setTitle(ucfirst($username));
+        $user->removeProperty('is_registered');
+        $user->removeProperty('is_admin');
+        if ($user === get_current_dpuser()) {
+            $this->mrCurrentDpUserRequest->setUsername($username);
         }
 
-        if (FALSE !== ($pos = strpos($this->__GET['location'], '?'))) {
-            $this->__GET['location'] =
-                substr($this->__GET['location'], 0, $pos);
+        foreach ($this->mDpUsers as $user_nr => &$u) {
+            if ($u[0] === $user) {
+                $this->mDpUsers[$user_nr][2] = $username;
+                $this->mDpUsers[$user_nr][3] = $cookie_id;
+                $this->mDpUsers[$user_nr][4] = $cookie_pass;
+                $this->mDpUsers[$user_nr][5] = 0;
+            }
         }
+        $this->mrCurrentDpUserRequest->setHasMoved();
+        $this->mNoDirectTell = TRUE;
+        $user->tell('<window><h1>' . sprintf(dptext('Logged out %s'),
+            $oldtitle) . '</h1><br />' . dptext('See you later!') . '<br />'
+            . dptext('You are now: <b>%s</b>', $user->getTitle())
+            . '</b></window>');
+        $this->mNoDirectTell = FALSE;
+        $user->tell('<location>' . DPUNIVERSE_PAGE_PATH
+            . 'login.php</location>');
 
-        if (FALSE !== ($pos = strpos($this->__GET['location'], '#'))) {
-            $this->__GET['location'] =
-                substr($this->__GET['location'], 0, $pos);
-        }
+        $user->getEnvironment()->tell(array(
+            'abstract' => '<changeDpElement id="' . $user->getUniqueId() . '">'
+            . $user->getAppearance(1, FALSE) . '</changeDpElement>',
+            'graphical' => '<changeDpElement id="'
+            . $user->getUniqueId() . '">'
+            . $user->getAppearance(1, FALSE, $user, 'graphical')
+            . '</changeDpElement>'), $user);
+    }
 
-        /* Experimental */
-        if (isset($this->__GET['proxy'])
-                || 0 === strpos($this->__GET['location'], '/mailman2/')) {
+    /**
+     * Attempts the first step in registering a new user, throws CAPTCHA
+     */
+    function validateNewUser(&$user)
+    {
+        if (FALSE === $this->validLoginInfo($user->_GET['username'],
+                $user->_GET['password'], $user->_GET['password2'])) {
+            $user->tell('<window styleclass="dpwindow_error"><h1>'
+                . dptext('Invalid registration') . '</h1><br />'
+                . dptext('Please correct the following errors:') . '<ul>'
+                . implode('', $this->mLastNewUserErrors) . '</ul></window>');
+            return FALSE;
+        } else {
+            if (!isset($user->_GET['givencode'])) {
+                if (FALSE === ($captcha_id = $this->getRandCaptcha())) {
+                    return TRUE;
+                }
+                $user->tell('<window><form method="post" onsubmit="return '
+                    . 'send_captcha(' . $captcha_id . ')"><div align="center">'
+                    . '<img id="captchaimage" src="/dpcaptcha.php?captcha_id='
+                    . $captcha_id . '" border="0" alt="" /></div>'
+                    . '<br clear="all" />'
+                    . dptext('To complete registration, please enter the code you see above:')
+                    . '<br /><br /><div align="center" '
+                    . 'style="margin-bottom: 5px"><input id="givencode" '
+                    . 'type="text" size="6" maxlength="6" value="" /> '
+                    . '<input type="submit" value="'
+                    . dptext('OK') . '" /></div><br />'
+                    . dptext('This system is used to filter software robots from
+registrations submitted by individuals. If you are unable to validate the
+above code, please <a href="mailto:registration@dutchpipe.org">mail us</a>
+to complete registration.') . '</form></window>');
+                return FALSE;
+            }
             return TRUE;
         }
-
-        if (7 < strlen($this->__GET['location'])
-                && 'http://' === substr($this->__GET['location'], 0, 7)) {
-            return TRUE;
-        }
-
-        return (file_exists(DPUNIVERSE_PREFIX_PATH . $this->__GET['location'])
-                && is_file(DPUNIVERSE_PREFIX_PATH . $this->__GET['location']))
-            || (file_exists(DPUNIVERSE_WWW_PATH . $this->__GET['location'])
-                && is_file(DPUNIVERSE_WWW_PATH . $this->__GET['location']));
     }
 
     /**
-     * Creates a new user object in the universe
+     * Attempts the second step in registering a new user, validates CAPTCHA
+     */
+    function validateCaptcha(&$user)
+    {
+        if (FALSE === $this->validateNewUser($user)) {
+            return;
+        }
+        if (!isset($user->_GET['captcha_id'])
+                || !isset($user->_GET['givencode']) || FALSE ===
+                $this->validateCaptcha2($user->_GET['captcha_id'],
+                $user->_GET['givencode'])) {
+            if (FALSE === ($captcha_attempts =
+                    $user->getProperty('captcha_attempts'))
+                    || $captcha_attempts < 2) {
+                $user->addProperty('captcha_attempts',
+                    FALSE === $captcha_attempts ? 1 : $captcha_attempts + 1);
+                return;
+            }
+            $user->removeProperty('captcha_attempts');
+            $user->tell('<window styleclass="dpwindow_error"><h1>'
+                . dptext('Failure validating code') . '</h1><br />'
+                . dptext('Please try again.') . '</window>');
+            return;
+        }
+
+        $username = $user->_GET['username'];
+
+        $keys = $vals = array();
+        $keys[] = 'userUsername';
+        $vals[] = "'" . addslashes($user->_GET['username']) . "'";
+        $keys[] = 'userUsernameLower';
+        $vals[] = "'" . addslashes(strtolower($user->_GET['username']))
+            . "'";
+        $keys[] = 'userPassword';
+        $vals[] = "'" . addslashes($user->_GET['password']) . "'";
+        $keys[] = 'userCookieId';
+        $vals[] = "'" . ($cookie_id = make_random_id()) . "'";
+        $keys[] = 'userCookiePassword';
+        $vals[] = "'" . ($cookie_pass = make_random_id()) . "'";
+        $keys = implode(',', $keys);
+        $vals = implode(',', $vals);
+        mysql_query("INSERT INTO Users ($keys) VALUES ($vals)");
+        $user->tell('<cookie>removeguest</cookie>');
+        $user->_COOKIE[DPSERVER_COOKIE_NAME] = "$cookie_id;$cookie_pass";
+        $user->tell('<cookie>' . $user->_COOKIE[DPSERVER_COOKIE_NAME]
+            . '</cookie>');
+        $user->addId($username);
+        $user->setTitle(ucfirst($username));
+        $user->addProperty('is_registered');
+        $user->removeProperty('is_admin');
+        if ($user === get_current_dpuser()) {
+            $this->mrCurrentDpUserRequest->setUsername($username);
+        }
+
+        foreach ($this->mDpUsers as $user_nr => &$u) {
+            if ($u[0] === $user) {
+                $this->mDpUsers[$user_nr][2] = $username;
+                $this->mDpUsers[$user_nr][3] = $cookie_id;
+                $this->mDpUsers[$user_nr][4] = $cookie_pass;
+                $this->mDpUsers[$user_nr][5] = 1;
+            }
+        }
+        $user->tell('<changeDpElement id="username">' . $username
+            . '</changeDpElement>');
+        $user->tell(array('abstract' => '<changeDpElement id="'
+            . $user->getUniqueId() . '"><b>'
+            . $user->getAppearance(1, FALSE) . '</b></changeDpElement>',
+            'graphical' => '<changeDpElement id="'
+            . $user->getUniqueId() . '"><b>'
+            . $user->getAppearance(1, FALSE, $user, 'graphical')
+            . '</b></changeDpElement>'));
+        $user->tell('<changeDpElement id="loginlink"><a href="'
+            . DPSERVER_CLIENT_URL . '?location=' . DPUNIVERSE_PAGE_PATH
+            . 'login.php&amp;act=logout" style="padding-left: 4px">'
+            . dptext('Logout') . '</a></changeDpElement>');
+        if ($env = $user->getEnvironment()) {
+            $env->tell(array('abstract' => '<changeDpElement id="'
+                . $user->getUniqueId() . '">'
+                . $user->getAppearance(1, FALSE) . '</changeDpElement>',
+                'graphical' => '<changeDpElement id="'
+                . $user->getUniqueId() . '">'
+                . $user->getAppearance(1, FALSE, $user, 'graphical')
+                . '</changeDpElement>'), $user);
+        }
+        $user->tell('<window><h1>'
+            . dptext('Thank you for registering and welcome to DutchPIPE!')
+            . '</h1><br />'
+            . sprintf(dptext('You are now logged in as: <b>%s</b>'), $username)
+            . '</window>');
+    }
+
+    /**
+     * Validates a given CAPTCHA code against the code in the database
      *
-     * An object to represent either a guest or a registered user in the
-     * universe is created, and added to the universe's user list. This method
-     * should only be called if the user does not exist yet in the universe,
-     * that is, the user entered the site. The user is created based on member
-     * values set in this object. After this method was called, the user object
-     * has been fully set-up, but has no environment yet.
+     * @param      string    $captchaId  Captcha id given by the validation form
+     * @param      string    $captchaGivenCode  User input
+     * @return     boolean   TRUE if the given code was valid, FALSE otherwise
      */
-    function createUser()
+    function validateCaptcha2($captchaId, $captchaGivenCode)
     {
-        echo "createUser\n";
-        $this->mrUser = $this->mrDpUniverse->newDpObject(DPUNIVERSE_STD_PATH
-            . 'DpUser.php');
-        $this->mrUser->addId($this->mUsername);
-        $this->mrUser->setTitle(ucfirst($this->mUsername));
+        $captchaId = addslashes($captchaId);
+        $captchaGivenCode = addslashes($captchaGivenCode);
 
-        if (FALSE !== $this->mIsKnownBot) {
-            $this->mrUser->setTitleImg(DPUNIVERSE_IMAGE_URL . 'bot.gif');
-            $this->mrUser->setBody('<img src="' . DPUNIVERSE_IMAGE_URL
-                . 'bot.gif" border="0" alt="" align="left" '
-                . 'style="margin-right: 15px" />'
-                . dptext('This is a search engine indexing this site.<br />'));
-        }
+        $result = mysql_query("SELECT captchaId FROM Captcha WHERE "
+            . "captchaId='$captchaId' AND captchaFile='$captchaGivenCode.gif'");
 
-        if (FALSE !== $this->mIsRegistered) {
-            $this->mrUser->addProperty('is_registered');
-        }
-        if ($this->mUsername == 'Lennert') {
-            $this->mrUser->addProperty('is_admin');
-        }
-        if (FALSE === $this->mCookieId) {
-            $this->mrUser->addProperty('no_cookies');
-        }
-        if (FALSE !== $this->mIsKnownBot) {
-            $this->mrUser->addProperty('is_known_bot');
-        }
-        $this->mrDpUniverse->mDpUsers[] = array(
-            $this->mrUser,
-            array(),
-            $this->mUsername,
-            $this->mCookieId,
-            $this->mCookiePass,
-            $this->mIsRegistered,
-            0,
-            FALSE,
-            FALSE);
-
-        end($this->mrDpUniverse->mDpUsers);
-        $this->mUserArrKey = key($this->mrDpUniverse->mDpUsers);
-        echo dptext("User created\n");
+        return $result && mysql_num_rows($result);
     }
 
     /**
-     * Checks the location of the user currently connected.
-     *
-     * Checks if the user moved or entered the site, so the user gets a new
-     * or a first environment. Also handles pages "outside" dpuniverse and
-     * method calls from the AJAX client.
+     * Is the given login info valid?
      */
-    function handleLocation()
+    private function validLoginInfo($userName, $password, $password2)
     {
-        //echo "handleLocation()\n";
-        if (is_null($this->mrEnvironment)) {
-            echo sprintf(dptext("Getting location %s\n"),
-                $this->__GET['location']);
-            $sublocation = !isset($this->__GET['sublocation']) ? FALSE : $this->__GET['sublocation'];
-            $tmp = $this->mrDpUniverse->getDpObject(
-                $this->__GET['location'], $sublocation);
-            if (FALSE === $tmp) {
-                $this->mrDpUniverse->getDpObject(
-                    DPUNIVERSE_PAGE_PATH . 'index.php');
-            }
-            $this->mrEnvironment = $tmp;
-        }
+        $this->mLastNewUserErrors = array();
 
-        if (FALSE === ($env = $this->mrUser->getEnvironment())
-                || $env !== $this->mrEnvironment) {
-            //echo "\n\n" . $location ."\n\n";
-            if (!$env) {
-                $from_where = sprintf(dptext("%s enters the site.<br />"),
-                    ucfirst($this->mrUser->getTitle(
-                    DPUNIVERSE_TITLE_TYPE_DEFINITE)));
-            } else {
-                $env->tell(sprintf(dptext("%s leaves to %s.<br />"),
-                    ucfirst($this->mrUser->getTitle(
-                    DPUNIVERSE_TITLE_TYPE_DEFINITE)),
-                    $this->mrEnvironment->getTitle()), $this->mrUser);
-                $from_where = sprintf(dptext("%s arrives from %s.<br />"),
-                    ucfirst($this->mrUser->getTitle(
-                    DPUNIVERSE_TITLE_TYPE_DEFINITE)), $env->getTitle());
+        $len = strlen($userName);
+        if (0 === $len) {
+            $this->mLastNewUserErrors[] = '<li>'
+                . dptext('No username was given') . '</li>';
+        } else {
+            if ($len < DPUNIVERSE_MIN_USERNAME_LEN) {
+                $this->mLastNewUserErrors[] = '<li>' . sprintf(
+                    dptext('The username must be at least %d characters long'),
+                    DPUNIVERSE_MIN_USERNAME_LEN) . '</li>';
+            } elseif ($len > DPUNIVERSE_MAX_USERNAME_LEN) {
+                $this->mLastNewUserErrors[] = '<li>' . sprintf(
+                    dptext('The username must be at most %d characters long'),
+                    DPUNIVERSE_MAX_USERNAME_LEN) . '</li>';
             }
-            $this->mrUser->moveDpObject($this->mrEnvironment);
-            $this->mrEnvironment->tell($from_where, $this->mrUser);
-        }
 
-        elseif (!isset($this->__GET['ajax'])
-                && !isset($this->__GET['method'])) {
-            echo "handleLocation getAppearance\n";
-            if (FALSE !== ($body = $this->mrEnvironment->getAppearance(0, TRUE,
-                    NULL, $this->mrUser->getProperty('display_mode')))) {
-                $this->mrUser->tell('<div id="dppage">' . $body . '</div>');
-            }
-        }
-        elseif (isset($this->__GET['method'])) {
-            if (!isset($this->__GET['call_object'])
-                    || !strlen($call_object = $this->__GET['call_object'])) {
-                $this->mrEnvironment->{$this->__GET['method']}();
-            }
-            else {
-                if (FALSE !== ($call_object =
-                        $this->mrDpUniverse->findDpObject($call_object))) {
-                    $call_object->{$this->__GET['method']}();
-                }
-            }
-        }
-        if (isset($this->__GET['getdivs'])) {
-            $getdivs = explode('#', trim($this->__GET['getdivs'], '#'));
-            foreach ($getdivs as $getdiv) {
-                echo "getdiv: $getdiv\n";
-                if ($getdiv == 'dpinventory') {
-                    $this->mrUser->tell($this->mrEnvironment->
-                        getAppearanceInventory(0, TRUE, $this->mrUser,
-                        $this->mrUser->getProperty('display_mode')));
-                } elseif ($getdiv == 'dpmessagearea') {
-                    $this->mrUser->tell('<div id="dpmessagearea">'
-                        . '<div id="dpmessagearea_inner"><div id="messages">'
-                        . '<br clear="all" /></div><br clear="all" />'
-                        . '<form id="actionform" method="get" onSubmit="return '
-                        . 'action_dutchpipe()"><input id="action" type="text" '
-                        . 'name="action" value="" size="40" maxlength="255" '
-                        . 'style="float: left; margin-top: 0px" /></form></div>'
-                        . '<br clear="all" />&#160;</div>');
-                }
-            }
-        }
-        $this->mToldSomething = FALSE;
-    }
-
-    /**
-     * Handles this user request after we have a user object and environment
-     *
-     * Checks for waiting messages and actions performed.
-     */
-    function handleUser()
-    {
-        if (isset($this->__GET['ajax'])) {
-            $this->mrUser->addProperty('is_ajax_capable');
-        }
-
-        /*
-         * Skip once if the user has moved and hence the request died. Need to
-         * think if this must account for the three other calls below too.
-         */
-        if (!isset($this->mHasMoved)) {
-            $this->handleMessages();
-        }
-        $this->handleAction();
-        $this->handleMoverror();
-        $this->handleNothingTold();
-    }
-
-    /**
-     * Checks for and handles actions by the current user
-     */
-    function handleAction()
-    {
-        if (isset($this->__GET) && is_array($this->__GET)
-                && isset($this->__GET['action'])) {
-            $this->mrUser->performAction(htmlspecialchars(
-                (string)$this->__GET['action']));
-        }
-    }
-
-    /**
-     * Checks for stored messages for the current user
-     */
-    function handleMessages()
-    {
-        /* Loop through all users to find the current user */
-        foreach ($this->mrDpUniverse->mDpUsers as $i => &$u) {
-            /* Check if this is the current user */
-            if ($u[_DPUSER_OBJECT] === $this->mrUser) {
-                /* Tell user all stored messages */
-                foreach ($u[_DPUSER_MESSAGES] as &$message) {
-                    if (is_null($message[1])
-                            || (FALSE !== ($env =
-                                $u[_DPUSER_OBJECT]->getEnvironment())
-                            && $env === $message[1])) {
-                        $this->mrUser->tell($message[0]);
-                        $this->mToldSomething = TRUE;
-                    } else {
+            /*if (FALSE !== ($words = file(DUTCHPIPE_FORBIDDEN_USERNAMES_FILE))
+                    && count($words)) {
+                foreach ($words as $word) {
+                    if (FALSE !== strpos($userName, $word)) {
+                        $this->lastUsernameError[] = '<li>' .
+                        dptext('This username is not allowed, please try again.')
+                        . '</li>';
+                        break;
                     }
                 }
-                /* Delete these stored messages */
-                $this->mrDpUniverse->mDpUsers[$i][_DPUSER_MESSAGES] = array();
+            }*/
+
+            $lower_user_name = strtolower($userName);
+            if ($lower_user_name{0} < 'a' || $lower_user_name{0} > 'z') {
+                $this->mLastNewUserErrors[] = '<li>'
+                     . dptext('Illegal character in username at position 1 (usernames must start with a letter, digits or other characters are not allowed)')
+                     . '</li>';
+            }
+            for ($i = 1; $i < $len; $i++) {
+                if (($lower_user_name{$i} < 'a' || $lower_user_name{$i} > 'z')
+                        && ($lower_user_name{$i} < '0'
+                        || $lower_user_name{$i} > '9')) {
+                    $this->mLastNewUserErrors[] = '<li>' . sprintf(
+                        dptext('Illegal character in username at position %d (you can only use a-z and 0-9)'),
+                        ($i + 1)) . '</li>';
+                    break;
+                }
+            }
+
+            $result = mysql_query("SELECT userId FROM Users WHERE "
+                . "userUsernameLower='" . strtolower($userName) . "'");
+            if ($result && mysql_num_rows($result)) {
+                $this->mLastNewUserErrors[] = '<li>'
+                    . dptext('That username is already in use') . '</li>';
             }
         }
+
+        if (!isset($password) || !strlen($password)) {
+            $this->mLastNewUserErrors[] = '<li>'
+                . dptext('No password was given') . '</li>';
+        }
+
+        if (0 === sizeof($this->mLastNewUserErrors)) {
+            if (strlen($password) < 6) {
+                $this->mLastNewUserErrors[] = '<li>'
+                    . dptext('Your password must be at least 6 characters long')
+                    . '</li>';
+            } elseif (strlen($password) > 32) {
+                $this->mLastNewUserErrors[] = '<li>'
+                    . dptext('Your password must be at most 32 characters long')
+                    . '</li>';
+            } elseif (!strlen($password2)) {
+                $this->mLastNewUserErrors[] = '<li>'
+                    . dptext('You didn\'t repeat your password') . '</li>';
+            } elseif ($password !== $password2) {
+                $this->mLastNewUserErrors[] = '<li>'
+                    . dptext('The repeated password was different') . '</li>';
+            }
+        }
+
+        return 0 === sizeof($this->mLastNewUserErrors);
     }
 
     /**
-     * Handles moving into objects which can't be created
+     * Sets the user been told anything this request
      *
-     * Used by the experimental "runtime" mechanism based on the PHP runtime
-     * module. Currently not functional, ignore.
+     * @access     private
      */
-    function handleMoverror()
+    function setToldSomething()
     {
-        if (isset($this->mMoveError)) {
-            $tmp = $this->mUsername;
-            /* :KLUDGE: A random non-existing name */
-            $this->mUsername = 'ddfjjsdfdfj';
-            $this->mrUser->tell($this->mMoveError);
-            unset($this->mMoveError);
-            $this->mUsername = $tmp;
-        }
+        $this->mrCurrentDpUserRequest->setToldSomething();;
     }
 
     /**
-     * Handles sending '1' for AJAX if no other talkback was sent
+     * Has the user been told anything this request?
+     *
+     * @access     private
+     * @return     boolean TRUE if user was told something, FALSE otherwise
      */
-    function handleNothingTold()
+    function isToldSomething()
     {
-        if (isset($this->__GET['ajax']) && !isset($this->__GET['method'])) {
-            if (FALSE === $this->mToldSomething) {
-                $this->mrUser->tell("empty");
-            } else {
-                echo "---------------------------\n";
-            }
-        } else {
-            echo "---------------------------\n";
-        }
+        return $this->mrCurrentDpUserRequest->isToldSomething();
+    }
+
+    /**
+     * Do not tell anything to the current http request?
+     *
+     * @access     private
+     * @return     boolean TRUE for no telling, FALSE otherwise
+     */
+    function isNoDirectTell()
+    {
+        return $this->mNoDirectTell;
     }
 }
+
 ?>

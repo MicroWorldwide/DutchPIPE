@@ -14,20 +14,23 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpcaptcha.php 45 2006-06-20 12:38:26Z ls $
+ * @version    Subversion: $Id: dpcaptcha.php 67 2006-06-30 22:43:03Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see         dpclient.php
  */
 
+$config_dir = realpath(dirname(isset($_SERVER['SCRIPT_FILENAME'])
+    ? $_SERVER['SCRIPT_FILENAME'] : __FILE__) . '/../config');
+
 /**
  * Gets server settings
  */
-require_once('../config/dpserver-ini.php');
+require_once($config_dir . '/dpserver-ini.php');
 
 /**
  * Gets universe settings
  */
-require_once('../config/dpuniverse-ini.php');
+require_once($config_dir . '/dpuniverse-ini.php');
 
 /**
  * Gets I18N/L10 dptext functionality (if enabled)

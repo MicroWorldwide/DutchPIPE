@@ -1,0 +1,95 @@
+<refentry id="{@id}">
+    <refnamediv>
+        <refname>Installation - Requirements</refname>
+        <refpurpose>
+            REQUIREMENTS FOR USING AND INSTALLING DUTCHPIPE
+        </refpurpose>
+        </refnamediv>
+    {@toc}
+    <refsect1 id="{@id skills}">
+        <title>Skill Requirements</title>
+        <orderedlist>
+            <listitem>
+                <formerpara>
+                    <title>PHP 5</title>
+                    <para>
+                        Knowledge of PHP 5 and in particular PHP 5 objects.
+                        However, if you have PHP 4 experience only, DutchPIPE is
+                        an excellent project to learn more about PHP 5.
+                    </para>
+                </formerpara>
+            </listitem>
+            <listitem>
+                <formerpara>
+                    <title>Javascript/AJAX</title>
+                    <para>
+                        If you like more magic to happen than the current
+                        library provides, Javascript/AJAX knowledge is required.
+                        As with PHP 5, DutchPIPE is a great project to get
+                        skilled with AJAX.
+                    </para>
+                </formerpara>
+            </listitem>
+        </orderedlist>
+    </refsect1>
+    <refsect1 id="{@id software}">
+        <title>Software Requirements</title>
+        <orderedlist>
+            <listitem>
+                <formerpara>
+                    <title>A *NIX or Windows platform</title>
+                    <para>
+                        DutchPIPE was developed and tested on FreeBSD 6. You
+                        must have full access to a computer or server to run
+                        DutchPIPE. I also installed it successfully on a Windows
+                        XP box, using {@link http://www.wampserver.com/en/}
+                        to install Apache, PHP and MySQL.
+                    </para>
+                </formerpara>
+            </listitem>
+            <listitem>
+                <formerpara>
+                    <title>A web server</title>
+                    <para>
+                        DutchPIPE.org runs on Apache 2.2, I haven't been able to
+                        test on other servers yet.
+                    </para>
+                </formerpara>
+            </listitem>
+            <listitem>
+                <formerpara>
+                    <title>
+                        PHP 5 with the extensions: simple_xml and sockets (both
+                        for the web server and "on the command line")
+                    </title>
+                    <para>
+                        DutchPIPE.org has been using PHP 5.1+. The simple_xml
+                        extension is supported by default on PHP 5.
+                    </para>
+                </formerpara>
+            </listitem>
+            <listitem>
+                <formerpara>
+                    <title>MySQL</title>
+                    <para>
+                        Used to store registered users. There are just a few
+                        queries, more databases will be supported later. If you
+                        don't have MySQL you can still test DutchPIPE if you rip
+                        some queries out, you just can't register.
+                    </para>
+                </formerpara>
+            </listitem>
+            <listitem>
+                <formerpara>
+                    <title>An AJAX capable web browser</title>
+                    <para>
+                        Currently Firefox, IE6 and IE7 beta 2 are supported
+                        100%. Opera and Safari will be supported as soon as
+                        possible. If you can help test on Safari, please contact
+                        me.
+                    </para>
+                </formerpara>
+            </listitem>
+        </orderedlist>
+    </refsect1>
+</refentry>

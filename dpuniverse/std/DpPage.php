@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpPage.php 45 2006-06-20 12:38:26Z ls $
+ * @version    Subversion: $Id: DpPage.php 97 2006-08-11 21:56:59Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -249,7 +249,7 @@ class DpPage extends DpObject
     /**
      * Gets data for the navigation trail for this page, if any
      *
-     * @return  array           navigation trail elements
+     * @return     array     navigation trail elements
      */
     function getNavigationTrail()
     {
@@ -259,7 +259,7 @@ class DpPage extends DpObject
     /**
      * Gets HTML with a navigation trail for this page
      *
-     * @return  string          HTML for navigation trail
+     * @return     string    HTML for navigation trail
      */
     function getNavigationTrailHtml()
     {
@@ -275,14 +275,26 @@ class DpPage extends DpObject
             . 'class="arrnav" /> ', $trail);
     }
 
+    /**
+     * Gets HTML with a navigation trail element for this page
+     *
+     * @access     private
+     * @param      mixed     $navitem   string or string/destination pairs
+     * @return     string    HTML for navigation trail element
+     * @see        getNavigationTrailHtml
+     */
     function _getNavigationTrailHtmlElement($navitem)
     {
         if (FALSE === is_array($navitem)) {
             return $navitem;
         }
 
-        $link = $navitem[1] == '/' ? '/' : DPSERVER_CLIENT_URL . '?location='
-            . $navitem[1];
+        if (strlen($navitem[1]) >= 6 && substr($navitem[1], 0, 6) == 'uri://') {
+            $link = substr($navitem[1], 6);
+        } else {
+            $link = $navitem[1] == '/' ? DPUNIVERSE_WWW_URL
+                : DPSERVER_CLIENT_URL . '?location=' . $navitem[1];
+        }
 
         return $navitem[0] <> DPUNIVERSE_NAVLOGO
             ? '<div id="navlink"><a class="navtrail" href="' . $link . '">'

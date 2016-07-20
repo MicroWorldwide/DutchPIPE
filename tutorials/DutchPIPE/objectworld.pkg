@@ -1,0 +1,122 @@
+<refentry id="{@id}">
+    <refnamediv>
+        <refname>A world populated with objects</refname>
+        <refpurpose>
+            PERSISTENT OBJECTS WHICH CAN CONTAIN OTHER OBJECTS
+        </refpurpose>
+    </refnamediv>
+    <refsect1 id="{@id how}">
+        <para>
+            An "object" is a programming principle, where you have little
+            pockets of functionality and information depicting stuff like users,
+            pages or a database api, which operate on themselves and on
+            eachother.
+        </para>
+        <para>
+            Web servers like Apache destroy served client requests, all objects
+            are destroyed after a page is served, and this made object oriented
+            programming rather limited before, serving mainly as a way to
+            organize code. There are web servers and many alternatives that do
+            allow a persistent state, although it's usually in single user mode,
+            and objects float "in nowhere". Most of them only show updates with
+            each page view, or require something like Java on the client-side.
+        </para>
+        <para>
+            What gives DutchPIPE the feel and functionality which makes it rise
+            above the normal concept of a collection of persistent objects, is
+            the concept of one world for everyone, and the concept of objects
+            being able to contain objects and be in another object. This is what
+            makes it an abstracted world, and this allows for a lot of
+            "auto-magic" to arise for developers. This world concept is much
+            like the {@link http://www.faqs.org/faqs/games/mud-faq/lp/ LPMud}
+            (Multi-user Dungeons/Domains/Dimensions by Lars Pensj&#246;) concept
+            I toyed with in the early nineties, and still appeals to me as one
+            of the most natural and powerful building concepts.
+        </para>
+        <figure>
+            <mediaobject>
+                <ulink url="/dpclient.php?location=/page/copyright.php">
+                    <imageobject>
+                        <imagedata fileref="/images/woodenshoes.jpg" width="270"
+                            height="178" align="right" format="JPG">
+                        </imagedata>Photo by Bobby Box - Click for details
+                    </imageobject>
+                </ulink>
+                <textobject>
+                    <phrase>Objects, objects, objects...</phrase>
+                </textobject>
+            </mediaobject>
+        </figure>
+        <para>
+            Our world concept is based on just three very important functions
+            which are available to all objects:
+        </para>
+        <itemizedlist>
+            <listitem>
+                <code>ob-&gt;getEnvironment()</code> returns the object which
+                contains '<code>ob</code>'
+            </listitem>
+            <listitem>
+                <code>ob-&gt;getInventory()</code> returns an array of objects
+                that '<code>ob</code>' contains
+            </listitem>
+            <listitem>
+                <code>ob-&gt;moveObject(ob2)</code> moves '<code>ob</code>' into
+                '<code>ob2</code>'
+            </listitem>
+        </itemizedlist>
+        <para>
+            (Internally, PHP doesn't know about the concept of objects
+            containing other objects, and this feature is purely simulated.
+            These functions operate on a global array which maps each object to
+            the object in which it is contained, its "environment".)
+        </para>
+        <para>
+            User objects are moved into page objects, that is, the page must be
+            seen as the environment or location of the user. Other objects, such
+            as a product object, can then be put in this location, and then the
+            user can pick it up to "carry" the object, because it is in the same
+            environment.
+        </para>
+        <para>
+            Each object inherits a standard object class which defines common
+            features, which among others simulate our world concept. The three
+            core methods listed to the left are among these. Others are methods
+            to set the object's appearance and add actions (see below) to it.
+            Extending the standard object class, other standard object classes,
+            such as the user, page or drink class, define our building tools.
+        </para>
+        <para>
+            Another important concept is that chains of events are triggered by
+            objects calling eachothers' methods. These chains of events can be
+            triggered by user actions, or running processes. Each object can
+            define actions, which can become available to a user when the object
+            is either a) the user itself, b) in the user's inventory, b) its
+            environment, c) in the user's environment.
+        </para>
+        <para>
+            For instance, a page can define the action "print", which becomes
+            available when the user enters the page, because the user object is
+            moved into it. The object "beer" defines the action "drink", which,
+            if the beer is "dropped" in a page, becomes available when the user
+            enters the page. When you try to drink it, it will then give a
+            message you need to pick up the beer, if you didn't do so already by
+            natural reflex. The object enters your inventory, and the drink
+            action becomes available again. The method in the object which is
+            linked to the drink action and called when you attempt to drink it,
+            now sees by a call to <code>getEnvironment()</code> it is indeed
+            picked up. It calls methods in itself to alter its state into "an
+            empty beer glass". It calls methods in the user object and in its
+            environment and other user objects present on the page to
+            communicate a message or animation which depicts the drinking (this
+            is an example of how users get messages and such from stuff
+            triggered by others). If the page depicts a bar, that object could
+            then decide to offer you a new beer object.
+        </para>
+        <para>
+            Popular actions are defined by the user object itself, for instance
+            the actions "get" and "drop" are not defined by each object for
+            themselves, but by the user object, to operate on other objects.
+        </para>
+    </refsect1>
+</refentry>

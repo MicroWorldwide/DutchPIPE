@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpObject.php 46 2006-06-20 12:55:45Z ls $
+ * @version    Subversion: $Id: DpObject.php 97 2006-08-11 21:56:59Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  */
 
@@ -158,10 +158,14 @@ class DpObject
      * :WARNING: it is unlikely you need to call this function directly
      *
      * @access     private
-     * @param      string    $unique_id  A unique id for this object
+     * @param      string    $unique_id   A unique id for this object
+     * @param      int       $reset_time  The UNIX reet time for this object
+     * @param      string    $location    Location, e.g. /page/cms.php
+     * @param      string    $sublocation Sublocation, e.g. 96
      * @see        createDpObject
      */
-    final function __construct($unique_id, $reset_time, $location, $sublocation = FALSE)
+    final function __construct($unique_id, $reset_time, $location,
+            $sublocation = FALSE)
     {
         /* This method may only be called once, at creation time */
         if (FALSE !== $this->getProperty('creation_time')) {
@@ -170,7 +174,10 @@ class DpObject
         $this->addProperty('reset_time', $reset_time);
         $this->addProperty('location', $location);
         if (FALSE !== $sublocation) {
+            echo "adding property sublocation\n";
             $this->addProperty('sublocation', $sublocation);
+        } else {
+            echo "no sublocation\n";
         }
 
         /* Standard setup calls to set some default values */
@@ -463,20 +470,31 @@ class DpObject
             }
         }
 
-        if ((!isset($this->_GET) || !isset($this->_GET['getdivs']))
-                && FALSE !== ($body = $target_ob->getAppearance(0, TRUE, NULL,
-                    $this->getProperty('display_mode')))) {
-            $this->tell('<div id="dppage">' . $body . '</div>');
+        if (!isset($this->_GET) || !isset($this->_GET['getdivs'])) {
+            $body = isset($this->_GET) && isset($this->_GET['ajax'])
+                ? $target_ob->getAppearanceInventory(0, TRUE, NULL,
+                    $this->getProperty('display_mode'))
+                : $target_ob->getAppearance(0, TRUE, NULL,
+                    $this->getProperty('display_mode'));
+            if (FALSE !== $body) {
+                if (!is_null($target_ob->getTemplateFile())) {
+                    $this->tell('<xhtml>' . $body . '</xhtml>');
+                } else {
+                    $this->tell('<div id="'
+                        . (isset($this->_GET) && isset($this->_GET['ajax'])
+                        ? 'dpinventory' : 'dppage') . '">' . $body . '</div>');
+                }
+            }
         }
 
         return FALSE;
     }
 
     /**
-     * Checks if an object is present in our inventory
+     * Checks if an object is present in this object's inventory
      *
      * If $what is a string, searches for an object with that id. If $what is an
-     * object, searches for the object. Searches are done in the inventory of
+     * object, searches for that object. Searches are done in the inventory of
      * this object.
      *
      * @param      mixed     $what       string (id) or object to search for
@@ -1056,7 +1074,7 @@ class DpObject
      *
      * @param      int       $level           level of visibility
      * @param      boolean   $include_div     include div with id around HTML?
-     * @param      object    $from            expiremental
+     * @param      object    $from            experimental
      * @param      string    $displayMode     'abstract' or 'graphical'
      * @param      boolean   $displayTitlebar display title bar for pages?
      * @return     string    HTML "appearance" of this object
@@ -1095,12 +1113,13 @@ class DpObject
                         . '<img id="butbottom" src="/images/bottom.gif" '
                         . 'align="absbottom" width="11" height="11" border="0" '
                         . 'alt="' . $bottom . '" title="' . $bottom . '" '
-                        . 'onClick="_gel(\'action\').focus(); '
+                        . 'onClick="_gel(\'dpaction\').focus(); '
                         . 'scroll(0, 999999)" /></div>';
                 }
+                $titlebar = '<div id="titlebar">' . $titlebar . '</div>';
             }
             $body = '<div id="' . $elementId . '"><div id="' . $elementId
-                . '_inner1"><div id="titlebar">' . $titlebar . '</div><div class="' . $elementId
+                . '_inner1">' . $titlebar . '<div class="' . $elementId
                 . '_inner2">' . ($displayTitlebar === -1 ? ''
                 : $this->getBody() . '<br />');
 
@@ -1117,7 +1136,15 @@ class DpObject
                     . ($inventory == '' ? dptext('Nothing') : $inventory)
                     . '</div></div></div>';
             }
-            return $body . $inventory . '</div></div></div>';
+            $body .= $inventory . '</div></div></div>';
+            if (FALSE !== $displayTitlebar && !is_null($this->mTemplateFile)) {
+                $fp = fopen($this->mTemplateFile, 'r');
+                $xhtml = fread($fp, filesize($this->mTemplateFile));
+                fclose($fp);
+                $xhtml = str_replace('{$body}', $body, $xhtml);
+                return $xhtml;
+            }
+            return $body;
         } elseif (1 === $level) {
             if (is_null($from)) {
                 $from = $user;
@@ -1418,9 +1445,10 @@ class DpObject
             $action_menu .= '<div class="action_menu" '
                 . 'onMouseOver="this.className=\'action_menu_selected\'" '
                 . 'onMouseOut="this.className=\'action_menu\'" '
-                . 'onClick="' . (FALSE === $send_action ?
-                "_gel('action').value = '$actionstr'" : 'send_action2server(\''
-                . $actionstr . "')") . '">' . $action_data[0] . "</div>\n";
+                . 'onClick="' . (FALSE === $send_action
+                ? "_gel('dpaction').value = '$actionstr'"
+                : 'send_action2server(\'' . $actionstr . "')") . '">'
+                . $action_data[0] . "</div>\n";
         }
         get_current_dpuser()->tell('<actions id="' . $this->getUniqueId()
             . '">' . $action_menu . '</actions>');

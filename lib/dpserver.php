@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpserver.php 45 2006-06-20 12:38:26Z ls $
+ * @version    Subversion: $Id: dpserver.php 77 2006-07-13 20:39:04Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpclient.php, dpuniverse.php
  */
@@ -282,7 +282,7 @@ final class DpServer
                  * system or external cron triggered calls should be used in the
                  * future
                  */
-                if (1 === mt_rand(1, 2 + sizeof($universe->mDpUsers))) {
+                if (1 === mt_rand(1, 2 + $universe->getNrOfUsers())) {
                     $this->_showStatus($universe);
                 }
                 break;
@@ -344,13 +344,15 @@ final class DpServer
             return;
         }
 
+        $info = $universe->getUniverseInfo();
+
         print_f("Memory: %uKB KB  #Objects: %u  #Users: %u  #Environments: %u  "
             . "#Timeouts: %u\n",
-            round(memory_get_usage() / 1024),
-            sizeof($universe->mDpObjects),
-            sizeof($universe->mDpUsers),
-            sizeof($universe->mEnvironments),
-            sizeof($universe->mTimeouts));
+            round($info['memory_usage'] / 1024),
+            sizeof($info['nr_of_objects']),
+            sizeof($info['nr_of_users']),
+            sizeof($info['nr_of_environments']),
+            sizeof($info['nr_of_timeouts']));
     }
 
     /**

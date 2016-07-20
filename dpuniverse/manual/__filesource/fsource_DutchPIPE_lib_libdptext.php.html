@@ -1,0 +1,110 @@
+<table border="0" cellpadding="0" cellspacing="0" style="width: 98%">
+  <tr valign="top">
+    <td class="menu">
+                        <br />
+            <br />
+              <div class="package">
+                    <a href="../ric_INSTALL.html">INSTALL</a>&nbsp;|
+                    <a href="../ric_LICENSE.html">LICENSE</a>&nbsp;|
+                    <a href="../ric_README.html">README</a>&nbsp;|
+                    <a href="../todolist.html">Todo List</a>&nbsp;|
+        <a href="../classtrees_DutchPIPE.html">Class Tree</a>&nbsp;|
+        <a href="../elementindex_DutchPIPE.html">Index</a>
+        </div>
+    </td>
+    <td>
+      <table cellpadding="10" cellspacing="0" width="100%" border="0"><tr><td valign="top">
+<span id="gototop" style="position:absolute;z-index:100"><a href="javascript:window.scrollTo(0,0)"><img id="buttop" src="/images/top.gif" width="11" height="11" border="0" alt="Go to Top" title="Go to Top" /></a></span>
+<script src="/jumptop.js"></script>
+<h1>Source for file dptext.php</h1>
+<p>Documentation is available at <a href="../DutchPIPE/lib/_lib---dptext.php.html">dptext.php</a></p>
+<div class="src-code"><span class="php">
+<ol class="src-bg"><li class="src-li"><div class="src-line"><a name="a1"></a><span class="src-php">&lt;?php</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a2"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a3"></a><span class="src-doc">&nbsp;*&nbsp;Replacements&nbsp;for&nbsp;gettext&nbsp;and&nbsp;_&nbsp;if&nbsp;gettext&nbsp;is&nbsp;not&nbsp;enabled&nbsp;in&nbsp;PHP</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a4"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a5"></a><span class="src-doc">&nbsp;*&nbsp;DutchPIPE&nbsp;version&nbsp;0.1;&nbsp;PHP&nbsp;version&nbsp;5</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a6"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a7"></a><span class="src-doc">&nbsp;*&nbsp;LICENSE:&nbsp;This&nbsp;source&nbsp;file&nbsp;is&nbsp;subject&nbsp;to&nbsp;version&nbsp;1.0&nbsp;of&nbsp;the&nbsp;DutchPIPE&nbsp;license.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a8"></a><span class="src-doc">&nbsp;*&nbsp;If&nbsp;you&nbsp;did&nbsp;not&nbsp;receive&nbsp;a&nbsp;copy&nbsp;of&nbsp;the&nbsp;DutchPIPE&nbsp;license,&nbsp;you&nbsp;can&nbsp;obtain&nbsp;one&nbsp;at</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a9"></a><span class="src-doc">&nbsp;*&nbsp;http://dutchpipe.org/license/1_0.txt&nbsp;or&nbsp;by&nbsp;sending&nbsp;a&nbsp;note&nbsp;to</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a10"></a><span class="src-doc">&nbsp;*&nbsp;license@dutchpipe.org,&nbsp;in&nbsp;which&nbsp;case&nbsp;you&nbsp;will&nbsp;be&nbsp;mailed&nbsp;a&nbsp;copy&nbsp;immediately.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a11"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a12"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@package</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;DutchPIPE</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a13"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@subpackage</span><span class="src-doc">&nbsp;lib</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a14"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@author</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lennert&nbsp;Stock&nbsp;&lt;ls@dutchpipe.org&gt;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a15"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@copyright</span><span class="src-doc">&nbsp;&nbsp;2006&nbsp;Lennert&nbsp;Stock</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a16"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@license</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;http://dutchpipe.org/license/1_0.txt&nbsp;&nbsp;DutchPIPE&nbsp;License</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a17"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@version</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;Subversion:&nbsp;$Id:&nbsp;dpfunctions.php&nbsp;15&nbsp;2006-05-18&nbsp;21:50:46Z&nbsp;ls&nbsp;$</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a18"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@link</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://dutchpipe.org/manual/package/DutchPIPE</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a19"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dpuniverse.php</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a20"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a21"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a22"></a><span class="src-key">if&nbsp;</span><span class="src-sym">(</span><span class="src-sym">!</span><span class="src-id"><a href="../DutchPIPE/config/_config---dpserver-ini.php.html#defineDPSERVER_GETTEXT_ENABLED">DPSERVER_GETTEXT_ENABLED</a>&nbsp;</span>||&nbsp;<span class="src-sym">!</span><a href="http://www.php.net/function_exists">function_exists</a><span class="src-sym">(</span><span class="src-str">'gettext'</span><span class="src-sym">))&nbsp;</span><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a23"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a24"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;Looks&nbsp;up&nbsp;an&nbsp;optionally&nbsp;formatted&nbsp;message&nbsp;in&nbsp;the&nbsp;current&nbsp;domain&nbsp;for</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a25"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;translation</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a26"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a27"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;All&nbsp;texts&nbsp;in&nbsp;the&nbsp;DutchPIPE&nbsp;source&nbsp;code&nbsp;should&nbsp;be&nbsp;passed&nbsp;through&nbsp;this</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a28"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;function&nbsp;in&nbsp;English.&nbsp;This&nbsp;allows&nbsp;DutchPIPE&nbsp;to&nbsp;return&nbsp;translated&nbsp;strings</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a29"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;for&nbsp;DutchPIPE&nbsp;sites&nbsp;in&nbsp;other&nbsp;languages.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a30"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a31"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;The&nbsp;message&nbsp;can&nbsp;be&nbsp;a&nbsp;plain&nbsp;string,&nbsp;or&nbsp;a&nbsp;formatted&nbsp;string&nbsp;according&nbsp;to</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a32"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;the&nbsp;sprintf&nbsp;format,&nbsp;see&nbsp;http://www.php.net/sprintf.&nbsp;In&nbsp;the&nbsp;last&nbsp;case&nbsp;more</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a33"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;arguments&nbsp;must&nbsp;be&nbsp;given&nbsp;to&nbsp;fill&nbsp;in&nbsp;values,&nbsp;as&nbsp;seen&nbsp;in&nbsp;the&nbsp;sprintf</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a34"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;documentation.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a35"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a36"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;If&nbsp;gettext&nbsp;is&nbsp;enabled&nbsp;and&nbsp;the&nbsp;set&nbsp;language&nbsp;is&nbsp;not&nbsp;equal&nbsp;to&nbsp;language&nbsp;of</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a37"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;the&nbsp;given&nbsp;string,&nbsp;a&nbsp;translated&nbsp;string&nbsp;will&nbsp;be&nbsp;returned&nbsp;if&nbsp;available&nbsp;in</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a38"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;the&nbsp;translation&nbsp;table.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a39"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a40"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;</span><span class="src-doc-coretag">@param&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="src-doc-type">string&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;</span><span class="src-doc-var">$message&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;the&nbsp;integer&nbsp;or&nbsp;string&nbsp;to&nbsp;check</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a41"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;</span><span class="src-doc-coretag">@param&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="src-doc-type">mixed&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="src-doc-var">$args,...&nbsp;</span><span class="src-doc">&nbsp;&nbsp;the&nbsp;integer&nbsp;or&nbsp;string&nbsp;to&nbsp;check</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a42"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;</span><span class="src-doc-coretag">@return&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="src-doc-type">string&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;string&nbsp;produced&nbsp;according&nbsp;to&nbsp;format&nbsp;and&nbsp;language</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a43"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a44"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">function&nbsp;</span><a href="../DutchPIPE/lib/_lib---dptext.php.html#functiondptext">dptext</a><span class="src-sym">(</span><span class="src-var">$message</span><span class="src-sym">)</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a45"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a46"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">if&nbsp;</span><span class="src-sym">(</span><span class="src-num">1&nbsp;</span>===&nbsp;<a href="http://www.php.net/func_num_args">func_num_args</a><span class="src-sym">(</span><span class="src-sym">))&nbsp;</span><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a47"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">return&nbsp;</span><span class="src-var">$message</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a48"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a49"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$args&nbsp;</span>=&nbsp;<a href="http://www.php.net/func_get_args">func_get_args</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a50"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$args&nbsp;</span>=&nbsp;<a href="http://www.php.net/array_slice">array_slice</a><span class="src-sym">(</span><span class="src-var">$args</span><span class="src-sym">,&nbsp;</span><span class="src-num">1</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a51"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">return&nbsp;</span><a href="http://www.php.net/vsprintf">vsprintf</a><span class="src-sym">(</span><span class="src-var">$message</span><span class="src-sym">,&nbsp;</span><span class="src-var">$args</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a52"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a53"></a><span class="src-sym">}&nbsp;</span><span class="src-key">else&nbsp;</span><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a54"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">if&nbsp;</span><span class="src-sym">(</span><span class="src-sym">!</span>isset<span class="src-sym">(</span><span class="src-var">$language</span><span class="src-sym">))&nbsp;</span><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a55"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-doc">/*&nbsp;:TODO:&nbsp;Check&nbsp;Windows/other&nbsp;*NIXes&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a56"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.php.net/putenv">putenv</a><span class="src-sym">(</span><span class="src-str">'LANGUAGE='&nbsp;</span>.&nbsp;<span class="src-id"><a href="../DutchPIPE/config/_config---dpserver-ini.php.html#defineDPSERVER_LOCALE_FULL">DPSERVER_LOCALE_FULL</a></span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a57"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.php.net/putenv">putenv</a><span class="src-sym">(</span><span class="src-str">'LANG='&nbsp;</span>.&nbsp;<span class="src-id"><a href="../DutchPIPE/config/_config---dpserver-ini.php.html#defineDPSERVER_LOCALE_FULL">DPSERVER_LOCALE_FULL</a></span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a58"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.php.net/setlocale">setlocale</a><span class="src-sym">(</span><span class="src-id">LC_ALL</span><span class="src-sym">,&nbsp;</span><span class="src-id"><a href="../DutchPIPE/config/_config---dpserver-ini.php.html#defineDPSERVER_LOCALE_FULL">DPSERVER_LOCALE_FULL</a></span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a59"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-id">bindTextDomain</span><span class="src-sym">(</span><span class="src-id"><a href="../DutchPIPE/config/_config---dpserver-ini.php.html#defineDPSERVER_GETTEXT_DOMAIN">DPSERVER_GETTEXT_DOMAIN</a></span><span class="src-sym">,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a60"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-id"><a href="../DutchPIPE/config/_config---dpserver-ini.php.html#defineDPSERVER_GETTEXT_LOCALE_PATH">DPSERVER_GETTEXT_LOCALE_PATH</a></span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a61"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-id">textDomain</span><span class="src-sym">(</span><span class="src-id"><a href="../DutchPIPE/config/_config---dpserver-ini.php.html#defineDPSERVER_GETTEXT_DOMAIN">DPSERVER_GETTEXT_DOMAIN</a></span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a62"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.php.net/bind_textdomain_codeset">bind_textdomain_codeset</a><span class="src-sym">(</span><span class="src-id"><a href="../DutchPIPE/config/_config---dpserver-ini.php.html#defineDPSERVER_GETTEXT_DOMAIN">DPSERVER_GETTEXT_DOMAIN</a></span><span class="src-sym">,</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a63"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-id"><a href="../DutchPIPE/config/_config---dpserver-ini.php.html#defineDPSERVER_GETTEXT_ENCODING">DPSERVER_GETTEXT_ENCODING</a></span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a64"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a65"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a66"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a67"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;</span><span class="src-doc-coretag">@ignore</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a68"></a><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a69"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">function&nbsp;</span><a href="../DutchPIPE/lib/_lib---dptext.php.html#functiondptext">dptext</a><span class="src-sym">(</span><span class="src-var">$message</span><span class="src-sym">)</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a70"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a71"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">if&nbsp;</span><span class="src-sym">(</span><span class="src-num">1&nbsp;</span>===&nbsp;<a href="http://www.php.net/func_num_args">func_num_args</a><span class="src-sym">(</span><span class="src-sym">))&nbsp;</span><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a72"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">return&nbsp;</span><a href="http://www.php.net/gettext">gettext</a><span class="src-sym">(</span><span class="src-var">$message</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a73"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a74"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a75"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-var">$args&nbsp;</span>=&nbsp;<a href="http://www.php.net/func_get_args">func_get_args</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a76"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">return&nbsp;</span><a href="http://www.php.net/vsprintf">vsprintf</a><span class="src-sym">(</span><a href="http://www.php.net/gettext">gettext</a><span class="src-sym">(</span><span class="src-var">$message</span><span class="src-sym">)</span><span class="src-sym">,&nbsp;</span><a href="http://www.php.net/array_slice">array_slice</a><span class="src-sym">(</span><span class="src-var">$args</span><span class="src-sym">,&nbsp;</span><span class="src-num">1</span><span class="src-sym">))</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a77"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a78"></a><span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a79"></a><span class="src-php">?&gt;</span></div></li>
+</ol>
+</span></div>
+        <div class="credit">
+		    <hr class="separator" />
+		    Documentation generated on Sun, 13 Aug 2006 20:43:30 +0200 by <a href="http://www.phpdoc.org">phpDocumentor 1.3.0RC6</a>
+	      </div>
+      </td></tr></table>
+    </td>
+  </tr>
+</table>

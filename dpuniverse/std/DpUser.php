@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpUser.php 45 2006-06-20 12:38:26Z ls $
+ * @version    Subversion: $Id: DpUser.php 84 2006-07-19 20:56:04Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpLiving
  */
@@ -189,7 +189,7 @@ class DpUser extends DpLiving
         // If this user is the same user doing the current HTTP request, tell
         // straight away. Otherwise, store the message for the next time we get
         // a HTTP request from the user.
-        if (TRUE === get_current_dpuniverse()->mNoDirectTell
+        if (TRUE === get_current_dpuniverse()->isNoDirectTell()
                 || $this !== get_current_dpuser()) {
             echo sprintf(dptext("Storing %s: %s\n"), $this->getTitle(),
                 (strlen($data) > 512 ? substr($data, 0, 512) : $data));
@@ -237,17 +237,13 @@ class DpUser extends DpLiving
                 $data = '1';
             }
         }
-        if ($data !== '1'
-                || !isset($universe->mrCurrentDpUserRequest->mToldSomething)
-                || FALSE ===
-                $universe->mrCurrentDpUserRequest->mToldSomething) {
-
+        if ($data !== '1' || !$universe->isToldSomething()) {
             if ($mtype_start !== '') {
                 $data = "<$mtype_start>$data</$mtype_end>";
             }
             if ($data !== '1') {
                 echo sprintf(dptext("Telling %s: %s\n"), $this->getTitle(),
-                    (strlen($data) > 512 ? substr($data, 0, 512) : $data));
+                    (strlen($data) > 256 ? substr($data, 0, 256) : $data));
             }
             if ($mtype_end === '' || $mtype_end === 'header'
                     || $mtype_end === 'cookie' || $mtype_end === 'location') {

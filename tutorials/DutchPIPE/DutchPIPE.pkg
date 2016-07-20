@@ -1,0 +1,238 @@
+<refentry id="{@id}">
+    <refnamediv>
+        <refname>Introduction</refname>
+        <refpurpose>GETTING STARTED WITH DUTCHPIPE</refpurpose>
+    </refnamediv>
+    {@toc}
+    <refsect1 id="{@id welcome}">
+        <title>Welcome to DutchPIPE</title>
+        <para>
+            With open source DutchPIPE software, web developers can make
+            virtual multi-user environments. Each web page becomes an
+            abstracted environment or location where visitors and other items
+            on the page are visualized. This status is retained as visitors
+            move around. A lot of real-time interaction is possible. The
+            result: Persistent Interactive Page Environments. DutchPIPE uses
+            AJAX and the DOM for the browser - it works without Java, Flash,
+            plug-in or firewall adjustments. On the server,
+            {@link http:///www.php.net/ PHP 5} is used.
+        </para>
+    </refsect1>
+    <refsect1 id="{@id warning}">
+        <title>Warning</title>
+        <para>
+            This is unfinished "alpha" software. It is not for the faint of
+            heart. Both code and documentation are in alpha status. This is the
+            the work of one man, in four months, after work. There will be bugs,
+            issues, and even plain unfinished parts. Some parts are quite clean,
+            others still the result of organic growth. This release is aimed at
+            those interested to play around with it, to increase interest, get
+            bug reports, attract contributors, and all that.
+        </para>
+        <para>
+            You should be aware that DutchPIPE is not secure yet, if there is
+            such a thing. For example, the AJAX engine uses lazy GETs all over
+            the place, even when POSTs should be used, and the consequences of
+            tinkering these requests have not been fully explored or closed yet.
+            In other words: Only use this alpha software if you know what you
+            are doing. Try this on a test machine, not your public company
+            server with other sites or anything like that.
+        </para>
+    </refsect1>
+    <refsect1 id="{@id layout}">
+        <title>Directory Layout</title>
+        <para>
+            Although this will most likely change in the near future, currently
+            DutchPIPE has the following directory structure:
+        </para>
+        <variablelist>
+            <varlistentry>
+                <term><filename>config/</filename></term>
+                <listitem><para>Configuration files</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>doc/</filename></term>
+                <listitem><para>Documentation files</para></listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>dpuniverse/</filename></term>
+                <listitem>
+                    <para>
+                        Your "universe", you can build a site inside this
+                        directory without worrying much of what goes on beyond
+                        it
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>lib/</filename></term>
+                <listitem>
+                    <para>
+                        The DutchPIPE server/engine and other DutchPIPE
+                        components
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>public/</filename></term>
+                <listitem>
+                    <para>Web enabled and publicly reachable directory</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>script/</filename></term>
+                <listitem>
+                    <para>DutchPIPE server startup script</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><filename>template/</filename></term>
+                <listitem>
+                    <para>Templates for building XHTML pages</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </refsect1>
+    <refsect1 id="{@id help}">
+        <title>Troubleshooting/Getting Help/Giving Feedback</title>
+        <para>
+            I'll try to test usage on as many platforms as possible to allow for
+            painless installation, but obviously I didn't have much time for
+            that yet. Since this is all new and tested on a limited number of
+            platforms, with lack of documentation, feel welcome to share your
+            experiences or particular pains and problems with the DutchPIPE
+            installation.
+        </para>
+        <para>
+            See the {@tutorial DutchPIPE.pkg#lounge Developer's Lounge},
+            {@tutorial DutchPIPE.pkg#mailinglists Mailing Lists} and
+            {@tutorial DutchPIPE.pkg#author The Author} sections below for
+            contact details. If you solved a particular installation problem, or
+            installed it successfully in a previously untested platform, please
+            also let me know, so I can update the documentation.
+        </para>
+    </refsect1>
+    <refsect1 id="{@id homepage}">
+        <title>Homepage</title>
+        <para>
+            For the latest releases, news, et cetera, see the DutchPIPE website
+            at:
+        </para>
+        <para>
+            {@link http://dutchpipe.org/}
+        </para>
+    </refsect1>
+    <refsect1 id="{@id lounge}">
+        <title>Developer's Lounge</title>
+        <para>
+            If you're experiencing problems, want to share ideas or just want to
+            lay back and sip on hot coffee, visit the developers lounge at:
+        </para>
+        <para>
+            {@link http://dutchpipe.org/dpclient.php?location=/page/lounge.php}
+        </para>
+    </refsect1>
+    <refsect1 id="{@id mailinglists}">
+        <title>Mailing Lists</title>
+        <para>
+            There are a number of DutchPIPE mailing lists, for instance to talk
+            about DutchPIPE or to discuss installation problems. For an overview
+            and to (un)subscribe, browse to:
+        </para>
+        <para>
+            {@link http://dutchpipe.org/mailman/}
+        </para>
+        <para>
+            If you're a serious developer, <filename>dutchpipe-talk</filename>
+            is the best way to discuss issues.
+        </para>
+    </refsect1>
+    <refsect1 id="{@id author}">
+        <title>The Author</title>
+        <para>
+            DutchPIPE was made by Lennert Stock. Feel free to send comments
+            and bug reports to the author at:
+        </para>
+        <para>
+            {@link mailto:ls@dutchpipe.org ls@dutchpipe.org}
+        </para>
+    </refsect1>
+    <refsect1 id="{@id roadmap}">
+        <title>Roadmap</title>
+        <para>
+            Well there isn't exactly a roadmap yet, but here are just -a few-
+            of the things on the wishlist.
+        </para>
+        <para>
+            First of all I must spend some time on non-coding issues so I can
+            properly start this project up. Provide proper documentation so
+            people can, ehm, actually use it, provide the usual tools such as
+            bug trackers and subversion access, and market the thing if
+            necessary, although I'm hoping you pass the word though.
+        </para>
+        <para>
+            The interface is still crude and must be made more user friendly.
+            The verb noun commands should only remain for power users and
+            under the hood, input fields for communications should pop up or
+            whatever.
+        </para>
+        <para>
+            Debugging and making DutchPIPE more secure.
+        </para>
+        <para>
+            Moveable or even animated objects.
+        </para>
+        <para>
+            Debugging and adhancements on running DutchPIPE on .html pages.
+            Making it possible to run DutchPIPE on pages on another server.
+            For this we need a proxy script to forward AJAX requests as AJAX
+            cannot be used across domains for security reasons.
+        </para>
+        <para>
+            Make options to let visitors make their own objects and "area".
+        </para>
+        <para>
+            Distributed DutchPIPE: Make it possible for DutchPIPE sites to
+            see, communicate and switch to other DutchPIPE sites, making it
+            one big, sprawling universe.
+        </para>
+        <para>
+            Better <filename>dpuniverse/std</filename> library. The library
+            provided for the universe is very basic now, and lots of
+            functionality will be added.
+        </para>
+        <para>
+            More showcases.
+        </para>
+        <para>
+            Learn English/learn how to spell.
+        </para>
+        <para>
+            Et cetera, et cetera. Of course this can't be done by one man, so
+            if you'd like any of the above or any other ideas implemented,
+            please read on...
+        </para>
+    </refsect1>
+    <refsect1 id="{@id contributing}">
+        <title>Contributing</title>
+        <para>
+            DutchPIPE is a brand new, fresh open source project. If you'd like
+            to contribute in any way, be it code, bugs, documentation, or open
+            source experience such as project setup and management, please mail
+            {@link mailto:ls@dutchpipe.org ls@dutchpipe.org}. The DutchPIPE
+            "noosphere" is huge and for the taking. This will be a free project
+            in any sense, if you shine at some particular skill or knowledge,
+            you'll be able to pretty much give it shape any way you please.
+            Again, this project is fresh. If you like established projects with
+            all the tools firmly in place, DutchPIPE is not for you. However, if
+            you're full of inspiration and just like to code, no one is in your
+            way, no one has done it yet and probably no one is even planning it.
+            You keep the copyright of your OS licensed contributions and are
+            fully credited for your efforts. Also, if you disliked certain
+            things or setups in other projects which appear to be written in
+            stone, this is your change to make your mark and make your
+            experience count.
+        </para>
+    </refsect1>
+</refentry>
+

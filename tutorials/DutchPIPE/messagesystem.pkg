@@ -1,0 +1,257 @@
+<refentry id="{@id}">
+    <refnamediv>
+        <refname>Message system</refname>
+        <refpurpose>COMMUNICATIONS TO OBJECTS, THE <methodname>tell</methodname> METHOD</refpurpose>
+    </refnamediv>
+    {@toc}
+    <refsect1 id="{@id introduction}">
+        <title>Introduction</title>
+        <para>
+            The DutchPIPE message system is responsible for all communications
+            to objects. These are not limited to users, you can communicate to
+            all objects, such as NPCs or pages. Also, it is not limited to text
+            communication, it takes care of all communications such as
+            requesting complete pages or sending the XHTML to add an avatar to a
+            page when someone else enters the page a user is on.
+        </para>
+        <para>
+            If the object is a user object, it will send messages and HTML to
+            represent objects, windows and the like to the user's browser. NPCs
+            and other objects will not react to messages by default, but can be
+            made to do so.
+        </para>
+    </refsect1>
+    <refsect1 id="{@id introduction}">
+        <title>The <methodname>tell</methodname> method</title>
+        <para>
+            The message system is centered around the following method which can
+            be called in all objects in your universe:
+        </para>
+        <programlisting role="php">
+<![CDATA[
+function tell($data)
+]]>
+        </programlisting>
+        <para>
+            When called with a string with data, it will communicate the string
+            as a &quot;message&quot; to the object it was called in:
+        </para>
+        <programlisting role="php">
+<![CDATA[
+$user->tell('You drink the beer.');
+]]>
+        </programlisting>
+        <para>
+            When called in pages, it will communicate the message to all objects
+            in that page. In this case, one or more extra parameters can be
+            given to skip:
+        </para>
+        <programlisting role="php">
+<![CDATA[
+function tell($data, &$from, ...)
+]]>
+        </programlisting>
+        <para>
+            This is used to skip the source of the message, so:
+        </para>
+        <programlisting role="php">
+<![CDATA[
+$page->tell($user->getTitle() . ' drinks the beer', $user);
+]]>
+        </programlisting>
+        <para>
+            will communicate that someone is drinking a beer to all objects on
+            the same page, except the user itself, who gets a custom message.
+        </para>
+    </refsect1>
+    <refsect1 id="{@id data}">
+        <title>The <code>$data</code> to communicate</title>
+        <para>
+            So far, we have only seen text messages being communicated. For
+            users, these messages will appear in the text message area in their
+            browsers.
+        </para>
+        <para>
+            However, the <code>$data</code> string uses the following XML format
+            to communicate (other) types of messages:
+        </para>
+        <variablelist>
+            <varlistentry>
+                <term><code>&lt;message&gt;data&lt;/message&gt;</code></term>
+                <listitem>
+                    <para>
+                        The default when the string isn't surrounded by tags.
+                        Transmits data to the text message area.
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><code>&lt;window&gt;data&lt;/window&gt;</code></term>
+                <listitem>
+                    <para>
+                        Creates a yellow window with data as content. The window
+                        tag can have these attributes:
+                    </para>
+                    <variablelist>
+                        <varlistentry>
+                            <term><code>autoclose="<arg>miliseconds</arg>"</code></term>
+                            <listitem>
+                                <para>
+                                    When not given, the window has a 'close' link.
+                                    With this argument given, it will automatically
+                                    close in the given number of miliseconds.
+                                </para>
+                            </listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term><code>styleclass="cssclass"</code></term>
+                            <listitem>
+                                <para>
+                                    Used to create a different window than the
+                                    default yellow one.
+                                </para>
+                            </listitem>
+                        </varlistentry>
+                    </variablelist>
+                    <para>
+                    An example which is used for drinking beer:
+                    </para>
+                    <programlisting role="php">
+<![CDATA[
+$env->tell('<window autoclose="2500" styleclass="dpwindow_drink">'
+    . '<h1>' . dptext('BUUUUUUUUUUUUUURRRP!') . '</h1></window>',
+    $user);
+]]>
+                    </programlisting>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        <para>
+            The following types are used by the DutchPIPE system and you
+            probably don't need to use them directly:
+        </para>
+        <variablelist>
+            <varlistentry>
+                <term>
+                    <code>
+                        &lt;div id="DOMelementid"&gt;content&lt;/div&gt;
+                    </code>
+                </term>
+                <listitem>
+                    <para>
+                        Adds a div element to the DOM of the user, removes any
+                        existing ones with the same id.
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><code>&lt;location&gt;url&lt;/location&gt;</code></term>
+                <listitem>
+                    <para>
+                        Moves an object to another location. This can be used to
+                        move users to another page.
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>
+                    <code>&lt;addDpElement&gt;</code>,
+                    <code>&lt;moveDpElement&gt;</code>,
+                    <code>&lt;changeDpElement&gt;</code>,
+                    <code>&lt;removeDpElement&gt;</code>
+                </term>
+                <listitem>
+                    <para>
+                        Used by {@link DpObject::moveDpObject()} to handle
+                        graphical object elements.
+                    </para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </refsect1>
+    <refsect1 id="{@id cdata}">
+        <title>CDATA/innerHTML</title>
+        <para>
+            Note that currently all message data is automatically wrapped in a
+            <code>&lt;![CDATA[ ]]&gt;</code> construct. So:
+        </para>
+        <para>
+            <code>&lt;message&gt;hello world&lt;/message&gt;</code>
+        </para>
+        <para>
+            will automatically be turned into and communicated as:
+        </para>
+        <para>
+            <code>
+                &lt;message&gt;&lt;![CDATA[hello world]]&gt;&lt;/message&gt;
+            </code>
+        </para>
+        <para>
+            This is done because otherwise the data must always be valid XHTML
+            to be parsed by the XML parser. For instance, for messages by users
+            this is absolutely necessary. At the client side, innerHTML is used
+            to add content.
+        </para>
+        <para>
+            Although this is "handy", this was the quick and lazy and not the
+            clean or advanced solution. The option to not do that for certain
+            things (such as the XHTML of pages) and operate in a cleaner way
+            with the DOM will be added in the future, allowing more trustworthy
+            DOMs in the browser.
+        </para>
+        <para>
+            In other words, it's rather lame for DutchPIPE to only do
+            DHTML/innerHTML and not proper DOM manipulations. We'll try to do
+            better.
+        </para>
+        <para>
+            For more info, do for example a Google search on "innerhtml vs dom".
+        </para>
+    </refsect1>
+    <refsect1 id="{@id cdata}">
+        <title>Behind the scenes</title>
+        <para>
+            For the browser, there are two ways to obtain data:
+        </para>
+        <itemizedlist>
+            <listitem>Through a page request</listitem>
+            <listitem>Using AJAX</listitem>
+        </itemizedlist>
+        <para>
+            Also, there are two ways data is communicated to the browser:
+        </para>
+        <itemizedlist>
+            <listitem>
+                Directly because of a user action (page request or performing an
+                action)
+            </listitem>
+            <listitem>
+                Indirectly (for example, someone else says something)
+            </listitem>
+        </itemizedlist>
+        <para>
+            A user is not permanently connected to a DutchPIPE site. The user
+            requests a page, and the HTTP connection is broken. Then every two
+            seconds, the user will request updates, and get disconnected every
+            time.
+        </para>
+        <para>
+            If an external event causes a message to be generated for a user, it
+            can't be directly communicated to the user's browser because of
+            that. Messages will be put in a queue, and are communicated during
+            the next page or AJAX request.
+        </para>
+        <para>
+            When a user requests a full page (he clicks a link for example), not
+            only the page content but also all waiting messages (text messages,
+            windows, moved or changed objects) are included in the XHTML. There
+            is no need to obtain those separately with AJAX.
+        </para>
+        <para>
+            When an AJAX check is performed and waiting messages are obtained,
+            the Javascript in the browser will insert, update or delete text and
+            elements on the fly.
+        </para>
+    </refsect1>
+</refentry>
+

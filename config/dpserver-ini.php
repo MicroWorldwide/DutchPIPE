@@ -20,7 +20,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpserver-ini.php 50 2006-06-22 21:33:25Z ls $
+ * @version    Subversion: $Id: dpserver-ini.php 91 2006-08-07 13:41:53Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @tutorial   DutchPIPE/DutchPIPE.pkg
  * @see        dpserver.php, dpclient.php, dpuniverse-ini.php
@@ -386,7 +386,7 @@ define('DPSERVER_DEBUG_TYPE', DPSERVER_DEBUG_TYPE_NONE);
  *
  * @see        DPSERVER_BASE64_SERVER2CLIENT
  */
-define('DPSERVER_BASE64_CLIENT2SERVER', FALSE);
+define('DPSERVER_BASE64_CLIENT2SERVER', TRUE);
 
 /**
  * Use base64_encode/decode on dpserver -> dpclient communication?
@@ -395,7 +395,7 @@ define('DPSERVER_BASE64_CLIENT2SERVER', FALSE);
  *
  * @see        DPSERVER_BASE64_CLIENT2SERVER
  */
-define('DPSERVER_BASE64_SERVER2CLIENT', FALSE);
+define('DPSERVER_BASE64_SERVER2CLIENT', TRUE);
 
 /**
  * Maximum number of bytes {@link dpclient.php} can read from

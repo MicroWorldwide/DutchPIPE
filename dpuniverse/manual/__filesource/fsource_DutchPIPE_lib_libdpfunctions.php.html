@@ -1,0 +1,154 @@
+<table border="0" cellpadding="0" cellspacing="0" style="width: 98%">
+  <tr valign="top">
+    <td class="menu">
+                        <br />
+            <br />
+              <div class="package">
+                    <a href="../ric_INSTALL.html">INSTALL</a>&nbsp;|
+                    <a href="../ric_LICENSE.html">LICENSE</a>&nbsp;|
+                    <a href="../ric_README.html">README</a>&nbsp;|
+                    <a href="../todolist.html">Todo List</a>&nbsp;|
+        <a href="../classtrees_DutchPIPE.html">Class Tree</a>&nbsp;|
+        <a href="../elementindex_DutchPIPE.html">Index</a>
+        </div>
+    </td>
+    <td>
+      <table cellpadding="10" cellspacing="0" width="100%" border="0"><tr><td valign="top">
+<span id="gototop" style="position:absolute;z-index:100"><a href="javascript:window.scrollTo(0,0)"><img id="buttop" src="/images/top.gif" width="11" height="11" border="0" alt="Go to Top" title="Go to Top" /></a></span>
+<script src="/jumptop.js"></script>
+<h1>Source for file dpfunctions.php</h1>
+<p>Documentation is available at <a href="../DutchPIPE/lib/_lib---dpfunctions.php.html">dpfunctions.php</a></p>
+<div class="src-code"><span class="php">
+<ol class="src-bg"><li class="src-li"><div class="src-line"><a name="a1"></a><span class="src-php">&lt;?php</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a2"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a3"></a><span class="src-doc">&nbsp;*&nbsp;Common&nbsp;functions&nbsp;available&nbsp;to&nbsp;all&nbsp;objects&nbsp;in&nbsp;the&nbsp;universe</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a4"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a5"></a><span class="src-doc">&nbsp;*&nbsp;DutchPIPE&nbsp;version&nbsp;0.1;&nbsp;PHP&nbsp;version&nbsp;5</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a6"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a7"></a><span class="src-doc">&nbsp;*&nbsp;LICENSE:&nbsp;This&nbsp;source&nbsp;file&nbsp;is&nbsp;subject&nbsp;to&nbsp;version&nbsp;1.0&nbsp;of&nbsp;the&nbsp;DutchPIPE&nbsp;license.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a8"></a><span class="src-doc">&nbsp;*&nbsp;If&nbsp;you&nbsp;did&nbsp;not&nbsp;receive&nbsp;a&nbsp;copy&nbsp;of&nbsp;the&nbsp;DutchPIPE&nbsp;license,&nbsp;you&nbsp;can&nbsp;obtain&nbsp;one&nbsp;at</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a9"></a><span class="src-doc">&nbsp;*&nbsp;http://dutchpipe.org/license/1_0.txt&nbsp;or&nbsp;by&nbsp;sending&nbsp;a&nbsp;note&nbsp;to</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a10"></a><span class="src-doc">&nbsp;*&nbsp;license@dutchpipe.org,&nbsp;in&nbsp;which&nbsp;case&nbsp;you&nbsp;will&nbsp;be&nbsp;mailed&nbsp;a&nbsp;copy&nbsp;immediately.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a11"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a12"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@package</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;DutchPIPE</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a13"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@subpackage</span><span class="src-doc">&nbsp;lib</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a14"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@author</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lennert&nbsp;Stock&nbsp;&lt;ls@dutchpipe.org&gt;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a15"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@copyright</span><span class="src-doc">&nbsp;&nbsp;2006&nbsp;Lennert&nbsp;Stock</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a16"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@license</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;http://dutchpipe.org/license/1_0.txt&nbsp;&nbsp;DutchPIPE&nbsp;License</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a17"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@version</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;Subversion:&nbsp;$Id:&nbsp;dpfunctions.php&nbsp;77&nbsp;2006-07-13&nbsp;20:39:04Z&nbsp;ls&nbsp;$</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a18"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@link</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://dutchpipe.org/manual/package/DutchPIPE</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a19"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@see</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dpuniverse.php</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a20"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a21"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a22"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a23"></a><span class="src-doc">&nbsp;*&nbsp;Gets&nbsp;the&nbsp;current&nbsp;user&nbsp;connected&nbsp;to&nbsp;the&nbsp;server</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a24"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a25"></a><span class="src-doc">&nbsp;*&nbsp;If&nbsp;a&nbsp;user&nbsp;page&nbsp;or&nbsp;AJAX&nbsp;request&nbsp;caused&nbsp;the&nbsp;current&nbsp;chain&nbsp;of&nbsp;execution&nbsp;that</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a26"></a><span class="src-doc">&nbsp;*&nbsp;caused&nbsp;this&nbsp;function&nbsp;to&nbsp;be&nbsp;called,&nbsp;that&nbsp;user&nbsp;object&nbsp;is&nbsp;returned.&nbsp;Otherwise</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a27"></a><span class="src-doc">&nbsp;*&nbsp;FALSE&nbsp;is&nbsp;returned.&nbsp;For&nbsp;example,&nbsp;if&nbsp;the&nbsp;chain&nbsp;of&nbsp;execution&nbsp;if&nbsp;caused&nbsp;by&nbsp;a</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a28"></a><span class="src-doc">&nbsp;*&nbsp;setTimeout,&nbsp;this&nbsp;will&nbsp;return&nbsp;FALSE.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a29"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a30"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@return&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="src-doc-type">object&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;</span><span class="src-doc-type">Reference&nbsp;</span><span class="src-doc">to&nbsp;user&nbsp;object&nbsp;of&nbsp;FALSE&nbsp;for&nbsp;no&nbsp;current&nbsp;user</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a31"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a32"></a><span class="src-key">function&nbsp;</span><span class="src-sym">&amp;</span><a href="../DutchPIPE/lib/_lib---dpfunctions.php.html#functionget_current_dpuser">get_current_dpuser</a><span class="src-sym">(</span><span class="src-sym">)</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a33"></a><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a34"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">global&nbsp;</span><span class="src-var">$grCurrentDpUniverse</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a35"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a36"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">return&nbsp;</span><span class="src-var">$grCurrentDpUniverse</span><span class="src-sym">-&gt;</span><span class="src-id">getCurrentDpUser</span><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a37"></a><span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a38"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a39"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a40"></a><span class="src-doc">&nbsp;*&nbsp;Gets&nbsp;the&nbsp;current&nbsp;object&nbsp;performing&nbsp;an&nbsp;action</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a41"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a42"></a><span class="src-doc">&nbsp;*&nbsp;This&nbsp;can&nbsp;also&nbsp;be&nbsp;a&nbsp;computer&nbsp;controlled&nbsp;character.&nbsp;If&nbsp;the&nbsp;chain&nbsp;of&nbsp;execution</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a43"></a><span class="src-doc">&nbsp;*&nbsp;that&nbsp;caused&nbsp;this&nbsp;function&nbsp;to&nbsp;be&nbsp;called&nbsp;isn't&nbsp;the&nbsp;result&nbsp;of&nbsp;a&nbsp;user&nbsp;or&nbsp;npc</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a44"></a><span class="src-doc">&nbsp;*&nbsp;performing&nbsp;an&nbsp;action,&nbsp;FALSE&nbsp;is&nbsp;returned.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a45"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a46"></a><span class="src-doc">&nbsp;*&nbsp;If&nbsp;the&nbsp;current&nbsp;object&nbsp;is&nbsp;a&nbsp;user&nbsp;performing&nbsp;an&nbsp;action,&nbsp;get_current_dpobject</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a47"></a><span class="src-doc">&nbsp;*&nbsp;doesn't&nbsp;necessarily&nbsp;equal&nbsp;get_current_dpuser.&nbsp;Someone&nbsp;or&nbsp;something&nbsp;might</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a48"></a><span class="src-doc">&nbsp;*&nbsp;force&nbsp;the&nbsp;user&nbsp;the&nbsp;perform&nbsp;an&nbsp;action.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a49"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a50"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@return&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="src-doc-type">object&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;</span><span class="src-doc-type">Reference&nbsp;</span><span class="src-doc">to&nbsp;user&nbsp;object&nbsp;of&nbsp;FALSE&nbsp;for&nbsp;no&nbsp;current&nbsp;user</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a51"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a52"></a><span class="src-key">function&nbsp;</span><span class="src-sym">&amp;</span><a href="../DutchPIPE/lib/_lib---dpfunctions.php.html#functionget_current_dpobject">get_current_dpobject</a><span class="src-sym">(</span><span class="src-sym">)</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a53"></a><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a54"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">global&nbsp;</span><span class="src-var">$grCurrentDpObject</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a55"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a56"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">return&nbsp;</span><span class="src-var">$grCurrentDpObject</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a57"></a><span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a58"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a59"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a60"></a><span class="src-doc">&nbsp;*&nbsp;Gets&nbsp;the&nbsp;current&nbsp;universe&nbsp;handling&nbsp;the&nbsp;current&nbsp;user</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a61"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a62"></a><span class="src-doc">&nbsp;*&nbsp;The&nbsp;universe&nbsp;object&nbsp;keeps&nbsp;track&nbsp;of&nbsp;all&nbsp;objects&nbsp;and&nbsp;provides&nbsp;methods&nbsp;such</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a63"></a><span class="src-doc">&nbsp;*&nbsp;as&nbsp;newDpObject.&nbsp;Usually&nbsp;and&nbsp;currently&nbsp;there's&nbsp;just&nbsp;the&nbsp;one&nbsp;universe&nbsp;object.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a64"></a><span class="src-doc">&nbsp;*&nbsp;In&nbsp;the&nbsp;future&nbsp;there&nbsp;might&nbsp;be&nbsp;more,&nbsp;for&nbsp;instance&nbsp;to&nbsp;allow&nbsp;users&nbsp;to&nbsp;switch</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a65"></a><span class="src-doc">&nbsp;*&nbsp;between&nbsp;different&nbsp;worlds&nbsp;without&nbsp;having&nbsp;to&nbsp;log&nbsp;in&nbsp;again.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a66"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a67"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@return&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="src-doc-type">object&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;</span><span class="src-doc-type">Reference&nbsp;</span><span class="src-doc">to&nbsp;user&nbsp;object&nbsp;of&nbsp;FALSE&nbsp;for&nbsp;no&nbsp;current&nbsp;user</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a68"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a69"></a><span class="src-key">function&nbsp;</span><span class="src-sym">&amp;</span><a href="../DutchPIPE/lib/_lib---dpfunctions.php.html#functionget_current_dpuniverse">get_current_dpuniverse</a><span class="src-sym">(</span><span class="src-sym">)</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a70"></a><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a71"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">global&nbsp;</span><span class="src-var">$grCurrentDpUniverse</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a72"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a73"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">return&nbsp;</span><span class="src-var">$grCurrentDpUniverse</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a74"></a><span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a75"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a76"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a77"></a><span class="src-doc">&nbsp;*&nbsp;Includes&nbsp;universe&nbsp;object</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a78"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a79"></a><span class="src-doc">&nbsp;*&nbsp;This&nbsp;is&nbsp;a&nbsp;wrapper&nbsp;around&nbsp;require_once.&nbsp;You&nbsp;can&nbsp;only&nbsp;inherit&nbsp;in</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a80"></a><span class="src-doc">&nbsp;*&nbsp;DPUNIVERSE_PREFIX_PATH&nbsp;(dpuniverse/&nbsp;in&nbsp;the&nbsp;standard&nbsp;distribution),&nbsp;which&nbsp;is</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a81"></a><span class="src-doc">&nbsp;*&nbsp;the&nbsp;top&nbsp;directory&nbsp;for&nbsp;this&nbsp;function.&nbsp;Use&nbsp;the&nbsp;constants&nbsp;from</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a82"></a><span class="src-doc">&nbsp;*&nbsp;config/dpuniverse.ini&nbsp;to&nbsp;form&nbsp;paths.</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a83"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a84"></a><span class="src-doc">&nbsp;*&nbsp;Examples&nbsp;(from&nbsp;dpuniverse/page/login.php):</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a85"></a><span class="src-doc">&nbsp;*&nbsp;inherit(DPUNIVERSE_STD_PATH&nbsp;.&nbsp;'DpPage.php');</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a86"></a><span class="src-doc">&nbsp;*&nbsp;inherit(DPUNIVERSE_INCLUDE_PATH&nbsp;.&nbsp;'events.php');</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a87"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a88"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@param&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="src-doc-type">string&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;</span><span class="src-doc-var">$path&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;path&nbsp;to&nbsp;class&nbsp;file&nbsp;within&nbsp;dpuniverse/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a89"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a90"></a><span class="src-key">function&nbsp;</span><a href="../DutchPIPE/lib/_lib---dpfunctions.php.html#functioninherit">inherit</a><span class="src-sym">(</span><span class="src-var">$path</span><span class="src-sym">)</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a91"></a><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a92"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-inc">require_once</span><span class="src-sym">(</span><span class="src-id"><a href="../DutchPIPE/config/_config---dpuniverse-ini.php.html#defineDPUNIVERSE_PREFIX_PATH">DPUNIVERSE_PREFIX_PATH</a>&nbsp;</span>.&nbsp;<span class="src-var">$path</span><span class="src-sym">)</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a93"></a><span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a94"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a95"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a96"></a><span class="src-doc">&nbsp;*&nbsp;Gets&nbsp;a&nbsp;32-character&nbsp;random&nbsp;string</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a97"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a98"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@return&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="src-doc-type">string&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;32&nbsp;random&nbsp;characters</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a99"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a100"></a><span class="src-key">function&nbsp;</span><a href="../DutchPIPE/lib/_lib---dpfunctions.php.html#functionmake_random_id">make_random_id</a><span class="src-sym">(</span><span class="src-sym">)</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a101"></a><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a102"></a>&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">return&nbsp;</span><a href="http://www.php.net/md5">md5</a><span class="src-sym">(</span><a href="http://www.php.net/uniqid">uniqid</a><span class="src-sym">(</span><a href="http://www.php.net/rand">rand</a><span class="src-sym">(</span><span class="src-sym">)</span><span class="src-sym">,&nbsp;</span><span class="src-id">true</span><span class="src-sym">))</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a103"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a104"></a><span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a105"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a106"></a><span class="src-doc">/**</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a107"></a><span class="src-doc">&nbsp;*&nbsp;Is&nbsp;the&nbsp;given&nbsp;integer&nbsp;or&nbsp;string&nbsp;a&nbsp;whole&nbsp;positive&nbsp;number?</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a108"></a><span class="src-doc">&nbsp;*</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a109"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@param&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="src-doc-type">mixed&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="src-doc-var">$var&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;integer&nbsp;of&nbsp;string&nbsp;to&nbsp;check</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a110"></a><span class="src-doc">&nbsp;*&nbsp;</span><span class="src-doc-coretag">@return&nbsp;</span><span class="src-doc">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="src-doc-type">boolean&nbsp;</span><span class="src-doc">&nbsp;&nbsp;TRUE&nbsp;for&nbsp;a&nbsp;whole&nbsp;positive&nbsp;number,&nbsp;FALSE&nbsp;otherwise</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a111"></a><span class="src-doc">&nbsp;*/</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a112"></a><span class="src-key">function&nbsp;</span><a href="../DutchPIPE/lib/_lib---dpfunctions.php.html#functionis_whole_number">is_whole_number</a><span class="src-sym">(</span><span class="src-var">$var</span><span class="src-sym">)</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a113"></a><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a114"></a>&nbsp;&nbsp;&nbsp;<span class="src-var">$var&nbsp;</span>=&nbsp;(string)<span class="src-var">$var</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a115"></a>&nbsp;</div></li>
+<li class="src-li"><div class="src-line"><a name="a116"></a>&nbsp;&nbsp;&nbsp;<span class="src-key">for&nbsp;</span><span class="src-sym">(</span><span class="src-var">$i&nbsp;</span>=&nbsp;<span class="src-num">0</span><span class="src-sym">,&nbsp;</span><span class="src-var">$len&nbsp;</span>=&nbsp;<a href="http://www.php.net/strlen">strlen</a><span class="src-sym">(</span><span class="src-var">$var</span><span class="src-sym">)</span><span class="src-sym">;&nbsp;</span><span class="src-var">$i&nbsp;</span>&lt;&nbsp;<span class="src-var">$len</span><span class="src-sym">;&nbsp;</span><span class="src-var">$i</span>++<span class="src-sym">)&nbsp;</span><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a117"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">if&nbsp;</span><span class="src-sym">((</span><span class="src-var">$ascii_code&nbsp;</span>=&nbsp;<a href="http://www.php.net/ord">ord</a><span class="src-sym">(</span><span class="src-var">$var</span><span class="src-sym">[</span><span class="src-var">$i</span><span class="src-sym">]</span><span class="src-sym">))&nbsp;</span>&lt;&nbsp;<span class="src-num">48&nbsp;</span>||&nbsp;<span class="src-var">$ascii_code&nbsp;</span>&gt;&nbsp;<span class="src-num">57</span><span class="src-sym">)&nbsp;</span><span class="src-sym">{</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a118"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-key">return&nbsp;</span><span class="src-id">FALSE</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a119"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a120"></a>&nbsp;&nbsp;&nbsp;<span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a121"></a>&nbsp;&nbsp;&nbsp;<span class="src-key">return&nbsp;</span><span class="src-id">TRUE</span><span class="src-sym">;</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a122"></a><span class="src-sym">}</span></div></li>
+<li class="src-li"><div class="src-line"><a name="a123"></a><span class="src-php">?&gt;</span></div></li>
+</ol>
+</span></div>
+        <div class="credit">
+		    <hr class="separator" />
+		    Documentation generated on Sun, 13 Aug 2006 20:42:50 +0200 by <a href="http://www.phpdoc.org">phpDocumentor 1.3.0RC6</a>
+	      </div>
+      </td></tr></table>
+    </td>
+  </tr>
+</table>
