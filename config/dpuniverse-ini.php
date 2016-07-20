@@ -6,7 +6,7 @@
  * define the settings and behavious of "the universe".
  * See dpserver-ini.php for settings dealing with the server related settings.
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -18,7 +18,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpuniverse-ini.php 238 2007-07-08 15:40:07Z ls $
+ * @version    Subversion: $Id: dpuniverse-ini.php 252 2007-08-02 23:30:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php, dpserver-ini.php
  */
@@ -350,7 +350,7 @@ align="left" width="73" height="15" border="0" alt="DutchPIPE"
 style="margin-top: 1px" />Home'), DPUNIVERSE_IMAGE_URL));
 
 /**
- * Administrators registered user names
+ * Administrators registered user names separated by the # character
  */
 define('DPUNIVERSE_ADMINISTRATORS', 'Lennert');
 ?>

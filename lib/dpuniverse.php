@@ -4,7 +4,7 @@
  *
  * Defines DpObjects, users, pages, etc. (our 'rules of nature')
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -16,7 +16,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpuniverse.php 243 2007-07-08 16:26:23Z ls $
+ * @version    Subversion: $Id: dpuniverse.php 255 2007-08-03 13:15:59Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        currentdpuserrequest.php, dpserver.php, dpfunctions.php
  */
@@ -180,6 +180,7 @@ final class DpUniverse
         /* These functions will be available for all objects */
         require_once(DPSERVER_LIB_PATH . 'dptext.php');
         require_once(DPUNIVERSE_LIB_PATH . 'dpfunctions.php');
+        require_once(DPUNIVERSE_LIB_PATH . 'dptemplates.php');
 
         mysql_pconnect(DPUNIVERSE_MYSQL_HOST, DPUNIVERSE_MYSQL_USER,
             DPUNIVERSE_MYSQL_PASSWORD)
@@ -454,8 +455,9 @@ final class DpUniverse
                             $listeners = get_current_dpuniverse()->
                                 getAlertEvent('people_leaving');
                             if (is_array($listeners)) {
-                                $listener_msg = sprintf(
-                                    dptext("%s left the site at %s.<br />"),
+                                $listener_msg = ' ' . sprintf(
+                                    dptext("<span class=\"col2\">%s</span> %s left the site at %s.<br />"),
+                                    strftime(dptext('%H:%M')),
                                     ucfirst($u[_DPUSER_OBJECT]->getTitle(
                                     DPUNIVERSE_TITLE_TYPE_DEFINITE)),
                                     $env->title);
@@ -761,7 +763,7 @@ final class DpUniverse
 
         $object->__construct2();
 
-        echo sprintf(dptext("made new object %s\n"), $pathname);
+        echo sprintf(dptext("Made new object %s\n"), $pathname);
 
         return $object;
     }
@@ -1244,7 +1246,9 @@ final class DpUniverse
         $user->setTitle(ucfirst($user->_GET['username']));
         $user->isRegistered = TRUE;
         if ($user === get_current_dpuser()) {
-            $this->mrCurrentDpUserRequest->setUsername($username);
+            $row = $this->mrCurrentDpUserRequest->findAndInitRegisteredDpUser(
+                $cookie_id, $cookie_pass);
+            $this->mrCurrentDpUserRequest->initDpUser();
         }
 
         /* :TODO: Move admin flag to user table in db */
@@ -1254,8 +1258,7 @@ final class DpUniverse
         }
         foreach ($this->mDpUsers as $user_nr => &$u) {
             if ($u[0] === $user) {
-                $this->mDpUsers[$user_nr][2] =
-                    $user->_GET['username'];
+                $this->mDpUsers[$user_nr][2] = $user->_GET['username'];
                 $this->mDpUsers[$user_nr][3] = $cookie_id;
                 $this->mDpUsers[$user_nr][4] = $cookie_pass;
                 $this->mDpUsers[$user_nr][5] = 1;
@@ -1437,7 +1440,8 @@ to complete registration.') . '</form></window>');
         $user->isRegistered = TRUE;
         $user->isAdmin = FALSE;
         if ($user === get_current_dpuser()) {
-            $this->mrCurrentDpUserRequest->setUsername($username);
+            $this->mrCurrentDpUserRequest->findAndInitRegisteredDpUser(
+                $cookie_id, $cookie_pass);
         }
 
         foreach ($this->mDpUsers as $user_nr => &$u) {

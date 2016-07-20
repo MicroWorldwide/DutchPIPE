@@ -1,143 +1,110 @@
 .mylogin { background-color: #ddd; padding: 3px; float: left; margin-bottom: 10px }
-body { background-color: #eeeeee; margin: 15px }
+body { background-color: #eee; margin: 10px; margin-left: 6px; margin-right: 8px; text-align: left }
 td { text-align: left }
-body, td, th, input { font-family: verdana,'Bitstream Vera Sans',helvetica,sans-serif; font-size: 13px; color: #000000 }
-#dppage { background-color: #ffffff; width: 100%; text-align: left; padding: 0px; border-right: solid 1px #bebec8; border-left: solid 1px #bebec8 }
-#dppage_inner1 { width: 100%; float: left }
-.dppage_inner2 { position: relative; margin: 15px; margin-top: 12px; margin-bottom: 0px }
-#dpobinv { width: 100%; text-align: left; padding: 0px }
+body, td, th, input { font-family: verdana,'Bitstream Vera Sans',helvetica,sans-serif; font-size: 12px; color: #000 }
+#dpobinv, #dpexamine, #dplist { width: 100%; text-align: left; padding: 0px }
 #dpobinv_inner1 { width: 100%; float: left }
 .dpobinv_inner2 { position: relative }
+#dpinventory { border: solid 1px #eee }
 .dpobject { background-color: #ffe0e0; width: 190px; padding: 10px; margin-top: 10px; margin-right: 10px; margin-bottom: 0px; float: left }
 .dpobject2 { background-color: #e0ffe0; width: 72px; padding: 5px; margin-top: 10px; margin-right: 10px; float: left }
 .title_img, .title_img_me { position: relative; text-align: center; width: 100px; height: 126px; font-size: 10px; font-family: verdana,arial,helvetica; margin-top: 1px; margin-right: 10px; margin-bottom: 0px; float: left }
 .title_img_me { font-weight: bold }
 .imgtxt { font-size: 10px; font-family: verdana,arial,helvetica }
 #navigation { }
-#messages { float: left; margin-top: 0px; margin-bottom: 0px }
+#messages { display: none; margin-top: 0px; margin-bottom: 0px }
 #dploginout { display: inline; margin: 0px; padding: 0px }
-#dpmessagearea { width: 100%; text-align: center; padding: 0px }
-#dpmessagearea_inner { margin-top: 0px; margin-bottom: 0px; text-align: left; }
-#box, #helpbox { border: solid 1px #000066; padding: 10px }
+#dpmessagearea { width: 100%; text-align: left; background-color: none; padding: 0px; border: none }
+#dpmessagearea_inner { margin-left: 15px; margin-right: 11px; margin-top: 0px; margin-bottom: 0px; text-align: left }
+#box, #helpbox { border: solid 1px #000; padding: 10px }
 #helpbox { float: left; margin-bottom: 5px }
 #helpbox tt { color: #0000CC }
 #lh { line-height: 16px; font-size: 16px; clear: both }
-#actionform, ul { margin-bottom: 0px }
-#actionform { margin: 0px; float: left; width: 99%; display: block }
-#dpaction { width: 600px; background-color: #f7f7fc; border: solid 1px #c9c9f0 ; padding-left: 2px; padding-right: 2px }
+ul { margin-bottom: 0px }
+#dpinput_wrap { width: 600px; margin: 0px; padding: 0px; text-align: left; background-color: none; border: none }
+#dpinput, #dpinput_say { margin: 0px }
+#dpinput { text-align: left; padding: 0px }
+#dpinput_say { display: none }
+#dpinput_inner { margin-left: 15px; margin-right: 11px; height: 1% }
+table.dpinput_table { width: 100%; font-size: 1px; height: 9px; display: none }
+table.dpinput_table td.dpinput_left, table.dpinput_table td.dpinput_top { font-size: 1px; padding: 0px; margin: 0px; line-height: 0px; height: 9px }
+table.dpinput_say_table { width: 100%; border-width: 0px 0px 0px 0px; border-spacing: 0px; border-style: none none none none; border-collapse: collapse; margin-top: 14px }
+table.dpinput_say_table td { vertical-align: middle }
+table.dpinput_say_table td.dpinput_say_left { border-width: 0px 0px 0px 0px; padding: 0px 0px 0px 0px; border-style: none none none none; -moz-border-radius: 0px 0px 0px 0px; border: solid 1px #c9c9f0; border-right-style: none; line-height: 15px; background-color: #f7f7fc }
+table.dpinput_say_table td.dpinput_say_right { text-align: left; width: 28px; border-width: 0px 0px 0px 0px; padding: 2px; border-style: none none none none; -moz-border-radius: 0px 0px 0px 0px; border: solid 1px #c9c9f0; border-left-style: none; font-size: 0px; line-height: 0px; background-color: #f7f7fc }
+table.dpinput_say_table td.dpinput_say_top { display: none; padding-left: 7px; border-top: solid 1px white; border-bottom: solid 1px white; vertical-align: top; padding-top: 4px; line-height: 0px }
+#actionform { display: block; margin: 0px; padding: 0px; border: none; line-height: 15px; height: 17px }
+#dpaction { margin: 0px; float: left; padding: 0px; width: 99%; background-color: transparent; border: none; padding-left: 2px; padding-right: 2px; margin-top: 1px; line-height: 15px; height: 15px }
+img.dpinput_menu {  }
+img.dpinput_close { margin-left: 2px }
+form { display: inline; margin-top: 0px }
+a:link { color: #000 }
+a:visited { color: #000 }
+a.menu { font-weight: bold }
+a.navtrail:link { color: #ffffff }
+a.navtrail:visited { color: #ffffff }
 a.dpsmall { font-size: 11px; font-family: verdana,arial,helvetica }
-.col2 { color: #666666; }
+.col2 { color: #666666 }
+a.col2:link, a.col2:visited { color: #666666; text-decoration: none }
 .dph, .boxh { color: #8B4513; font-size: 22px; font-weight: normal; margin-bottom: 4px }
 .boxh { margin-bottom: 4px }
 .arr,.arrr,.arr2 { margin-top: 2px }
-.arr,.arr2 { margin-right: 4px;  }
-.arrr { margin-left: 4px; }
-.arr { display: block; float: left; }
+.arr,.arr2 { margin-right: 4px }
+.arrr { margin-left: 4px }
+.arr { display: block; float: left }
 .block { display: block; float: left; margin-right: 5px; margin-top: 2px }
 .block2 { display: block; float: left; margin-right: 5px; margin-top: 5px }
 #navlink {position: relative; float: left }
 .arrnav { display: block; float: left; margin-left: 6px; margin-right: 6px; margin-top: 2px }
 .notop { margin-top: 0px }
+.newsh { font-weight: bold }
+.newsd { font-size: 11px; text-transform: uppercase }
 #helptext tt { color: #0000CC }
-.me { font-weight: bold; }
+.me { font-weight: bold }
 #dpfooter { float: left; font-size: 10px; font-family: verdana; margin-left: 5px; margin-top: 4px; color: #8e8e9f }
 #dpfooter a { color: #8e8e9f }
 .smalltext1 { font-size: 10px; font-family: verdana }
-#butbottom, #buttop { cursor: pointer }
+#butbottom, #dpbuttop, img.dpinput_close, img.dpinput_menu { cursor: pointer }
 #butbottom { margin-bottom: 2px }
-#buttop { margin-top: 3px }
+#buttop { margin-top: 2px; margin-bottom: 2px }
 #dltable td { background-color: #e0e0e0 }
 #dlreq { margin-top: 0px; margin-bottom: 0px; padding-left: 0px; margin-left: 2em }
 #dlreq li { margin-top: 5px }
 .dpimage { cursor: pointer }
 .dpimage_move { cursor: move }
-.actionwindow
-{
-    display: none;
-    cursor: pointer;
-    position: absolute;
-    font-weight: normal;
-    text-align: left;
-    width: 90px;
-    background-color: #eeeeee;
-    border: solid 1px black;
-    padding-left: 2px;
-    padding-right: 2px;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    display: block;
-    opacity: 0.95;
-    -moz-opacity: 0.95;
-    z-index: 5;
-}
-.action_menu_selected, .action_menu { padding-left: 4px; padding-right: 4px; font-size: 11px; font-family: arial,verdana,'Bitstream Vera Sans',helvetica,sans-serif }
-.action_menu_selected { background-color: #000066; color: #fff }
-.action_menu { background-color: transparent; color: #000066 }
-.dpwindow_default, .dpwindow_drink, .dpwindow_error, .dpwindow_todo, .dpwindow_src
-{
-    display: none;
-    position: absolute;
-    cursor: move;
-    text-align: left;
-}
-.dpwindow_default {
-    left: 75px;
-    top: 50px;
-    width: 382px;
-    background-color: #ffcc00;
-    border: solid 1px black;
-    padding: 15px;
-    display: block;
-    opacity: 0.95;
-    -moz-opacity: 0.95;
-    z-index: 5;
-}
-.dpwindow_drink {
-    left: 75px;
-    top: 50px;
-    width: 300px;
-    background-color: #ff9999;
-    border: solid 1px black;
-    padding: 15px;
-    display: block;
-    opacity: 0.90;
-    -moz-opacity: 0.90;
-    z-index: 5;
-}
-.dpwindow_error {
-    left: 75px;
-    top: 50px;
-    width: 300px;
-    background-color: #ff6666;
-    border: solid 1px black;
-    padding: 15px;
-    display: block;
-    opacity: 0.97;
-    -moz-opacity: 0.97;
-    z-index: 5;
-}
-.dpwindow_todo {
-    left: 40px;
-    top: 35px;
-    width: 560px;
-    background-color: #00ccff;
-    border: solid 1px black;
-    padding: 15px;
-    display: block;
-    opacity: 0.94;
-    -moz-opacity: 0.94;
-    z-index: 5;
-}
-.dpwindow_src {
-    left: 20px;
-    top: 10px;
-    width: 650px;
-    background-color: #CFD5E0;
-    border: solid 1px black;
-    padding: 15px;
-    display: block;
-    opacity: 0.97;
-    -moz-opacity: 0.97;
-    z-index: 5;
+.dpclr { clear: both; height: 0px; width: 0px; line-height: 0px; font-size: 0px }
+.dpclr2 { clear: both; height: 17px; width: 1px; line-height: 17px; font-size: 1px }
+.dpfill { position: absolute; width: auto; clear: both; height: 0px; width: 0px; line-height: 0px; font-size: 0px }
+.actionwindow { display: none; padding: 0px; position: absolute; z-index: 7; background-color: #eeeeee; opacity: 0.95; -moz-opacity: 0.95; cursor: default; -moz-user-select: none; user-select: none }
+.actionwindow, .actionwindow_inner { font-weight: normal; text-align: left }
+.actionwindow_inner { display: block; border: solid 1px black; padding: 2px }
+.am, .am_deep, .am_selected, .am_deep_selected { overflow: hidden; white-space: nowrap }
+.am { background-color: transparent; color: #000066; padding-left: 4px; padding-right: 4px; font-size: 0px; line-height: 16px; font-family: arial,verdana,'Bitstream Vera Sans',helvetica,sans-serif }
+.am_deep { background: transparent url(images/marr_out.gif) no-repeat top right }
+.am_deep_ghosted { background-image: none !important }
+.am_selected { background-color: #000066; color: #fff }
+.am_deep_selected { background: #000066 url(images/marr_over.gif) no-repeat top right }
+.am_deep_selected_ghosted { background-image: none !important }
+.am_ghosted { color: graytext !important }
+.am_icon, .am_empty { float: left; white-space: nowrap; overflow: hidden; line-height: 0px; font-size: 1px; text-align: left; margin: 0; padding: 0 }
+.am_icon { width: 13px; padding-top: 5px }
+.am_icon img { margin: 0px; padding: 0px }
+.am_empty { float: left; width: 0px; height: 0px; line-height: 0px; font-size: 0px }
+.am_empty2 { float: left; width: 3px; height: 0px; line-height: 0px; font-size: 0px }
+.am_title { float: left; white-space: nowrap;  overflow: hidden; font-size: 11px }
+.am_submenu { float: left; white-space: nowrap; width: 8px; overflow: hidden }
+.dpwindow_default, .dpwindow_drink, .dpwindow_error, .dpwindow_src, .dpwindow_tell, .dpwindow_shout, .dpwindow_emote { display: block; position: absolute; left: 75px; top: 50px; cursor: move; text-align: left; z-index: 5; border: solid 1px black; padding: 15px; opacity: 0.95; -moz-opacity: 0.95 }
+.dpwindow_default { width: 382px; background-color: #ffcc00 }
+.dpwindow_drink { left: 115px; top: 80px; width: 300px; background-color: #ff9999; opacity: 0.90; -moz-opacity: 0.90 }
+.dpwindow_error { width: 300px; background-color: #ff6666; opacity: 0.97; -moz-opacity: 0.97 }
+.dpwindow_src { left: 20px; top: 10px; width: 650px; background-color: #CFD5E0; opacity: 0.97; -moz-opacity: 0.97 }
+.dpwindow_tell { left: 88px; top: 105px; width: 450px; background-color: #99ff99 }
+.dpwindow_shout { left: 100px; top: 115px; width: 450px; background-color: #00ccff }
+.dpwindow_emote { left: 60px; top: 135px; width: 450px; background-color: #ff9900 }
+.dpinactive { opacity: 0.60; -moz-opacity: 0.60; filter: alpha(opacity=60) }
+.dpinactive_txt { color: #6666A3 }
+.dpcomm { width: 375px }
+.dpemote { width: 320px }
+
 }
 

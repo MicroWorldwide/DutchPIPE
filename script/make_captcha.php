@@ -15,7 +15,7 @@
  * For additional details, see:
  * http://blog.theoconcept.com/index.php/2006/01/27/3-un-peu-tordu-comme-idee
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -28,7 +28,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006 Julien CROUZET
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: make_captcha.php 238 2007-07-08 15:40:07Z ls $
+ * @version    Subversion: $Id: make_captcha.php 252 2007-08-02 23:30:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver.php, /www/captcha.php
  */

@@ -2,7 +2,7 @@
 /**
  * The Shop's Store
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: store.php 243 2007-07-08 16:26:23Z ls $
+ * @version    Subversion: $Id: store.php 252 2007-08-02 23:30:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -110,193 +110,14 @@ leave <a href="%s">west</a> to the shop.<br />'),
         }
     }
 
-    /**
-     * Gets the HTML "appearance" of this object
-     *
-     * Gets HTML to represent the object to another objects. That is, other
-     * objects call this method in order to "see" it, and HTML is returned. How
-     * an object is seen depends on how the object is related to the object that
-     * is viewing it in terms of "physical" location.
-     *
-     * In other words, a level of 0 means this object is seen by something in
-     * its inventory (a user sees a page). Level 1 means this object is seen by
-     * an object in its environment (a user sees another user). Level 2 means
-     * this object is in the inventory of the object that is seeing it.
-     *
-     * @param      int       $level           level of visibility
-     * @param      boolean   $include_div     include div with id around HTML?
-     * @param      object    $from            experimental
-     * @param      string    $displayMode     'abstract' or 'graphical'
-     * @param      boolean   $displayTitlebar display title bar for pages?
-     * @return     string    HTML "appearance" of this object
-     */
-    public function getStoreList($displayMode = 'abstract',
-            $elementId = 'dppage')
+    function filterAppearance($level, &$from, $appearance, &$user)
     {
-        $body = $inventory = '';
-
-        $body = '<div id="' . $elementId . '"><div id="' . $elementId
-            . '_inner1"><div class="' . $elementId . '_inner2">';
-
-        $inv = $this->getInventory();
-        $inventory = '';
-        foreach ($inv as &$ob) {
-            $inventory .= $this->getStoreItem($ob, TRUE, NULL, $displayMode);
-        }
-        if ($inventory !== '') {
-            $inventory =
-                "<div id=\"dpinventory\"><div id=\"{$this->uniqueId}\">"
-                . "$inventory</div></div>";
-        } else {
-            $inventory = dptext('Nothing');
+        if (1 === $level && !$from[0]->isNoBuy) {
+            $appearance .= '<br />' . sprintf(dptext('%d credits'),
+                $this->getBuyValue($from[0]->value));
         }
 
-        $body .= $inventory . '</div></div></div>';
-
-        return $body;
-    }
-
-    public function getStoreItem(&$ob, $include_div = TRUE,
-            $from = NULL, $displayMode = 'abstract',
-            $displayTitlebar = TRUE, $elementId = 'dpstore')
-    {
-        $user = get_current_dpuser();
-        $body = $inventory = '';
-        $titlebar = '';
-
-        $status = !isset($ob->status) || FALSE === $ob->status
-            ? '' : ' (' . $ob->status . ')';
-
-        if (is_null($from)) {
-            $from = $user;
-        }
-
-        if ($displayMode === 'graphical' && isset($ob->titleImg)) {
-            $title_img = '<img src="' . $ob->titleImg
-                . '" border="0" alt="" style="cursor: pointer" '
-                . 'onClick="get_store_actions(\'' . $this->uniqueId
-                . '\', \'' . $ob->uniqueId . '\', event)" /><br />'
-                . ucfirst($ob->getTitle(
-                DPUNIVERSE_TITLE_TYPE_INDEFINITE)) . $status . ($ob->isNoBuy
-                ? '' : '<br />' . sprintf(dptext('%d credits'),
-                $this->getBuyValue($ob->value)));
-            return FALSE === $include_div ? $title_img
-                : '<div id="' . $ob->uniqueId
-                . '" class="title_img' . ($from === $ob ? '_me' : '')
-                . '">' . $title_img . '</div>';
-        }
-
-        $body = $from === $ob ? '<span class="me">'
-            . ucfirst($ob->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE))
-            . $status . '</span>'
-            : ucfirst($ob->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE))
-            . $status;
-
-        $inv = $ob->getInventory();
-        foreach ($inv as &$ob2) {
-            $inventory .= $ob2->getAppearance(1, $include_div, $from,
-                $displayMode);
-        }
-
-        return FALSE === $include_div ? $body . $inventory
-            : '<div id="' . $ob->uniqueId
-            . '" class="dpobject" onClick="get_actions(\''
-            . $ob->uniqueId . '\')">'
-            . $body . $inventory . '</div>';
-    }
-
-    /**
-     * Gets the HTML "appearance" of this object
-     *
-     * Gets HTML to represent the object to another objects. That is, other
-     * objects call this method in order to "see" it, and HTML is returned. How
-     * an object is seen depends on how the object is related to the object that
-     * is viewing it in terms of "physical" location.
-     *
-     * In other words, a level of 0 means this object is seen by something in
-     * its inventory (a user sees a page). Level 1 means this object is seen by
-     * an object in its environment (a user sees another user). Level 2 means
-     * this object is in the inventory of the object that is seeing it.
-     *
-     * @param      int       $level           level of visibility
-     * @param      boolean   $include_div     include div with id around HTML?
-     * @param      object    $from            experimental
-     * @param      string    $displayMode     'abstract' or 'graphical'
-     * @param      boolean   $displayTitlebar display title bar for pages?
-     * @return     string    HTML "appearance" of this object
-     */
-    public function getUserList($user, $displayMode = 'abstract',
-            $elementId = 'dppage')
-    {
-        $body = $inventory = '';
-
-        $body = '<div id="' . $elementId . '"><div id="' . $elementId
-            . '_inner1"><div class="' . $elementId . '_inner2">';
-
-        $inv = $user->getInventory();
-        $inventory = '';
-        foreach ($inv as &$ob) {
-            $inventory .= $this->getUserItem($ob, TRUE, NULL, $displayMode);
-        }
-        if ($inventory !== '') {
-            $inventory =
-                "<div id=\"dpinventory\"><div id=\"{$this->uniqueId}\">"
-                . "$inventory</div></div>";
-        } else {
-            $inventory = dptext('Nothing');
-        }
-
-        $body .= $inventory . '</div></div></div>';
-
-        return $body;
-    }
-
-    public function getUserItem(&$ob, $include_div = TRUE,
-            $from = NULL, $displayMode = 'abstract',
-            $displayTitlebar = TRUE, $elementId = 'dpstore')
-    {
-        $user = get_current_dpuser();
-        $body = $inventory = '';
-        $titlebar = '';
-
-        $status = !isset($ob->status) || FALSE === $ob->status
-            ? '' : ' (' . $ob->status . ')';
-
-        if (is_null($from)) {
-            $from = $user;
-        }
-
-        if ($displayMode === 'graphical' && isset($ob->titleImg)) {
-            $title_img = '<img src="' . $ob->titleImg
-                . '" border="0" alt="" style="cursor: pointer" '
-                . 'onClick="get_seller_actions(\'' . $this->uniqueId
-                . '\', \'' . $ob->uniqueId . '\', event)" /><br />'
-                . ucfirst($ob->getTitle(
-                DPUNIVERSE_TITLE_TYPE_INDEFINITE)) . $status . ($ob->isNoSell
-                ? '' : '<br />' . $this->getSellValue($ob->value) . ' credits');
-            return FALSE === $include_div ? $title_img
-                : '<div id="' . $ob->uniqueId
-                . '" class="title_img' . ($from === $ob ? '_me' : '')
-                . '">' . $title_img . '</div>';
-        }
-
-        $body = $from === $ob ? '<span class="me">'
-            . ucfirst($ob->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE))
-            . $status . '</span>'
-            : ucfirst($ob->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE))
-            . $status;
-
-        $inv = $ob->getInventory();
-        foreach ($inv as &$ob2) {
-            $inventory .= $ob2->getAppearance(1, $include_div, $from,
-                $displayMode);
-        }
-
-        return FALSE === $include_div ? $body . $inventory
-            : '<div id="' . $ob->uniqueId
-            . '" class="dpobject" onClick="get_actions(\''
-            . $ob->uniqueId . '\')">'
-            . $body . $inventory . '</div>';
+        return $appearance;
     }
 
     function getBonusValue($value)
@@ -322,69 +143,6 @@ leave <a href="%s">west</a> to the shop.<br />'),
         $result = 2 * $value - $this->getBonusValue(2 * $value);
 
         return 0 == $result && $value > 0 ? 1 : $result;
-    }
-
-    /**
-     * Tells user the HTML with the action menu for this object
-     */
-    function getStoreActionsMenu($itemid)
-    {
-        /* Bounce back a checksum so the client can find the right response */
-        if (!isset(get_current_dpuser()->_GET['checksum'])) {
-            return;
-        }
-        $checksum = get_current_dpuser()->_GET['checksum'];
-
-        $user = get_current_dpuser();
-
-        $actions = array(
-            dptext('buy') => sprintf(dptext('buy %s'), $itemid),
-            dptext('see') => sprintf(dptext('see %s'), $itemid)
-        );
-
-        $action_menu = '';
-        foreach ($actions as $menu => $fullaction) {
-            $action_menu .= '<div id="action_menu0" '
-                . 'class="am" onMouseOver="action_over(this)" '
-                . 'onMouseOut="action_out(this)" '
-                . 'onClick="send_action2server(\'' . $fullaction . '\')">'
-                . $menu . "</div>\n";
-        }
-        get_current_dpuser()->tell('<actions id="' . $this->uniqueId
-            . '" level="0" checksum="' . $checksum
-            . '"><div class="actionwindow_inner">' . $action_menu
-            . '</div></actions>');
-    }
-
-    /**
-     * Tells user the HTML with the action menu for this object
-     */
-    function getSellersActionsMenu($itemid)
-    {
-        /* Bounce back a checksum so the client can find the right response */
-        if (!isset(get_current_dpuser()->_GET['checksum'])) {
-            return;
-        }
-        $checksum = get_current_dpuser()->_GET['checksum'];
-
-        $user = get_current_dpuser();
-
-        $actions = array(
-            dptext('sell') => sprintf(dptext('sell %s'), $itemid)
-        );
-
-        $action_menu = '';
-        foreach ($actions as $menu => $fullaction) {
-            $action_menu .= '<div id="action_menu0" '
-                . 'class="am" onMouseOver="action_over(this)" '
-                . 'onMouseOut="action_out(this)" '
-                . 'onClick="send_action2server(\'' . $fullaction . '\')">'
-                . $menu . "</div>\n";
-        }
-        get_current_dpuser()->tell('<actions id="' . $this->uniqueId
-            . '" level="0" checksum="' . $checksum
-            . '"><div class="actionwindow_inner">' . $action_menu
-            . '</div></actions>');
     }
 }
 ?>

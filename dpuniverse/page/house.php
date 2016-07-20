@@ -2,7 +2,7 @@
 /**
  * Inside The House
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: house.php 243 2007-07-08 16:26:23Z ls $
+ * @version    Subversion: $Id: house.php 252 2007-08-02 23:30:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -55,7 +55,7 @@ final class House extends DpPage
         $this->setMapArea('house_map', 'chest_area', 'poly',
             '353,264,355,218,425,216,448,226,444,273,375,284,353,264');
         $this->addItem(explode('#', dptext('chest#wooden chest')),
-            dptext('A wooden chest. You can search it. It is %s.'),
+            dptext("A wooden chest. You wonder what's inside. It is %s."),
             'getChestStatusStr', 'chest_area');
         $this->addExit(explode('#',
             dptext('s#alley#enter alley#door#enter door#out#exit#leave#leave house')),

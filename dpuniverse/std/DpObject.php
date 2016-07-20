@@ -2,7 +2,7 @@
 /**
  * The standard object which is built upon by all other objects
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpObject.php 243 2007-07-08 16:26:23Z ls $
+ * @version    Subversion: $Id: DpObject.php 252 2007-08-02 23:30:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  */
 
@@ -43,6 +43,9 @@ inherit(DPUNIVERSE_INCLUDE_PATH . 'actions.php');
  */
 inherit(DPUNIVERSE_INCLUDE_PATH . 'title_types.php');
 
+/**
+ * Gets mass constants
+ */
 inherit(DPUNIVERSE_INCLUDE_PATH . 'mass.php');
 
 /**
@@ -59,7 +62,7 @@ inherit(DPUNIVERSE_INCLUDE_PATH . 'mass.php');
  *   'introduction'
  * - int|float <b>credits</b> - Credits contained, integer or float depending
  *   on type, initially 0
- * - string <b>templateFile</b> - Optional replacement for dpdefault.tpl,
+ * - string <b>template</b> - Optional replacement for dpdefault.tpl,
  *   absolute path on server
  * - string <b>title</b> - Title for this object, "beer", used for object
  *   labels, etc.
@@ -210,7 +213,7 @@ class DpObject extends DpProperties
         /*
          * Path to non-default XHTML template file for this object, if any
          */
-        $this->templateFile = new_dp_property(NULL);
+        $this->template = new_dp_property(NULL);
 
         $this->addId(dptext('object'));
 
@@ -424,7 +427,7 @@ class DpObject extends DpProperties
      *
      * @param   mixed   &$target_ob path or object to move into to
      * @param   boolean $simple     skip some checks
-     * @return  int     FALSE for success, an error code for failure
+     * @return  int     TRUE for success, an error code for failure
      */
     function moveDpObject(&$target_ob, $simple = FALSE)
     {
@@ -519,7 +522,7 @@ class DpObject extends DpProperties
         if ($curr_env !== $target_ob) {
             $this->event(EVENT_CHANGED_ENV, $curr_env, $target_ob);
             if ($this->isRemoved) {
-                return;
+                return E_MOVEOBJECT_REMOVED;
             }
             if (FALSE !== ($curr_env)) {
                 $old_page = $curr_env;
@@ -587,18 +590,22 @@ class DpObject extends DpProperties
 
         if (!isset($this->_GET) || !isset($this->_GET['getdivs'])) {
             $body = isset($this->_GET) && isset($this->_GET['ajax'])
+                /* Back/forward button is used */
                 ? $target_ob->getAppearanceInventory(0, TRUE, NULL,
                     $this->displayMode)
                 : $target_ob->getAppearance(0, TRUE, NULL,
                     $this->displayMode);
             if (FALSE !== $body) {
-                if (!is_null($target_ob->templateFile)) {
-                    $this->tell('<xhtml>' . $body . '</xhtml>');
-                } else {
-                    $this->tell('<div id="'
-                        . (isset($this->_GET) && isset($this->_GET['ajax'])
-                        ? 'dpinventory' : 'dppage') . '">' . $body . '</div>');
-                }
+                $template_path = is_null($target_ob->template) ? ''
+                    : ' template="' . $target_ob->template . '"';
+                $this->tell('<div id="'
+                    . (isset($this->_GET) && isset($this->_GET['ajax'])
+                    ? 'dpinventory' . '"' : 'dppage' . '"' . $template_path)
+                    . '>' . $body . '</div>');
+                $this->tell('<inputpersistent persistent="'
+                    . (!$this->inputPersistent ? 'off' : $this->inputPersistent)
+                    . '">&nbsp;</inputpersistent>');
+
                 if ($this->isUser && ($type = $target_ob->isMovingArea)) {
                     if (!isset($this->_GET) || !isset($this->_GET['ajax'])) {
                         $this->tell('<script type="text/javascript" src="'
@@ -631,7 +638,7 @@ function init_drag() {
             }
         }
 
-        return FALSE;
+        return TRUE;
     }
 
     /**
@@ -1080,13 +1087,7 @@ function init_drag() {
                 $rval .= $data;
             }
             elseif ($type === 'file') {
-                $tmp = file_get_contents(
-                    (DPSERVER_GETTEXT_ENABLED && DPSERVER_LOCALE != '0'
-                    && file_exists(DPSERVER_GETTEXT_LOCALE_PATH
-                    . DPSERVER_LOCALE . $data)
-                    ? DPSERVER_GETTEXT_LOCALE_PATH . DPSERVER_LOCALE
-                    : DPUNIVERSE_PREFIX_PATH)
-                    . $data);
+                $tmp = dp_file_get_contents($data);
 
                 if (FALSE !== $tmp) {
                     $rval .= str_replace(array('{DPSERVER_CLIENT_URL}',
@@ -1183,6 +1184,7 @@ function init_drag() {
      * @param      boolean   $displayTitlebar display title bar for pages?
      * @param      boolean   $elementId       to be used as html element id
      * @return     string    HTML "appearance" of this object
+     * @see        getAppearanceTitle
      */
     public function getAppearance($level = 0, $include_div = TRUE,
             $from = NULL, $displayMode = 'abstract',
@@ -1196,6 +1198,8 @@ function init_drag() {
         $titlebar = '';
         if (0 === $level) {
             if (TRUE === $displayTitlebar) {
+                $template_path = is_null($this->template) ? ''
+                    : ' template="' . $this->template . '"';
                 $navtrail = $this->getNavigationTrailHtml();
                 if (FALSE === $user) {
                     $titlebar = $navtrail;
@@ -1226,15 +1230,19 @@ function init_drag() {
                         . 'scroll(0, 999999)" /></div></div>';
                 }
                 $titlebar = '<div id="titlebar">' . $titlebar . '</div>';
+            } else {
+                $template_path = '';
             }
-            $body = '<div id="' . $elementId . '"><div id="' . $elementId
-                . '_inner1">' . $titlebar . '<div class="' . $elementId
-                . '_inner2" id="' . $elementId . '_inner2">'
-                . '<div id="dppage_body">' . ($displayTitlebar === -1 ? ''
-                : $this->getBody() . '</div><br />');
+
+            $body = '<div id="' . $elementId . '"' . $template_path
+                . '><div id="' . $elementId . '_inner1">' . $titlebar
+                . '<div class="' . $elementId . '_inner2" id="' . $elementId
+                . '_inner2">' . '<div id="dppage_body">'
+                . ($displayTitlebar === -1 ? '' : $this->getBody()
+                . '</div><br />');
 
             $inventory = $this->getAppearanceInventory($level, $include_div,
-                $from, $displayMode);
+                $from, $displayMode, $displayTitlebar, $elementId);
 
             if (isset($this->isLiving) && TRUE === $this->isLiving) {
                 $reguser_age = $inactive_time = $session_age = '';
@@ -1285,13 +1293,6 @@ function init_drag() {
                     . '</div></div></div>';
             }
             $body .= $inventory . '</div></div></div>';
-            if (FALSE !== $displayTitlebar && !is_null($this->templateFile)) {
-                $fp = fopen($this->templateFile, 'r');
-                $xhtml = fread($fp, filesize($this->templateFile));
-                fclose($fp);
-                $xhtml = str_replace('{$body}', $body, $xhtml);
-                return $xhtml;
-            }
             return $body;
         } elseif (1 === $level) {
             $status = !isset($this->status) || FALSE === $this->status
@@ -1302,19 +1303,11 @@ function init_drag() {
             }
 
             if ($displayMode === 'graphical' && isset($this->titleImg)) {
-                $title_img_class = "dpimage";
-                if ($this->isDraggable($user)) {
-                    $title_img_class .= ' draggable';
-                }
-                $title_img = '<img src="' . $this->titleImg
-                    . '" border="0" alt="" class="' . $title_img_class
-                    . '" onMD="init_drag(\'' . $this->uniqueId . '\', event)" '
-                    . 'onClick="get_actions(\'' . $this->uniqueId
-                    . '\', event)" /><br />' . ucfirst($this->getTitle(
-                    DPUNIVERSE_TITLE_TYPE_INDEFINITE)) . $status;
+                $title_img = $this->getAppearanceTitle($user);
+
                 return FALSE === $include_div ? $title_img
-                    : '<div id="' . $this->uniqueId
-                    . '" class="title_img' . ($from === $this ? '_me' : '')
+                    : '<div id="' . $this->uniqueId . '" '
+                    . 'class="title_img' . ($from !== $this ? '' : '_me')
                     . ' draggable">' . $title_img . '</div>';
             }
 
@@ -1352,6 +1345,63 @@ function init_drag() {
     }
 
     /**
+     * Gets the graphical appearance in HTML for this object
+     *
+     * Returns the HTML with the image and the title of the object. The method
+     * filterAppearance($level, &$from, $appearance, &$user) is called in the
+     * environments of the object if defined. $level is 1, $from is an array
+     * starting with this object, followed by elements defining a path to the
+     * current object being called, $appearance the default appearance HTML and
+     * $user the user for which we're getting the appearance of the object. If
+     * you define it, it should return a string with the HTML for the
+     * appearance, just like getAppearanceTitle does itself.
+     *
+     * @param      object    &$user        performer of actions
+     * @return     string    the graphical appearance in HTML for this object
+     * @see        getAppearanceTitle
+     * @since      DutchPIPE 0.3.0
+     */
+    function getAppearanceTitle(&$user)
+    {
+
+        $status = !isset($this->status) || FALSE === $this->status
+            ? '' : ' (' . $this->status . ')';
+        $title_pre = $title_post = '';
+        $title_img_class = "dpimage";
+        if ($this->isDraggable($user)) {
+            $title_img_class .= ' draggable';
+        }
+        if ($this->isInactive) {
+            $title_img_class .= ' dpinactive';
+            $title_pre = '<span class="dpinactive_txt">';
+            $title_post = '</span>';
+        }
+        $alt = dptext('Click me!');
+
+        $img_title = '<img src="' . $this->titleImg . '" '
+            . 'border="0" class="' . $title_img_class . '" '
+            //. 'onMD="init_drag(\'' . $this->uniqueId . '\', event)" '
+            . 'onClick="get_actions(\'' . $this->uniqueId . '\', event)" '
+            . 'alt="' . $alt . '" title="' . $alt . '" /> <br />' . $title_pre
+            . ucfirst($this->getTitle( DPUNIVERSE_TITLE_TYPE_INDEFINITE))
+            . $status . $title_post;
+
+        $env =& $this;
+        $from = array();
+        do {
+            $from[] = $env;
+            if (method_exists($env, 'filterAppearance')) {
+                $img_title = $env->filterAppearance(1, $from, $img_title,
+                    $user);
+            }
+
+            $env = $env->getEnvironment();
+        } while ($env);
+
+        return $img_title;
+    }
+
+    /**
      * Gets the HTML "appearance" of all objects in this object's inventory
      *
      * Gets HTML to represents the all objects in this object's inventory using
@@ -1364,18 +1414,21 @@ function init_drag() {
      * @return     string    HTML "appearances" of this object's inventory
      */
     function getAppearanceInventory($level = 0, $include_div = TRUE,
-            $from = NULL, $displayMode = 'abstract')
+            $from = NULL, $displayMode = 'abstract', $displayTitlebar = TRUE,
+            $elementId = 'dppage')
     {
         $inv = $this->getInventory();
         $inventory = '';
         foreach ($inv as &$ob) {
             $inventory .= $ob->getAppearance($level + 1, $include_div, $from,
-                $displayMode);
+                $displayMode, $displayTitlebar, $elementId);
         }
+        $div_id = 'dppage' === $elementId ? 'dpinventory' : 'dpobinv';
+
         return $inventory == '' ? ''
-            : "<div id=\"dpinventory\"><div class=\"dpinventory2\" id=\""
-                . "{$this->uniqueId}\">$inventory</div><br clear=\"all\" />"
-                . "</div>";
+            : "<div id=\"$div_id\"><div class=\"dpinventory2\" id=\""
+                . "{$this->uniqueId}\">$inventory</div><div class=\"dpclr\">"
+                . "&nbsp;</div></div><div class=\"dpclr\">&nbsp;</div>";
     }
 
     /**
@@ -1570,73 +1623,20 @@ function init_drag() {
      * on items (the "action menu"), and at the same time to add actions you can
      * type. See DpLiving.php for some good examples.
      *
-     * Each action must be added with three mandatory parameters: its title
-     * in the menu ($actionMenu), its command line equivalent ($actionVerb),
-     * and the method called in this object when a user or object performs the
-     * action ($actionMethod).
+     * Because of the complexity of this method, it has its own manual page.
+     * See {@tutorial DutchPIPE/actions.pkg} for further information.
      *
-     * So note.php has the following line in its createDpObject method:
-     * > $this->addAction('read me!', 'read', 'actionRead');
-     *
-     * When someone clicks on the note and selects 'read me!', or types
-     * 'read [something]', method actionRead is called with two parameters:
-     * > function actionRead($verb, $noun)
-     * $verb contains 'read', $noun contains whatever else the user typed (minus
-     * the leading space), or the objects unique id if the mouse was used (see
-     * the uniqueId property).
-     *
-     * The following four parameters are optional, see include/actions.php for
-     * constants used to pass these parameters.
-     *
-     * $actionOperant is used when you click to perform an action only, and is
-     * used to define on who the action operates, in other words, how the verb
-     * noun command that is internally formed gets its noun. With the default
-     * DP_ACTION_OPERANT_MENU, the noun becomes the object that carries the
-     * action in its action menu, for example "object_41", a unique object id.
-     * Where a user would type 'read note', clicking would generate
-     * 'read object_41'.
-     * With DP_ACTION_OPERANT_NONE, there is no noun, for example "laugh".
-     * DP_ACTION_OPERANT_COMPLETE can be used to ask the user on who or what
-     * the action must be performed, for example "give".
-     *
-     * $actionTarget is used to determine on which objects' action menus this
-     * action must appear. This doesn't have to be this object, the default
-     * DP_ACTION_TARGET_SELF. For a user object that defines actions, this would
-     * be true for the action "laugh", it should appear in the action menu of
-     * the user itself. With DP_ACTION_TARGET_LIVING the menu item appears on
-     * other users and computer generated characters, for example action "kiss"
-     * should not appear on the user but on anyone near. Likewise, with
-     * DP_ACTION_TARGET_OBJINV and DP_ACTION_TARGET_OBJENV you can make the
-     * action appear on any object in this object's inventory or environment.
-     *
-     * $actionAuthorized defines what objects or users may perform the action if
-     * the action is in their scope (see next).
-     * By default, everybody may try to perform the action (although the method
-     * that is called may forbid it anyway) and this option is set to
-     * DP_ACTION_AUTHORIZED_ALL. Use DP_ACTION_AUTHORIZED_GUEST to restrict it
-     * to guests. With DP_ACTION_AUTHORIZED_REGISTERED, the action becomes only
-     * available for registered users. Use DP_ACTION_AUTHORIZED_ADMIN to
-     * restrict the action to your site administrators.
-     *
-     * $actionScope defines which objects have access to the action to begin
-     * with. With the default, DP_ACTION_SCOPE_ALL, the action becomes available
-     * for the object to which is was added, but also all objects it contains or
-     * in its environment. For example, the action "read" on a note uses this.
-     * However, the action 'smile' added to a user object is designed so
-     * the action becomes available for the user, not other objects nearby, by
-     * using DP_ACTION_SCOPE_SELF. With DP_ACTION_SCOPE_ENVIRONMENT and
-     * DP_ACTION_SCOPE_INVENTORY you can also restrict the scope.
-     *
-     * @param      mixed     $actionMenu         title of clickable menu item
-     * @param      mixed     $actionVerb         alternative verb to type
-     * @param      mixed     $actionMethod       method called to perform action
-     * @param      mixed     $actionOperant      on who/what does it have effect?
-     * @param      mixed     $actionTarget       where should menu item appear?
-     * @param      mixed     $actionAuthorized   who may perform this action?
-     * @param      mixed     $actionScope        who sees action to begin with?
-     * @param      mixed     $mapArea            imagemap area id or definition
-     * @param      string    $mapAreaAction      specific action to use
+     * @param      mixed     $actionMenu        title of clickable menu item
+     * @param      mixed     $actionVerb        alternative verb to type
+     * @param      mixed     $actionMethod      method called to perform action
+     * @param      mixed     $actionOperant     on who/what does it have effect?
+     * @param      mixed     $actionTarget      where should menu item appear?
+     * @param      mixed     $actionAuthorized  who may perform this action?
+     * @param      mixed     $actionScope       who sees action to begin with?
+     * @param      mixed     $mapArea           imagemap area id or definition
+     * @param      string    $mapAreaAction     specific action to use
      * @see        removeAction, getActionData,  getActionsMenu, setMapArea
+     * @tutorial   DutchPIPE/actions.pkg
      */
     final public function addAction($actionMenu, $actionVerb, $actionMethod,
             $actionOperant = DP_ACTION_OPERANT_MENU,
@@ -1803,7 +1803,7 @@ function init_drag() {
     function getActionsMenu()
     {
         /*
-         * The checksum is bounced back so the client can find the right
+         * A checksum is bounced back so the client can find the right
          * response
          */
         if (!($user = get_current_dpuser())
@@ -1811,20 +1811,33 @@ function init_drag() {
             return;
         }
 
-        /*
-         * If the user is navigating to submenus, the client passes each menu
-         * title leading to the submenu, for example:
-         * &l1=foo&l2=bar
-         */
-        $lvl_titles = array();
-        $lvl_cnt = 0;
-        while (isset($user->_GET['l' . ($lvl_cnt + 1)])) {
-            $lvl_cnt++;
-            $lvl_titles[] = $lvl_last_title = $user->_GET['l' . $lvl_cnt];
-        }
+        $user->lastActionTime = !isset($user->lastActionTime)
+            ? new_dp_property(time()) : time();
 
-        $actions = $this->getTargettedActions($user,
-            !isset($lvl_last_title) ? NULL : $lvl_titles);
+        if (!($rval = $this->_getActionsMenuLevels($user))) {
+            return;
+        }
+        list($lvl_titles, $lvl_cnt, $lvl_last_title) = $rval;
+
+        if (!isset($user->_GET['map_name'])
+                || !isset($user->_GET['map_area_id'])) {
+            $actions = $this->getTargettedActions($user,
+                is_null($lvl_last_title) ? NULL : $lvl_titles);
+        } else {
+            $actions = $this->getTargettedActions($user,
+                (is_null($lvl_last_title) ? NULL : $lvl_titles),
+                $user->_GET['map_area_id']);
+            /*
+             * For map area actions, when there's only one action, don't show a
+             * menu, but execute action immediately
+             */
+            if (1 === count($actions) && 0 === $lvl_cnt) {
+                reset($actions);
+                $user->_GET['menuaction'] = '1';
+                $user->performAction($actions[key($actions)][0]);
+                return;
+            }
+        }
 
         if (!count($actions)) {
             return;
@@ -1832,93 +1845,136 @@ function init_drag() {
 
         $action_menu = '';
 
+        $icon_used = $submenu_used = FALSE;
         foreach ($actions as $action_menu_title => &$action_data) {
             /* If set to FALSE, inserts action into the command line */
-            $send_action = TRUE;
             $get_operant = FALSE;
-            $is_submenu = is_bool($action_data);
-            $ghosted = FALSE;
-            $gstyle = $gdstyle = $gdsstyle = '';
+            $is_submenu = is_array($action_data) && $action_data[6];
 
-            if (!$is_submenu && is_array($action_data)) {
-                $action = $action_data[0];
-                $operant = $action_data[1];
-                $ghosted = $action_data[2];
-                $defined_by = $action_data[3];
-                if ($ghosted = $action_data[2]) {
-                    $gstyle = !$ghosted ? '' : ' am_ghosted';
-                    $gdstyle = !$ghosted ? '' : ' am_deep_ghosted';
-                    $gdsstyle = !$ghosted ? '' : ' am_deep_selected_ghosted';
-                }
+            $icon = '&nbsp;';
+            $icon_over = FALSE;
 
-                if (is_array($operant) && 2 === count($operant)
-                        && is_object($operant[0])) {
-                    $operant = $operant[0]->{$operant[1]}($action, $this,
-                        $defined_by, $user);
-                } elseif (DP_ACTION_OPERANT_METHOD === $operant) {
-                    $operant = $this->getActionOperant($action, $this,
-                        $defined_by, $user);
+            if (is_array($action_data) && $action_data[4]) {
+                $icon = $action_data[4];
+                if ($action_data[5]) {
+                    $icon_over = $action_data[5];
                 }
-                if (is_array($operant) ||
-                        DP_ACTION_OPERANT_METHOD_MENU === $operant) {
-                    $actionstr = '';
-                    $action_data = 'foo';
-                    $get_operant = $is_submenu = TRUE;
-                } elseif (DP_ACTION_OPERANT_MENU === $operant) {
-                    $actionstr = $action . ' ' . $this->uniqueId;
-                } elseif (DP_ACTION_OPERANT_NONE === $operant) {
-                    $actionstr = $action;
-                } elseif (is_string($operant)) {
-                    $actionstr = $action . ' ' . $operant;
-                    $send_action = FALSE;
-                } else {
-                    $actionstr = $action . ' ';
-                    $send_action = FALSE;
-                }
-            } else {
-                $actionstr = is_string($action_data) ? $action_data : '';
+                $icon_used = TRUE;
             }
-            $mouseover = "action_over(this)";
+
+            list($actionstr, $send_action, $ghosted) =
+                $this->_getActionsMenuFullAction($action_data, $user);
+
+            if ((!isset($user->inputMode) || 'say' !== $user->inputMode)
+                    && '' === $actionstr) {
+                $get_operant = $is_submenu = TRUE;
+            }
+
+            if (!$ghosted) {
+                $gstyle = $gdstyle = $gdsstyle = '';
+            } else {
+                $gstyle = ' am_ghosted';
+                $gdstyle = ' am_deep_ghosted';
+                $gdsstyle = ' am_deep_selected_ghosted';
+            }
+
+            $mouseover = "if (action_over(this)) { ";
+            $add_to_mouseover = '';
             $mouseout = $mouseclick = '';
 
             if (!$lvl_cnt && !$is_submenu) {
-                $mouseover .= "; jQuery('div.am_deep_selected')."
+                $mouseover .= "jQuery('div.am_deep_selected')."
                     . "removeClass('am_deep_selected am_selected$gdsstyle')";
+                $add_to_mouseover = '; ';
             }
-            if (!$is_submenu) {
-                $mouseout = "action_out(this)";
-                if (!$ghosted) {
-                    $mouseclick = FALSE === $send_action
-                        ? "_gel('dpaction').value = '$actionstr'"
-                        : 'send_action2server(\'' . addslashes($actionstr)
-                        . "')";
-                } else {
-                    $mouseclick = 'am_no_close = true';
-                }
+            if (!$is_submenu || $ghosted) {
+                $mouseout = "am_target_out = this";
+                $mouseclick = $ghosted ? 'am_no_close = true'
+                    : ((FALSE === $send_action ? 'show_input'
+                    : 'send_action2server') . "('" .
+                    addslashes(htmlspecialchars($actionstr)) . "')");
             } else {
-                $mouseover .= "; jQuery(this).addClass('am_deep_selected"
-                    . $gdsstyle
-                    . "'); get_actions('{$this->uniqueId}', event, ";
+                $submenu_used = TRUE;
+                $mouseover .= $add_to_mouseover
+                    . "jQuery(this).addClass('am_deep_selected" . $gdsstyle
+                    . "'); " . (isset($user->_GET['map_area_id'])
+                    ? "get_map_area_actions('{$user->_GET['map_name']}', "
+                    . "'{$user->_GET['map_area_id']}', "
+                    : "get_actions(")
+                    . "'{$this->uniqueId}', event, ";
 
                 for ($i = 0; $i < $lvl_cnt; $i++) {
-                    $mouseover .= "'" . addslashes($lvl_titles[$i]) . "', ";
+                    $mouseover .= "'"
+                        . addslashes(htmlspecialchars($lvl_titles[$i])) . "', ";
                 }
 
-                $mouseover .= "'" . addslashes($action_menu_title) . "')";
+                $mouseover .= "'"
+                    . addslashes(htmlspecialchars($action_menu_title)) . "')";
+
+                $add_to_mouseover = '; ';
                 $mouseclick = 'am_no_close = true';
             }
 
+            if ($icon_over) {
+                $mouseover .= $add_to_mouseover
+                    . "jQuery('span.am_icon', this).attr('id', "
+                    . "jQuery('span.am_icon > img', this).attr('src')); "
+                    . "jQuery('span.am_icon > img', this).attr('src', "
+                    . "'{$icon_over}')";
+            }
+
+            $mouseover .= '}';
+
             $action_menu .= '<div id="action_menu' . $lvl_cnt . '" '
                 . 'class="am' . (!$is_submenu ? '' : ' am_deep' . $gdstyle)
-                . $gstyle . '" onMouseOver="' . $mouseover . '" '
-                . 'onMouseOut="' . $mouseout . '" '
-                . 'onClick="' . $mouseclick . '">'
-                . $action_menu_title . "</div>\n";
+                . $gstyle . '" onMouseOver="' . $mouseover
+                . '" onMouseOut="' . $mouseout
+                . '" onClick="' . $mouseclick . '">'
+                . '<span class="AM_ICON" id=' . $icon_over . '>' . $icon
+                . '</span>'
+                . '<span class="am_title">' . $action_menu_title . '</span>'
+                . '<span class="AM_SUBMENU">&nbsp;</span>&nbsp;'
+                . '<br clear="all" /></div>' . "\n";
         }
+
+        $action_menu = str_replace(array('AM_ICON', 'AM_SUBMENU'),
+            array((!$icon_used ? 'am_empty' : 'am_icon'),
+            (!$submenu_used ? 'am_empty2' : 'am_submenu')), $action_menu);
+
         $user->tell('<actions id="' . $this->uniqueId
             . '" level="' . $lvl_cnt . '" checksum="' . $user->_GET['checksum']
             . '"><div class="actionwindow_inner">' . $action_menu
             . '</div></actions>');
+    }
+
+    /**
+     * Gets information about the current trail of menu and submenus
+     *
+     * Used by getActionsMenu.
+     *
+     * @access     private
+     * @param      object    &$user        performer of actions
+     * @return     array     data structure with level info
+     * @see        getActionsMenu
+     * @since      DutchPIPE 0.3.0
+     */
+    private function &_getActionsMenuLevels(&$user)
+    {
+        /*
+         * If the user is navigating to submenus, the client passes each menu
+         * title leading to the submenu, for example:
+         * &l1=foo&l2=bar
+         */
+        $lvl_titles = array();
+        $lvl_cnt = 0;
+        $lvl_last_title = NULL;
+        while (isset($user->_GET['l' . ($lvl_cnt + 1)])) {
+            $lvl_cnt++;
+            $lvl_titles[] = $lvl_last_title = $user->_GET['l' . $lvl_cnt];
+        }
+        $rval = array($lvl_titles, $lvl_cnt, $lvl_last_title);
+
+        return $rval;
     }
 
     /**
@@ -1937,13 +1993,15 @@ function init_drag() {
      *
      * @param      object    &$user      user getting the menu
      * @param      array     $levels     current path of user in (sub)menu
+     * @param      string    $mapAreaId  id of area in imagemap
      * @return     array     array with menu actions, can be empty
      * @see        getActionsMenu
      */
-    function &getTargettedActions(&$user, $levels = NULL)
+    function &getTargettedActions(&$user, $levels = NULL, $mapAreaId = NULL)
     {
         /* Gets menu actions on this object defined by this object */
-        $actions = $this->_getTargettedActions($this, $user, $levels);
+        $actions = $this->_getTargettedActions($this, $user, $levels,
+            $mapAreaId);
 
         /*
          * Gets menu actions on this object defined by objects in inventory:
@@ -1951,7 +2009,7 @@ function init_drag() {
         $inv = $this->getInventory();
         foreach ($inv as &$ob) {
             $actions = array_merge($actions,
-                $this->_getTargettedActions($ob, $user, $levels));
+                $this->_getTargettedActions($ob, $user, $levels, $mapAreaId));
         }
 
         /*
@@ -1964,7 +2022,8 @@ function init_drag() {
             foreach ($inv as &$ob) {
                 if ($ob !== $this) {
                     $actions = array_merge($actions,
-                        $this->_getTargettedActions($ob, $user, $levels));
+                        $this->_getTargettedActions($ob, $user, $levels,
+                        $mapAreaId));
                 }
             }
 
@@ -1973,7 +2032,7 @@ function init_drag() {
              * environment:
              */
             $actions = array_merge($actions,
-                $this->_getTargettedActions($env, $user, $levels));
+                $this->_getTargettedActions($env, $user, $levels, $mapAreaId));
         }
 
         return $actions;
@@ -1992,120 +2051,222 @@ function init_drag() {
      * @param      object    &$ob        target of actions
      * @param      object    &$user      performer of actions
      * @param      array     $levels     current path of user in (sub)menu
+     * @param      string    $mapAreaId  id of area in imagemap
      * @return     array     array with actions, can be empty
      * @see        getTargettedActions, _checkTargettedAction
+     * @since      DutchPIPE 0.3.0
      */
-    function &_getTargettedActions(&$ob, &$user, $levels = NULL)
+    private function &_getTargettedActions(&$ob, &$user, $levels = NULL,
+            $mapAreaId = NULL)
     {
-        $ob_actions = $ob->getActionData();
+        $ob_actions = is_null($mapAreaId) ? $ob->getActionData()
+            : $ob->getMapAreaActions($mapAreaId);
 
         if (FALSE === $ob_actions || !count($ob_actions)) {
             $ob_actions = array();
             return $ob_actions;
         }
-        $moreactions = array();
+        $t_actions = array();
 
         $is_registered = isset($user->isRegistered)
             && $this->isRegistered === TRUE;
         $is_admin = isset($user->isAdmin) && $user->isAdmin === TRUE;
 
         $level = !is_array($levels) ? 0 : count($levels);
-        foreach ($ob_actions as $verb => &$a_d) {
-            foreach ($a_d as $action_data) {
-                $get_operant = FALSE;
-                $add_operant = 0;
-                $operant = NULL;
-
-                if ($level) {
-                    $operant = $action_data[2];
-                    parse_dp_callable($action_data[0], $verb, $this, $ob,
-                        $user);
-                    if (is_array($operant) && 2 === count($operant)
-                            && is_object($operant[0])) {
-                        $operant = $operant[0]->{$operant[1]}($verb, $this, $ob,
-                            $user);
-                    } elseif (DP_ACTION_OPERANT_METHOD === $operant) {
-                        $operant = $this->getActionOperant($verb, $this, $ob,
-                            $user);
-                    }
-                    if (is_array($operant) ||
-                            DP_ACTION_OPERANT_METHOD_MENU === $operant) {
-                        $get_operant = TRUE;
-                        $add_operant = 1;
-                        if (is_array($action_data[0]) && ($sz = count(
-                                $action_data[0])) < $level - $add_operant) {
-                            continue;
-                        }
-                    } elseif (!is_array($action_data[0])
-                            || ($sz = count($action_data[0])) < $level) {
+        if (is_null($mapAreaId)) {
+            foreach ($ob_actions as $verb => &$a_d) {
+                foreach ($a_d as $action_data) {
+                    if (FALSE === $this->_addTargettedAction($t_actions,
+                            $verb, $action_data, $ob, $user, $level, $levels,
+                            $is_registered, $is_admin)) {
                         continue;
-                    }
-
-                    for ($i = 0; $i < $level; $i++) {
-                        if (!is_array($action_data[0])) {
-                            if (0 === $i && $levels[0] === $action_data[0]) {
-                                continue;
-                            }
-                            continue 2;
-                        }
-                        if ($levels[$i] <> $action_data[0][$i]) {
-                            continue 2;
-                        }
-                    }
-                }
-
-                if (!$get_operant && FALSE ===
-                        $this->_checkTargettedAction($action_data, $verb, $ob,
-                            $user, $is_registered, $is_admin)) {
-                    continue;
-                }
-
-                if (!$get_operant) {
-                    $titles =& $action_data[0];
-                    //parse_dp_callable($action_data[4], $verb, $this, $ob,
-                    //    $user);
-                    $ghosted = DP_ACTION_AUTHORIZED_DISABLED & $action_data[4];
-
-                    $data = array($verb, $action_data[2], $ghosted, $ob);
-
-                    if (is_string($titles)) {
-                        $title = $titles;
-                    } elseif (is_array($titles)) {
-                        if (2 !== count($titles) || !is_object($titles[0])) {
-                            parse_dp_callable($titles[$level], $verb, $this,
-                                $ob, $user);
-                        } else {
-                            parse_dp_callable($titles, $verb, $this, $ob,
-                                $user);
-                        }
-
-                        $title = !is_array($titles) ? $titles : $titles[$level];
-                    } else {
-                        continue;
-                    }
-
-                    if (!is_array($titles)) {
-                        $moreactions[$title] = $data;
-                    } elseif ($cnt = count($titles)) {
-                        $moreactions[$title] = $cnt > $level + 1 - $add_operant
-                            ? FALSE : $data;
-                    }
-                } else {
-                    if (is_array($operant) && 2 === count($operant)
-                            && is_object($operant[0])) {
-                        $data = $operant[0]->{$operant[1]}($verb, $this, $ob,
-                            $user);
-                    } elseif (DP_ACTION_OPERANT_METHOD_MENU === $operant) {
-                        $data = $ob->getActionOperantMenu($verb, $this, $ob,
-                            $user);
-                    }
-                    if ($data && is_array($data)) {
-                        $moreactions += $data;
                     }
                 }
             }
+        } else {
+            foreach ($ob_actions as $action_data) {
+                if (FALSE === $this->_addTargettedAction($t_actions, NULL,
+                        $action_data, $ob, $user, $level, $levels,
+                        $is_registered, $is_admin)) {
+                    continue;
+                }
+            }
         }
-        return $moreactions;
+        return $t_actions;
+    }
+
+    /**
+     * Adds action that can be performed on a given object by a given user
+     *
+     * Used by _getTargettedActions.
+     *
+     * @access     private
+     * @param      array     &$t_actions   targetted actions found so far
+     * @param      string    $verb         associated verb for this action
+     * @param      array     &$actionData  complete action data
+     * @param      object    &$ob          target of actions
+     * @param      object    &$user        performer of actions
+     * @param      integer   $level        submenu level, starts at 0
+     * @param      array     $levels       sublevel titles
+     * @param      boolean   $isRegistered is performer a registered user?
+     * @param      boolean   $isAdmin      is performer an administrator?
+     * @return     array     array with actions, can be empty
+     * @see        _getTargettedActions
+     * @since      DutchPIPE 0.3.0
+     */
+    private function _addTargettedAction(&$t_actions, $verb, &$actionData,
+            &$ob, &$user, $level, &$levels, $isRegistered, $isAdmin)
+    {
+        $get_operant = FALSE;
+        $add_operant = 0;
+        $verb_data = $operant = NULL;
+
+        $is_map_area = is_null($verb);
+        if (1 || $level) {
+            if ($is_map_area) {
+                if (!is_null($actionData[2]) && !is_null($actionData[3])) {
+                    $verb_data = $ob->getActionData($actionData[2],
+                        $actionData[3]);
+                    $operant = $verb_data[2];
+                    $verb = $verb_data[2];
+                } else {
+                    $operant = DP_ACTION_OPERANT_MENU;
+                    $verb = $actionData[1];
+                }
+            } else {
+                $operant = $actionData[2];
+            }
+
+            parse_dp_callable($actionData[0], $verb, $this, $ob, $user);
+
+            if (is_array($operant) && 2 === count($operant)
+                    && is_object($operant[0])) {
+                $operant = $operant[0]->{$operant[1]}($verb, $this, $ob,
+                    $user);
+            } elseif (DP_ACTION_OPERANT_METHOD === $operant) {
+                $operant = $this->getActionOperant($verb, $this, $ob,
+                    $user);
+            }
+            if (is_array($operant) ||
+                    DP_ACTION_OPERANT_METHOD_MENU === $operant) {
+                $get_operant = TRUE;
+                $add_operant = 1;
+                if (is_array($actionData[0]) && count($actionData[0])
+                        < $level - $add_operant) {
+                    return FALSE;
+                }
+            } elseif (is_array($actionData[0])
+                    && count($actionData[0]) < $level) {
+                return FALSE;
+            }
+
+            for ($i = 0; $i < $level; $i++) {
+                $action_menu_title = !is_array($actionData[0])
+                    ? $actionData[0] : $actionData[0][$i];
+                if (FALSE !== ($pos = strrpos($action_menu_title, '#'))) {
+                    $action_menu_title = substr($action_menu_title,
+                        $pos + 1);
+                }
+
+                if (!is_array($actionData[0])) {
+                    if (0 === $i && $levels[0] === $action_menu_title) {
+                        continue;
+                    }
+                    return FALSE;
+                }
+                if ($levels[$i] <> $action_menu_title) {
+                    return FALSE;
+                }
+            }
+        }
+
+        $ghosted = FALSE;
+        if (!$is_map_area) {
+            if (FALSE ===
+                    $this->_checkTargettedAction($verb, $actionData, $ob,
+                    $user, $isRegistered, $isAdmin)) {
+                return FALSE;
+            }
+            parse_dp_callable($actionData[4], $verb, $this, $ob, $user);
+            $ghosted = DP_ACTION_AUTHORIZED_DISABLED & $actionData[4];
+        } else {
+            if (!is_null($actionData[2]) && !is_null($actionData[3])) {
+                if (is_null($verb_data)) {
+                    $verb_data = $ob->getActionData($actionData[2],
+                        $actionData[3]);
+                }
+
+                if (!$get_operant && FALSE === $this->_checkTargettedAction(
+                        $actionData[2], $verb_data, $ob, $user, $isRegistered,
+                        $isAdmin)) {
+                    return FALSE;
+                }
+                if (is_array($verb_data)) {
+                    parse_dp_callable($verb_data[4], $verb, $this, $ob, $user);
+                    $ghosted = DP_ACTION_AUTHORIZED_DISABLED & $verb_data[4];
+                }
+            }
+        }
+
+        if (!$get_operant || $ghosted || ($level < (!is_array($actionData[0])
+                ? 1 : count($actionData[0])))) {
+            $titles =& $actionData[0];
+            if (is_string($titles)) {
+                $title = $titles;
+            } elseif (is_array($titles)) {
+                if (2 !== count($titles) || !is_object($titles[0])) {
+                    parse_dp_callable($titles[$level], $verb, $this,
+                        $ob, $user);
+                } else {
+                    parse_dp_callable($titles, $verb, $this, $ob,
+                        $user);
+                }
+
+                $title = !is_array($titles) ? $titles : $titles[$level];
+            } else {
+                return FALSE;
+            }
+
+            $icon = $icon_over = FALSE;
+            if (FALSE !== strpos($title, '#')) {
+                $tmp = explode('#', $title);
+                if (2 == count($tmp)) {
+                    $icon = $tmp[0];
+                    $title = $tmp[1];
+                } elseif (3 == count($tmp)) {
+                    $icon = $tmp[0];
+                    $icon_over = $tmp[1];
+                    $title = $tmp[2];
+                }
+            }
+
+            $cnt = !is_array($titles) ? 1 : count($titles);
+            $is_submenu = $cnt > $level + 1
+                - ($ghosted && $level + 1 === $cnt ? 0 : $add_operant);
+
+            $data = !$is_map_area
+                ? array($verb, $actionData[2], $ghosted, $ob, $icon,
+                    $icon_over, $is_submenu)
+                : array($actionData[1], (is_null($verb_data)
+                    ? DP_ACTION_OPERANT_MENU : $verb_data[2]), $ghosted, $ob,
+                    $icon, $icon_over, $is_submenu);
+
+            $t_actions[$title] = $data;
+        } elseif ($get_operant) {
+            if (is_array($operant) && 2 === count($operant)
+                    && is_object($operant[0])) {
+                $data = $operant[0]->{$operant[1]}($verb, $this, $ob,
+                    $user);
+            } elseif (DP_ACTION_OPERANT_METHOD_MENU === $operant) {
+                $data = $ob->getActionOperantMenu($verb, $this, $ob,
+                    $user);
+            }
+            if ($data && is_array($data)) {
+                $t_actions += $data;
+            }
+        }
+
+        return TRUE;
     }
 
     /**
@@ -2115,20 +2276,28 @@ function init_drag() {
      * directives of the action.
      *
      * @access     private
-     * @param      array     &$action_data   action data array
-     * @param      object    &$ob            target of actions
-     * @param      object    &$user          performer of actions
-     * @param      boolean   $is_registered  is performer a registered user?
-     * @param      boolean   $is_admin       is performer an administrator?
+     * @param      string    $verb          associated verb for this action
+     * @param      array     &$actionData   complete action data
+     * @param      object    &$ob           target of actions
+     * @param      object    &$user         performer of actions
+     * @param      boolean   $isRegistered  is performer a registered user?
+     * @param      boolean   $isAdmin       is performer an administrator?
      * @return     boolean   TRUE to include action, FALSE to exclude
      * @see        getTargettedActions, _getTargettedActions
      * @since      DutchPIPE 0.2.1
      */
-    private function _checkTargettedAction(&$action_data, $verb, &$ob, &$user,
-            $is_registered = FALSE, $is_admin = FALSE)
+    private function _checkTargettedAction($verb, &$actionData, &$ob, &$user,
+            $isRegistered = FALSE, $isAdmin = FALSE)
     {
-        $target =& $action_data[3];
+        $target =& $actionData[3];
         parse_dp_callable($target, $verb, $this, $ob, $user);
+
+        if (is_array($target) && 2 === count($target) && isset($target[0])
+                && is_object($target[0]) && isset($target[1])
+                && is_integer($target[1])) {
+            $ob =& $target[0];
+            $target = $target[1];
+        }
 
         if ($target === DP_ACTION_TARGET_NONE) {
             return FALSE;
@@ -2138,23 +2307,36 @@ function init_drag() {
 
         if ($ob === $this) {
             $compare = $compare | DP_ACTION_TARGET_SELF;
-        } elseif (isset($this->isLiving) && FALSE !== $this->isLiving) {
-            $compare = $compare | DP_ACTION_TARGET_LIVING;
-        } elseif (FALSE !== ($this_env = $this->getEnvironment())
-                && FALSE !== ($ob_env = $ob->getEnvironment())
-                && $this_env === $ob_env) {
-            $compare = $compare | DP_ACTION_TARGET_OBJENV;
-        } elseif (FALSE !== ($this_env = $this->getEnvironment())
-                && $this_env === $ob) {
-            $compare = $compare | DP_ACTION_TARGET_OBJINV;
+        } else {
+            if (isset($this->isLiving) && TRUE === $this->isLiving) {
+                $compare = $compare | DP_ACTION_TARGET_LIVING;
+
+                if (isset($this->isUser) && TRUE === $this->isUser) {
+                    $compare = $compare | DP_ACTION_TARGET_USER;
+                }
+            } elseif (FALSE !== ($this_env = $this->getEnvironment())
+                    && FALSE !== ($ob_env = $ob->getEnvironment())
+                    && $this_env === $ob_env) {
+                $compare = $compare | DP_ACTION_TARGET_OBJENV;
+            } elseif (FALSE !== ($this_env = $this->getEnvironment())
+                    && $this_env === $ob) {
+                $compare = $compare | DP_ACTION_TARGET_OBJINV;
+            }
         }
 
         if (!($target & $compare)) {
             return FALSE;
         }
 
-        $scope =& $action_data[5];
+        $scope =& $actionData[5];
         parse_dp_callable($scope, $verb, $this, $ob, $user);
+
+        if (is_array($scope) && 2 === count($scope) && isset($scope[0])
+                && is_object($scope[0]) && isset($scope[1])
+                && is_integer($scope[1])) {
+            $ob =& $scope[0];
+            $scope = $scope[1];
+        }
 
         if ($scope & DP_ACTION_SCOPE_SELF) {
             if ($user !== $ob) {
@@ -2172,24 +2354,95 @@ function init_drag() {
             }
         }
 
-        $auth =& $action_data[4];
+        $auth =& $actionData[4];
         parse_dp_callable($auth, $verb, $this, $ob, $user);
 
         if ($auth & DP_ACTION_AUTHORIZED_GUEST) {
-            if (TRUE === $is_registered) {
+            if (TRUE === $isRegistered) {
                 return FALSE;
             }
         } elseif ($auth & DP_ACTION_AUTHORIZED_REGISTERED) {
-            if (TRUE !== $is_registered) {
+            if (TRUE !== $isRegistered) {
                 return FALSE;
             }
         } elseif ($auth & DP_ACTION_AUTHORIZED_ADMIN) {
-            if (TRUE !== $is_admin) {
+            if (TRUE !== $isAdmin) {
                 return FALSE;
             }
         }
 
         return TRUE;
+    }
+
+    /**
+     * Gets the full action string for an action and some other data
+     *
+     * Used by getActionsMenu.
+     *
+     * @access     private
+     * @param      array     &$actionData   action data array
+     * @param      object    &$user          performer of actions
+     * @return     array     data structure with action info
+     * @see        getActionsMenu
+     * @since      DutchPIPE 0.3.0
+     */
+    private function _getActionsMenuFullAction(&$actionData, $user)
+    {
+        $send_action = TRUE;
+        $is_submenu = is_array($actionData) && $actionData[6];
+        $gstyle = $gdstyle = $gdsstyle = '';
+        $ghosted = FALSE;
+
+        if (!$is_submenu && is_array($actionData)) {
+            $action = $actionData[0];
+            $operant = $actionData[1];
+            $ghosted = $actionData[2];
+            $defined_by = $actionData[3];
+            if ($ghosted) {
+                $actionstr = '';
+            } else {
+                if (is_array($operant) && 2 === count($operant)
+                        && is_object($operant[0])) {
+                    $operant = $operant[0]->{$operant[1]}($action, $this,
+                        $defined_by, $user);
+                } elseif (DP_ACTION_OPERANT_METHOD === $operant) {
+                    $operant = $this->getActionOperant($action, $this,
+                        $defined_by, $user);
+                }
+                if (is_array($operant) ||
+                        DP_ACTION_OPERANT_METHOD_MENU === $operant) {
+                    $actionstr = '';
+                } elseif (DP_ACTION_OPERANT_MENU === $operant) {
+                    $actionstr = isset($user->_GET['map_area_id']) ? $action
+                        : $action . ' ' . $this->uniqueId;
+                } elseif (DP_ACTION_OPERANT_NONE === $operant) {
+                    $actionstr = $action;
+                } elseif (is_string($operant)) {
+                    $actionstr = $action . ' ' . $operant;
+                    if (strlen($actionstr) && ' ' === substr($actionstr, -1)) {
+                        if (isset($user->inputMode)
+                                && 'say' === $user->inputMode
+                                && dptext('say') !== $action) {
+                            $actionstr = '/' . $actionstr;
+                        }
+                        $send_action = FALSE;
+                    }
+                } else {
+                    /* DP_ACTION_OPERANT_COMPLETE */
+                    $actionstr = $action . ' ';
+                    if (isset($user->inputMode) && 'say' === $user->inputMode) {
+                        $actionstr = dptext('say') === $action ? ''
+                            : '/' . $actionstr;
+                    }
+                    $send_action = FALSE;
+                }
+            }
+        } else {
+            $actionstr = is_string($actionData) ? $actionData : '';
+        }
+
+        return array($actionstr, $send_action, $ghosted, $gstyle, $gdstyle,
+            $gdsstyle);
     }
 
     /**
@@ -2221,7 +2474,7 @@ function init_drag() {
      * @param      string    $mapAreaCoords  x,y,... (depends on shape)
      * @param      string    $mapAreaAlt     mouse tooltip for this area
      * @see        getMapArea, addMapAreaAction, removeMapAreaAction,
-     *             getMapAreaActions, getMapAreaHtml, getMapAreaActionsMenu
+     *             getMapAreaActions, getMapAreaHtml, getActionsMenu
      * @since      DutchPIPE 0.2.0
      */
     function setMapArea($mapName, $mapAreaId, $mapAreaShape, $mapAreaCoords,
@@ -2247,7 +2500,7 @@ function init_drag() {
      * @param      string    $mapAreaId  id of area in imagemap
      * @return     mixed     array with imagemap areas, can be empty, or FALSE
      * @see        setMapArea, addMapAreaAction, removeMapAreaAction,
-     *             getMapAreaActions, getMapAreaHtml, getMapAreaActionsMenu
+     *             getMapAreaActions, getMapAreaHtml, getActionsMenu
      * @since      DutchPIPE 0.2.0
      */
     function getMapArea($mapName = NULL, $mapAreaId = NULL)
@@ -2286,7 +2539,7 @@ function init_drag() {
      * @param      string    $actionVerb       optional associated verb
      * @param      string    $actionVerbKey    optional index of this verb
      * @see        setMapArea, getMapArea, removeMapAreaAction,
-     8             getMapAreaActions, getMapAreaHtml, getMapAreaActionsMenu
+     8             getMapAreaActions, getMapAreaHtml, getActionsMenu
      * @since      DutchPIPE 0.2.0
      */
     function addMapAreaAction($mapAreaId, $actionMenuTitle, $action,
@@ -2317,7 +2570,7 @@ function init_drag() {
      * @param      string    $actionMenuTitle  title of menu item
      * @param      string    $action           action executed when clicked
      * @see        setMapArea, getMapArea, addMapAreaAction, getMapAreaActions,
-     *             getMapAreaHtml, getMapAreaActionsMenu
+     *             getMapAreaHtml, getActionsMenu
      * @since      DutchPIPE 0.2.0
      */
     function removeMapAreaAction($mapAreaId, $actionMenuTitle, $action = NULL)
@@ -2343,7 +2596,7 @@ function init_drag() {
      * @param      string    $mapAreaId  id of area in imagemap
      * @return     array     array with map area data, can be empty
      * @see        setMapArea, getMapArea, addMapAreaAction,
-     *             removeMapAreaAction, getMapAreaHtml, getMapAreaActionsMenu
+     *             removeMapAreaAction, getMapAreaHtml, getActionsMenu
      * @since      DutchPIPE 0.2.0
      */
     function getMapAreaActions($mapAreaId = NULL)
@@ -2365,7 +2618,7 @@ function init_drag() {
      * @param      string    $mapName        name of imagemap
      * @return     string    HTML for one or more imagemaps, or empty string.
      * @see        getBody, setMapArea, getMapArea, addMapAreaAction,
-     *             removeMapAreaAction, getMapAreaActions, getMapAreaActionsMenu
+     *             removeMapAreaAction, getMapAreaActions, getActionsMenu
      * @since      DutchPIPE 0.2.0
      */
     function getMapAreaHtml($mapName = NULL)
@@ -2410,360 +2663,6 @@ function init_drag() {
         $rval .= '</map>';
 
         return $rval;
-    }
-
-    /**
-     * Tells the current user the HTML with the action menu for an imagemap area
-     *
-     * @return     array   array with actions, can be empty
-     * @see        setMapArea, getMapArea, addMapAreaAction,
-     *             removeMapAreaAction, getMapAreaActions, getMapAreaHtml,
-     *             getTargettedMapAreaActions
-     * @since      DutchPIPE 0.2.0
-     */
-    function getMapAreaActionsMenu()
-    {
-        /*
-         * The checksum is bounced back so the client can find the right
-         * response
-         */
-        if (!($user = get_current_dpuser())
-                || !isset($user->_GET['checksum'])) {
-            return;
-        }
-
-        if (!isset($user->_GET['map_name'])
-                || !isset($user->_GET['map_area_id'])) {
-            return;
-        }
-
-        $map_name = $user->_GET['map_name'];
-        $map_area_id = $user->_GET['map_area_id'];
-
-        /*
-         * If the user is navigating to submenus, the client passes each menu
-         * title leading to the submenu, for example:
-         * &l1=foo&l2=bar
-         */
-        $lvl_titles = array();
-        $lvl_cnt = 0;
-        while (isset($user->_GET['l' . ($lvl_cnt + 1)])) {
-            $lvl_cnt++;
-            $lvl_titles[] = $lvl_last_title = $user->_GET['l'
-                . $lvl_cnt];
-        }
-
-        $actions = $this->getTargettedMapAreaActions($user,
-            (!isset($lvl_last_title) ? NULL : $lvl_titles), $map_area_id);
-
-        if (!($sz = count($actions))) {
-            return;
-        }
-        if (1 === $sz && 0 === $lvl_cnt) {
-            reset($actions);
-            $user->performAction($actions[key($actions)][0]);
-            return;
-        }
-
-        $action_menu = '';
-
-        foreach ($actions as $action_menu_title => &$action_data) {
-            /* If set to FALSE, inserts action into the command line */
-            $send_action = TRUE;
-            $get_operant = FALSE;
-            $is_submenu = is_bool($action_data);
-            $ghosted = FALSE;
-            $gstyle = $gdstyle = $gdsstyle = '';
-
-            if (!$is_submenu && is_array($action_data)) {
-                $action = $action_data[0];
-                $operant = $action_data[1];
-                $ghosted = $action_data[2];
-                $defined_by = $action_data[3];
-                if ($ghosted = $action_data[2]) {
-                    $gstyle = !$ghosted ? '' : ' am_ghosted';
-                    $gdstyle = !$ghosted ? '' : ' am_deep_ghosted';
-                    $gdsstyle = !$ghosted ? '' : ' am_deep_selected_ghosted';
-                }
-
-                if (is_array($operant) && 2 === count($operant)
-                        && is_object($operant[0])) {
-                    $operant = $operant[0]->{$operant[1]}($action, $this,
-                        $defined_by, $user);
-                } elseif (DP_ACTION_OPERANT_METHOD === $operant) {
-                    $operant = $this->getActionOperant($action, $this,
-                        $defined_by, $user);
-                }
-                if (is_array($operant) ||
-                        DP_ACTION_OPERANT_METHOD_MENU === $operant) {
-                    $actionstr = '';
-                    $action_data = 'foo';
-                    $get_operant = $is_submenu = TRUE;
-                } elseif (DP_ACTION_OPERANT_MENU === $operant) {
-                    $actionstr = $action;
-                } elseif (DP_ACTION_OPERANT_NONE === $operant) {
-                    $actionstr = $action;
-                } elseif (is_string($operant)) {
-                    $actionstr = $action . ' ' . $operant;
-                    $send_action = FALSE;
-                } else {
-                    $actionstr = $action . ' ';
-                    $send_action = FALSE;
-                }
-            } else {
-                $actionstr = is_string($action_data) ? $action_data : '';
-            }
-
-            $mouseover = "action_over(this)";
-            $mouseout = $mouseclick = '';
-
-            if (!$lvl_cnt && !$is_submenu) {
-                $mouseover .= "; jQuery('div.am_deep_selected')."
-                    . "removeClass('am_deep_selected am_selected$gdsstyle')";
-            }
-            if (!$is_submenu) {
-                $mouseout = "action_out(this)";
-                if (!$ghosted) {
-                    $mouseclick = FALSE === $send_action
-                        ? "_gel('dpaction').value = '$actionstr'"
-                        : 'send_action2server(\'' . addslashes($actionstr)
-                        . "')";
-                } else {
-                    $mouseclick = 'am_no_close = true';
-                }
-            } else {
-                $mouseover .= "; jQuery(this).addClass('am_deep_selected"
-                    . $gdsstyle . "'); get_map_area_actions('{$map_name}', "
-                    . "'{$map_area_id}', '{$this->uniqueId}', event, ";
-
-                for ($i = 0; $i < $lvl_cnt; $i++) {
-                    $mouseover .= "'" . addslashes($lvl_titles[$i]) . "', ";
-                }
-
-                $mouseover .= "'" . addslashes($action_menu_title) . "')";
-                $mouseclick = 'am_no_close = true';
-            }
-
-            $action_menu .= '<div id="action_menu' . $lvl_cnt . '" '
-                . 'class="am' . (!$is_submenu ? '' : ' am_deep' . $gdstyle)
-                . $gstyle . '" onMouseOver="' . $mouseover . '" '
-                . 'onMouseOut="' . $mouseout . '" '
-                . 'onClick="' . $mouseclick . '">'
-                . $action_menu_title . "</div>\n";
-        }
-        $user->tell('<actions id="' . $this->uniqueId
-            . '" level="' . $lvl_cnt . '" checksum="' . $user->_GET['checksum']
-            . '"><div class="actionwindow_inner">' . $action_menu
-            . '</div></actions>');
-    }
-
-    /**
-     * Gets actions which can be performed on an imagemap area, for action menu
-     *
-     * Gets an array with actions which can be performed on a given imagemap
-     * area, so we can make a menu when hovering over the object image with the
-     * mouse. This includes actions that are defined by other objects but appear
-     * in this imagemap area's action menu.
-     *
-     * An array is returned, empty if there are no menu actions found, with
-     * key-value pairs. Each key is the (first) menu title associated with the
-     * action pair, each value an array of four elements: the action, the
-     * "operant" as defined with addAction, and the associated verb and verb
-     * key (if any, otherwise these are NULL).
-     *
-     * @param      object    &$user      user getting the menu
-     * @param      array     $levels     current path of user in (sub)menu
-     * @param      string    $mapAreaId  id of area in imagemap
-     * @return     array     array with menu actions, can be empty
-     * @see        getMapAreaActionsMenu
-     * @since      DutchPIPE 0.2.0
-     */
-    function &getTargettedMapAreaActions(&$user, $levels, $mapAreaId)
-    {
-        /* Gets menu actions on this object defined by this object */
-        $actions = $this->_getTargettedMapAreaActions($this, $user, $levels,
-            $mapAreaId);
-
-        /*
-         * Gets menu actions on this object defined by objects in inventory:
-         */
-        $inv = $this->getInventory();
-        foreach ($inv as &$ob) {
-            $actions = array_merge($actions,
-                $this->_getTargettedMapAreaActions($ob, $user, $levels,
-                $mapAreaId));
-        }
-
-        /*
-         * Gets menu actions on this object defined by objects in this
-         * object's environment:
-         */
-        $env = $this->getEnvironment();
-        if (FALSE !== $env) {
-            $inv = $env->getInventory();
-            foreach ($inv as &$ob) {
-                if ($ob !== $this) {
-                    $actions = array_merge($actions,
-                        $this->_getTargettedMapAreaActions($ob, $user, $levels,
-                        $mapAreaId));
-                }
-            }
-            /*
-             * Gets menu actions on this object defined by the object's
-             * environment:
-             */
-            $actions = array_merge($actions,
-                $this->_getTargettedMapAreaActions($env, $user, $levels,
-                $mapAreaId));
-        }
-
-        return $actions;
-    }
-
-    /**
-     * Gets actions that can be performed on a given object by a given user
-     *
-     * An array is returned with each element a pair consisting of:
-     *     menulabel => array(action, operant, verb, verb_key)
-     * with operant one of DP_ACTION_OPERANT_ from
-     * dpuniverse/include/actions.php, for example:
-     * 'search' => array('search fountain', DP_ACTION_OPERANT_MENU, 'search', 0)
-     *
-     * @access     private
-     * @param      object    &$ob        target of actions
-     * @param      object    &$user      performer of actions
-     * @param      array     $levels     current path of user in (sub)menu
-     * @param      string    $mapAreaId  id of area in imagemap
-     * @return     array     array with actions, can be empty
-     * @see        getTargettedMapAreaActions, _checkTargettedAction
-     */
-    function &_getTargettedMapAreaActions(&$ob, &$user, $levels, $mapAreaId)
-    {
-        $ob_actions = $ob->getMapAreaActions($mapAreaId);
-
-        if (FALSE === $ob_actions || !count($ob_actions)) {
-            $ob_actions = array();
-            return $ob_actions;
-        }
-        $moreactions = array();
-
-        $is_registered = isset($user->isRegistered)
-            && $this->isRegistered === TRUE;
-        $is_admin = isset($user->isAdmin) && $user->isAdmin === TRUE;
-
-        $level = !is_array($levels) ? 0 : count($levels);
-        foreach ($ob_actions as $action_data) {
-            $get_operant = FALSE;
-            $add_operant = 0;
-            $verb_data = $operant = NULL;
-
-            if ($level) {
-                if (!is_null($action_data[2]) && !is_null($action_data[3])) {
-                    $verb_data = $ob->getActionData($action_data[2],
-                        $action_data[3]);
-                    $operant = $verb_data[2];
-                } else {
-                    $operant = DP_ACTION_OPERANT_MENU;
-                }
-
-                parse_dp_callable($action_data[0], $verb, $this, $ob, $user);
-                if (is_array($operant) && 2 === count($operant)
-                        && is_object($operant[0])) {
-                    $operant = $operant[0]->{$operant[1]}($verb, $this, $ob,
-                        $user);
-                } elseif (DP_ACTION_OPERANT_METHOD === $operant) {
-                    $operant = $this->getActionOperant($verb, $this, $ob,
-                        $user);
-                }
-                if (is_array($operant) ||
-                        DP_ACTION_OPERANT_METHOD_MENU === $operant) {
-                    $get_operant = TRUE;
-                    $add_operant = 1;
-                    if (is_array($action_data[0]) && ($sz = count(
-                            $action_data[0])) < $level - $add_operant) {
-                        continue;
-                    }
-                } elseif (!is_array($action_data[0])
-                        || ($sz = count($action_data[0])) < $level) {
-                    continue;
-                }
-
-                for ($i = 0; $i < $level; $i++) {
-                    if (!is_array($action_data[0])) {
-                        if (0 === $i && $levels[0] === $action_data[0]) {
-                            continue;
-                        }
-                        continue 2;
-                    }
-                    if ($levels[$i] <> $action_data[0][$i]) {
-                        continue 2;
-                    }
-                }
-            }
-
-            if (!is_null($action_data[2]) && !is_null($action_data[3])) {
-                if (is_null($verb_data)) {
-                    $verb_data = $ob->getActionData($action_data[2],
-                        $action_data[3]);
-                }
-
-                if (!$get_operant && FALSE === $this->_checkTargettedAction(
-                        $verb_data, $action_data[2], $ob, $user, $is_registered,
-                        $is_admin)) {
-                    continue;
-                }
-            }
-
-            if (!$get_operant) {
-                $titles =& $action_data[0];
-                $ghosted = FALSE;
-
-                if (!is_null($verb_data)) {
-                    //parse_dp_callable($verb_data[4], $action_data[2], $this,
-                    //    $ob, $user);
-                    $ghosted = DP_ACTION_AUTHORIZED_DISABLED & $verb_data[4];
-                }
-
-                $data =  array($action_data[1], (is_null($verb_data)
-                    ? DP_ACTION_OPERANT_MENU : $verb_data[2]), $ghosted, $ob);
-
-                if (is_string($titles)) {
-                    $title = $titles;
-                } elseif (is_array($titles)) {
-                    if (2 !== count($titles) || !is_object($titles[0])) {
-                        parse_dp_callable($titles[$level], $action_data[2],
-                            $this, $ob, $user);
-                    } else {
-                        parse_dp_callable($titles, $action_data[2], $this, $ob,
-                            $user);
-                    }
-
-                    $title = !is_array($titles) ? $titles : $titles[$level];
-                } else {
-                    continue;
-                }
-
-                if (!is_array($titles)) {
-                    $moreactions[$title] = $data;
-                } elseif ($cnt = count($titles)) {
-                    $moreactions[$title] = $cnt > $level + 1 - $add_operant
-                        ? FALSE : $data;
-                }
-            } else {
-                if (is_array($operant) && 2 === count($operant)
-                        && is_object($operant[0])) {
-                    $data = $operant[0]->{$operant[1]}($action_data[2], $this,
-                        $ob, $user);
-                } elseif (DP_ACTION_OPERANT_METHOD_MENU === $operant) {
-                    $data = $ob->getActionOperantMenu($action_data[2], $this,
-                        $ob, $user);
-                }
-                if ($data && is_array($data)) {
-                    $moreactions += $data;
-                }
-            }
-        }
-        return $moreactions;
     }
 
     /**
@@ -2855,7 +2754,6 @@ function init_drag() {
             return FALSE;
         }
 
-
         $scope =& $action_data[5];
         parse_dp_callable($scope, $verb, NULL, $this, $living);
 
@@ -2926,6 +2824,8 @@ function init_drag() {
      *
      * Called when certain events occur, given with $name.
      *
+     * @param      object    $name       Name of event
+     * @param      mixed     $args       One or more arguments, depends on event
      * @since      DutchPIPE 0.2.0
      */
     function eventDpObject($name)
@@ -2972,11 +2872,11 @@ function init_drag() {
      *
      * Experimental mouse dragging of objects.
      *
-     * @param      object    $by_who     subject that wants to drag us
+     * @param      object    &$by_who    subject that wants to drag us
      * @return     boolean   TRUE if $by_who may drag us, FALSE otherwise
      * @since      DutchPIPE 0.2.0
      */
-    function isDraggable($by_who)
+    function isDraggable(&$by_who)
     {
         return $this->getDpProperty('isDraggable');
     }
@@ -3040,9 +2940,7 @@ function init_drag() {
     }
 
     /**
-     * Can we be dragged on the screen by the given user?
-     *
-     * Experimental mouse dragging of objects.
+     * Gets the amount of a given heap object
      *
      * @param      string    $idProperty unique property to identify heap object
      * @return     int|float amount, depends on heap type

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-07-08 18:15+0200\n"
+"POT-Creation-Date: 2007-08-03 14:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,7 +16,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: config/dpserver-ini.php:336
+#: template/dpdefault_input_say.tpl:11
+msgid "Input Field Options"
+msgstr ""
+
+#: template/dpdefault_input_say.tpl:12
+msgid "Close Input Field"
+msgstr ""
+
+#: template/dpdefault_input_say.tpl:14 template/dpdefault_input.tpl:5
+msgid "Go to Top"
+msgstr ""
+
+#: config/dpserver-ini.php:343
 msgid "The DutchPIPE server is down"
 msgstr ""
 
@@ -72,7 +84,7 @@ msgstr ""
 msgid "The barkeeper says: Why don't you have a beer with me?<br />"
 msgstr ""
 
-#: dpuniverse/npc/barkeeper.php:94 dpuniverse/std/DpLiving.php:178
+#: dpuniverse/npc/barkeeper.php:94 dpuniverse/std/DpLiving.php:195
 msgid "shout"
 msgstr ""
 
@@ -80,10 +92,10 @@ msgstr ""
 msgid "Today free beer in the bar for everyone!"
 msgstr ""
 
-#: dpuniverse/npc/mobile.php:99 dpuniverse/npc/mobile.php:113
 #: dpuniverse/npc/barkeeper.php:113 dpuniverse/npc/barkeeper.php:136
 #: dpuniverse/npc/barkeeper.php:168 dpuniverse/npc/drunk.php:133
-#: dpuniverse/npc/drunk.php:151
+#: dpuniverse/npc/drunk.php:151 dpuniverse/npc/mobile.php:99
+#: dpuniverse/npc/mobile.php:113
 msgid "glass"
 msgstr ""
 
@@ -151,14 +163,14 @@ msgstr ""
 msgid "get"
 msgstr ""
 
-#: dpuniverse/npc/barkeeper.php:222 dpuniverse/std/DpLiving.php:437
-#: dpuniverse/std/DpLiving.php:527 lib/dpuniverse.php:447
-#: lib/dpuniverse.php:472
+#: dpuniverse/npc/barkeeper.php:222 dpuniverse/std/DpLiving.php:469
+#: dpuniverse/std/DpLiving.php:559 lib/dpuniverse.php:448
+#: lib/dpuniverse.php:474
 msgid "all"
 msgstr ""
 
 #: dpuniverse/npc/barkeeper.php:222 dpuniverse/std/DpLiving.php:173
-#: lib/dpuniverse.php:446 lib/dpuniverse.php:471
+#: lib/dpuniverse.php:447 lib/dpuniverse.php:473
 msgid "drop"
 msgstr ""
 
@@ -236,7 +248,7 @@ msgstr ""
 msgid "say tHanX *bUUrp* bUu-UUUt I doN'T NEed tHaT! *hIC*"
 msgstr ""
 
-#: dpuniverse/npc/drunk.php:181
+#: dpuniverse/npc/drunk.php:181 dpuniverse/std/DpLiving.php:680
 #, php-format
 msgid "give %s to %s"
 msgstr ""
@@ -263,6 +275,16 @@ msgstr ""
 
 #: dpuniverse/npc/mobile.php:69
 msgid "kick"
+msgstr ""
+
+#: dpuniverse/npc/mobile.php:72 dpuniverse/std/DpUser.php:188
+#: dpuniverse/std/DpUser.php:189 dpuniverse/std/DpUser.php:190
+#: dpuniverse/std/DpUser.php:191 dpuniverse/std/DpUser.php:192
+msgid "admin"
+msgstr ""
+
+#: dpuniverse/npc/mobile.php:72
+msgid "silence"
 msgstr ""
 
 #: dpuniverse/npc/mobile.php:80
@@ -294,11 +316,12 @@ msgid "get glass"
 msgstr ""
 
 #: dpuniverse/npc/mobile.php:143 dpuniverse/std/DpPage.php:74
+#: dpuniverse/std/DpUser.php:181
 msgid "login"
 msgstr ""
 
-#: dpuniverse/npc/mobile.php:145 dpuniverse/std/DpPage.php:420
-#: dpuniverse/std/DpUser.php:525
+#: dpuniverse/npc/mobile.php:145 dpuniverse/std/DpPage.php:453
+#: dpuniverse/std/DpUser.php:615
 msgid "home"
 msgstr ""
 
@@ -307,7 +330,7 @@ msgid "Kick who?<br />"
 msgstr ""
 
 #: dpuniverse/npc/mobile.php:175 dpuniverse/npc/mobile.php:227
-#: dpuniverse/std/DpLiving.php:707
+#: dpuniverse/std/DpLiving.php:776
 #, php-format
 msgid "%s is not here.<br />"
 msgstr ""
@@ -389,7 +412,7 @@ msgstr ""
 msgid "1 credit"
 msgstr ""
 
-#: dpuniverse/obj/credits.php:52 dpuniverse/page/store.php:181
+#: dpuniverse/obj/credits.php:52 dpuniverse/page/store.php:116
 #, php-format
 msgid "%d credits"
 msgstr ""
@@ -398,7 +421,7 @@ msgstr ""
 msgid "credit#credits"
 msgstr ""
 
-#: dpuniverse/obj/credits.php:56
+#: dpuniverse/obj/credits.php:59
 msgid "It is real money!"
 msgstr ""
 
@@ -418,27 +441,27 @@ msgstr ""
 msgid "note#paper note#small note#small paper note#small, paper note#a small note"
 msgstr ""
 
-#: dpuniverse/obj/note.php:53
+#: dpuniverse/obj/note.php:55
 msgid "This is a small paper note. You can read it.<br />"
 msgstr ""
 
-#: dpuniverse/obj/note.php:78
+#: dpuniverse/obj/note.php:80
 msgid "read"
 msgstr ""
 
-#: dpuniverse/obj/note.php:78
+#: dpuniverse/obj/note.php:80
 msgid "read me!"
 msgstr ""
 
-#: dpuniverse/obj/note.php:93
+#: dpuniverse/obj/note.php:95
 msgid "What do you want to read?<br />"
 msgstr ""
 
-#: dpuniverse/obj/note.php:99
+#: dpuniverse/obj/note.php:101
 msgid "Read WHAT?<br />"
 msgstr ""
 
-#: dpuniverse/obj/note.php:104
+#: dpuniverse/obj/note.php:106
 msgid "Hello world."
 msgstr ""
 
@@ -483,10 +506,10 @@ msgstr ""
 msgid "A simple door. It is %s."
 msgstr ""
 
-#: dpuniverse/page/store.php:57 dpuniverse/page/alley2.php:62
-#: dpuniverse/page/alley.php:53 dpuniverse/page/bar.php:56
-#: dpuniverse/page/freemovement.php:65 dpuniverse/page/house.php:52
-#: dpuniverse/page/shop.php:63 dpuniverse/page/square.php:83
+#: dpuniverse/page/alley.php:53 dpuniverse/page/alley2.php:62
+#: dpuniverse/page/bar.php:56 dpuniverse/page/freemovement.php:65
+#: dpuniverse/page/house.php:52 dpuniverse/page/shop.php:66
+#: dpuniverse/page/square.php:83 dpuniverse/page/store.php:57
 msgid "Showcases"
 msgstr ""
 
@@ -569,10 +592,10 @@ msgstr ""
 msgid "Unlock what?"
 msgstr ""
 
-#: dpuniverse/page/store.php:74 dpuniverse/page/alley.php:158
-#: dpuniverse/page/alley.php:191 dpuniverse/page/house.php:229
-#: dpuniverse/page/house.php:234 dpuniverse/page/house.php:317
-#: dpuniverse/page/house.php:322
+#: dpuniverse/page/alley.php:158 dpuniverse/page/alley.php:191
+#: dpuniverse/page/house.php:229 dpuniverse/page/house.php:234
+#: dpuniverse/page/house.php:317 dpuniverse/page/house.php:322
+#: dpuniverse/page/store.php:74
 msgid "silver key"
 msgstr ""
 
@@ -692,7 +715,7 @@ msgstr ""
 
 #: dpuniverse/page/house.php:58
 #, php-format
-msgid "A wooden chest. You can search it. It is %s."
+msgid "A wooden chest. You wonder what's inside. It is %s."
 msgstr ""
 
 #: dpuniverse/page/house.php:61
@@ -854,8 +877,8 @@ msgstr ""
 msgid "index.html"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:1207 dpuniverse/page/login.php:52
-#: dpuniverse/page/login.php:56 lib/dpcurrentrequest.php:885
+#: dpuniverse/page/login.php:52 dpuniverse/page/login.php:56
+#: dpuniverse/std/DpObject.php:1211 lib/dpcurrentrequest.php:1006
 msgid "Login/register"
 msgstr ""
 
@@ -881,115 +904,120 @@ msgid ""
 "<p align=\"justify\">You are in a small pawn shop\n"
 "where you can buy and sell things. Try this\n"
 "<a href=\"javascript:send_action2server('list')\">list</a> to view all items for\n"
-"sale.</p><p align=\"justify\">An exit <a href=\"%s\">west</a> leads back to the\n"
-"village square.</p>"
-msgstr ""
-
-#: dpuniverse/page/shop.php:65
-msgid "w#square#out#exit#leave#leave shop"
+"sale. Check out your\n"
+"<a href=\"javascript: send_action2server('inventory')\">inventory</a> to see\n"
+"what you can sell.</p><p align=\"justify\">An exit <a href=\"%s\">west</a> leads\n"
+"back to the village square.</p>"
 msgstr ""
 
 #: dpuniverse/page/shop.php:68
+msgid "w#square#out#exit#leave#leave shop"
+msgstr ""
+
+#: dpuniverse/page/shop.php:71
 msgid "leave shop"
 msgstr ""
 
-#: dpuniverse/page/shop.php:69
+#: dpuniverse/page/shop.php:72 dpuniverse/page/shop.php:200
 msgid "list"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:170 dpuniverse/page/shop.php:72
-msgid "inventory"
-msgstr ""
-
-#: dpuniverse/std/DpLiving.php:170 dpuniverse/page/shop.php:73
-msgid "inventory#inv#i"
-msgstr ""
-
-#: dpuniverse/page/store.php:341 dpuniverse/page/shop.php:76
-msgid "buy"
-msgstr ""
-
-#: dpuniverse/page/store.php:373 dpuniverse/page/shop.php:79
+#: dpuniverse/page/shop.php:75 dpuniverse/page/shop.php:99
 msgid "sell"
 msgstr ""
 
-#: dpuniverse/page/store.php:342 dpuniverse/page/shop.php:82
+#: dpuniverse/page/shop.php:78 dpuniverse/page/shop.php:87
+msgid "buy"
+msgstr ""
+
+#: dpuniverse/page/shop.php:81 dpuniverse/page/shop.php:90
 msgid "see"
 msgstr ""
 
-#: dpuniverse/page/shop.php:104
+#: dpuniverse/page/shop.php:124
 msgid "The shop has the following items for sale:"
 msgstr ""
 
-#: dpuniverse/page/shop.php:124
-msgid "<b>You are carrying:</b>"
+#: dpuniverse/page/shop.php:139
+#, php-format
+msgid "sell %s"
 msgstr ""
 
-#: dpuniverse/page/shop.php:138 dpuniverse/page/shop.php:250
+#: dpuniverse/page/shop.php:140
+#, php-format
+msgid "sell for %d credits"
+msgstr ""
+
+#: dpuniverse/page/shop.php:156 dpuniverse/page/shop.php:272
 #, php-format
 msgid "That item (\"%s\") is not for sale here.<br />"
 msgstr ""
 
-#: dpuniverse/page/shop.php:146
+#: dpuniverse/page/shop.php:164
 #, php-format
 msgid "%s costs %d credits, which you don't have.<br />"
 msgstr ""
 
-#: dpuniverse/page/shop.php:156
+#: dpuniverse/page/shop.php:174
 #, php-format
 msgid "You cannot carry %s, it is too heavy. Drop something else first.<br />"
 msgstr ""
 
-#: dpuniverse/page/shop.php:161
+#: dpuniverse/page/shop.php:179
 #, php-format
 msgid "You cannot carry %s, it takes too much volume. Drop something else first.<br />"
 msgstr ""
 
-#: dpuniverse/page/shop.php:166
+#: dpuniverse/page/shop.php:184
 #, php-format
 msgid "You fail to buy %s as it cannot be moved.<br />"
 msgstr ""
 
-#: dpuniverse/page/shop.php:175
+#: dpuniverse/page/shop.php:193
 #, php-format
 msgid "You buy %s for %d credits.<br />"
 msgstr ""
 
-#: dpuniverse/page/shop.php:178
+#: dpuniverse/page/shop.php:196
 #, php-format
 msgid "%s buys %s.<br />"
 msgstr ""
 
-#: dpuniverse/page/shop.php:194
+#: dpuniverse/page/shop.php:203 dpuniverse/std/DpLiving.php:174
+#: lib/dpclient-js-src.php:40 public/dpclient-js.php:33
+msgid "inventory"
+msgstr ""
+
+#: dpuniverse/page/shop.php:216
 #, php-format
 msgid "You don't own that item (\"%s\").<br />"
 msgstr ""
 
-#: dpuniverse/page/shop.php:199
+#: dpuniverse/page/shop.php:221
 msgid "The shop doesn't accept filled glasses and liquids.<br />"
 msgstr ""
 
-#: dpuniverse/page/shop.php:205
+#: dpuniverse/page/shop.php:227
 #, php-format
 msgid "%s has no value.<br />"
 msgstr ""
 
-#: dpuniverse/page/shop.php:213
+#: dpuniverse/page/shop.php:235
 #, php-format
 msgid "%s cannot be sold.<br />"
 msgstr ""
 
-#: dpuniverse/page/shop.php:219
+#: dpuniverse/page/shop.php:241
 #, php-format
 msgid "You sell %s for %d credits.<br />"
 msgstr ""
 
-#: dpuniverse/page/shop.php:222
+#: dpuniverse/page/shop.php:244
 #, php-format
 msgid "%s sells %s.<br />"
 msgstr ""
 
-#: dpuniverse/page/shop.php:241
+#: dpuniverse/page/shop.php:263
 msgid "See what item for sale?<br />"
 msgstr ""
 
@@ -1133,26 +1161,6 @@ msgstr ""
 msgid "A shiny trophy earned on a DutchPIPE showcase."
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:1284 dpuniverse/page/store.php:151
-#: dpuniverse/page/store.php:246
-msgid "Nothing"
-msgstr ""
-
-#: dpuniverse/page/store.php:341
-#, php-format
-msgid "buy %s"
-msgstr ""
-
-#: dpuniverse/page/store.php:342
-#, php-format
-msgid "see %s"
-msgstr ""
-
-#: dpuniverse/page/store.php:373
-#, php-format
-msgid "sell %s"
-msgstr ""
-
 #: dpuniverse/std/DpDrink.php:69
 msgid "bottle"
 msgstr ""
@@ -1173,43 +1181,43 @@ msgstr ""
 msgid "bottle#empty bottle"
 msgstr ""
 
-#: dpuniverse/std/DpDrink.php:87
+#: dpuniverse/std/DpDrink.php:88
 msgid "drink"
 msgstr ""
 
-#: dpuniverse/std/DpDrink.php:210
+#: dpuniverse/std/DpDrink.php:211
 msgid "What do you want to drink?<br />"
 msgstr ""
 
-#: dpuniverse/std/DpDrink.php:216
+#: dpuniverse/std/DpDrink.php:217
 #, php-format
 msgid "You can't drink: %s<br />"
 msgstr ""
 
-#: dpuniverse/std/DpDrink.php:222
+#: dpuniverse/std/DpDrink.php:223
 msgid "You must pick it up first.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpDrink.php:226
+#: dpuniverse/std/DpDrink.php:227
 #, php-format
 msgid "%s is empty.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpDrink.php:237
+#: dpuniverse/std/DpDrink.php:238
 #, php-format
 msgid "%s drinks %s.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpDrink.php:242 dpuniverse/std/DpDrink.php:249
+#: dpuniverse/std/DpDrink.php:243 dpuniverse/std/DpDrink.php:250
 msgid "BUUUUUUUUUUUUUURRRP!"
 msgstr ""
 
-#: dpuniverse/std/DpDrink.php:246
+#: dpuniverse/std/DpDrink.php:247
 #, php-format
 msgid "You drink %s.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpDrink.php:271
+#: dpuniverse/std/DpDrink.php:278
 msgid "You would spill it out.<br />"
 msgstr ""
 
@@ -1226,16 +1234,8 @@ msgstr ""
 msgid "/^(\\d+) (.+)$/"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:167
+#: dpuniverse/std/DpLiving.php:169
 msgid "This description hasn't been set yet.<br />"
-msgstr ""
-
-#: dpuniverse/std/DpObject.php:1465 dpuniverse/std/DpLiving.php:171
-msgid "examine"
-msgstr ""
-
-#: dpuniverse/std/DpLiving.php:171
-msgid "examine#exam#exa#x#look#l"
 msgstr ""
 
 #: dpuniverse/std/DpLiving.php:172
@@ -1246,29 +1246,49 @@ msgstr ""
 msgid "take#get"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:175 dpuniverse/std/DpLiving.php:631
-msgid "give"
+#: dpuniverse/std/DpLiving.php:174
+msgid "inventory#inv#i"
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:175 dpuniverse/std/DpObject.php:1518
+msgid "examine"
 msgstr ""
 
 #: dpuniverse/std/DpLiving.php:175
+msgid "examine#exam#exa#x#look#l"
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:177 dpuniverse/std/DpLiving.php:678
+msgid "give"
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:177
 msgid "give to..."
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:2790 dpuniverse/std/DpLiving.php:176
+#: dpuniverse/std/DpLiving.php:178
+msgid "<div style=\"width: 81px; margin: 0px\"><div style=\"float: left\">page chat</div> <div style=\"float: right\">TAB</div></div>"
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:178 dpuniverse/std/DpObject.php:2425
+#: dpuniverse/std/DpObject.php:2434 dpuniverse/std/DpObject.php:2689
+#: dpuniverse/std/DpUser.php:1142
 msgid "say"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:2794 dpuniverse/std/DpLiving.php:177
-msgid "tell"
+#: dpuniverse/std/DpLiving.php:180 dpuniverse/std/DpLiving.php:181
+#: dpuniverse/std/DpLiving.php:182 dpuniverse/std/DpLiving.php:184
+#: dpuniverse/std/DpLiving.php:185 dpuniverse/std/DpLiving.php:191
+#: dpuniverse/std/DpLiving.php:653 dpuniverse/std/DpLiving.php:654
+msgid "emotions"
 msgstr ""
 
 #: dpuniverse/std/DpLiving.php:180 dpuniverse/std/DpLiving.php:181
-#: dpuniverse/std/DpLiving.php:182 dpuniverse/std/DpLiving.php:183
-#: dpuniverse/std/DpLiving.php:184 dpuniverse/std/DpLiving.php:185
-#: dpuniverse/std/DpLiving.php:186 dpuniverse/std/DpLiving.php:187
-#: dpuniverse/std/DpLiving.php:188 dpuniverse/std/DpLiving.php:189
-#: dpuniverse/std/DpLiving.php:190 dpuniverse/std/DpLiving.php:191
-msgid "emotions"
+#: dpuniverse/std/DpLiving.php:182 dpuniverse/std/DpLiving.php:184
+#: dpuniverse/std/DpLiving.php:185 dpuniverse/std/DpLiving.php:191
+#: dpuniverse/std/DpLiving.php:193 dpuniverse/std/DpLiving.php:195
+#: dpuniverse/std/DpLiving.php:653
+msgid "more chat"
 msgstr ""
 
 #: dpuniverse/std/DpLiving.php:180
@@ -1319,353 +1339,379 @@ msgstr ""
 msgid "emote"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:326 dpuniverse/std/DpLiving.php:379
-#: dpuniverse/std/DpLiving.php:388
+#: dpuniverse/std/DpLiving.php:191
+msgid "emote..."
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:193
+msgid "send message to..."
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:193 dpuniverse/std/DpLiving.php:194
+#: dpuniverse/std/DpLiving.php:692 dpuniverse/std/DpObject.php:2693
+msgid "tell"
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:194
+msgid "send message..."
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:195
+msgid "shout to site..."
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:354
+#, php-format
+msgid "Action by %s: %s\n"
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:358 dpuniverse/std/DpLiving.php:411
+#: dpuniverse/std/DpLiving.php:420
 msgid "look"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:327 dpuniverse/std/DpLiving.php:379
-#: dpuniverse/std/DpLiving.php:389
+#: dpuniverse/std/DpLiving.php:359 dpuniverse/std/DpLiving.php:411
+#: dpuniverse/std/DpLiving.php:421
 msgid "l"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:380
+#: dpuniverse/std/DpLiving.php:412
 msgid "at"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:390
+#: dpuniverse/std/DpLiving.php:422
 msgid "Look at what?<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:391
+#: dpuniverse/std/DpLiving.php:423
 msgid "Examine what?<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:404 dpuniverse/std/DpLiving.php:469
-#: dpuniverse/std/DpLiving.php:552
+#: dpuniverse/std/DpLiving.php:436 dpuniverse/std/DpLiving.php:501
+#: dpuniverse/std/DpLiving.php:584
 #, php-format
 msgid "There is no %s here.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:432
+#: dpuniverse/std/DpLiving.php:464
 #, php-format
 msgid "%s what?<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:446 dpuniverse/std/DpLiving.php:492
+#: dpuniverse/std/DpLiving.php:478 dpuniverse/std/DpLiving.php:524
 msgid "You can't carry more weight, drop something first.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:449 dpuniverse/std/DpLiving.php:496
+#: dpuniverse/std/DpLiving.php:481 dpuniverse/std/DpLiving.php:528
 msgid "You can't carry more volume, drop something first.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:453 dpuniverse/std/DpLiving.php:500
+#: dpuniverse/std/DpLiving.php:485 dpuniverse/std/DpLiving.php:532
 #, php-format
 msgid "You take %s.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:455 dpuniverse/std/DpLiving.php:502
+#: dpuniverse/std/DpLiving.php:487 dpuniverse/std/DpLiving.php:534
 #, php-format
 msgid "%s takes %s.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:462
+#: dpuniverse/std/DpLiving.php:494
 msgid "There is nothing to pick up here.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:474
+#: dpuniverse/std/DpLiving.php:506
 #, php-format
 msgid "%s refuses to be taken.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:520
+#: dpuniverse/std/DpLiving.php:552
 msgid "Drop what?<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:531
+#: dpuniverse/std/DpLiving.php:563
 msgid "You have nothing to drop.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:538 dpuniverse/std/DpLiving.php:567
+#: dpuniverse/std/DpLiving.php:570 dpuniverse/std/DpLiving.php:599
 #, php-format
 msgid "You drop %s.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:541 dpuniverse/std/DpLiving.php:570
+#: dpuniverse/std/DpLiving.php:573 dpuniverse/std/DpLiving.php:602
 #, php-format
 msgid "%s drops %s.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:1280 dpuniverse/std/DpLiving.php:588
+#: dpuniverse/std/DpLiving.php:620 dpuniverse/std/DpObject.php:1288
 msgid "You are carrying:"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:605
+#: dpuniverse/std/DpLiving.php:637
 msgid "Say what?<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:611
+#: dpuniverse/std/DpLiving.php:643
 #, php-format
 msgid "%s says: %s<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:613
+#: dpuniverse/std/DpLiving.php:645
 #, php-format
 msgid "You say: %s<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:632
+#: dpuniverse/std/DpLiving.php:693
 #, php-format
-msgid "give %s to "
+msgid "tell %s"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:669
+#: dpuniverse/std/DpLiving.php:738
 msgid "give..."
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:674
+#: dpuniverse/std/DpLiving.php:743
 msgid "<span style='color: #999'>give to...</span>"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:691
+#: dpuniverse/std/DpLiving.php:760
 msgid "to"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:695
+#: dpuniverse/std/DpLiving.php:764
 msgid "Give what to who?<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:702
+#: dpuniverse/std/DpLiving.php:771
 #, php-format
 msgid "You have no %s.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:712
+#: dpuniverse/std/DpLiving.php:781
 #, php-format
 msgid "%s gives %s to %s.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:717
+#: dpuniverse/std/DpLiving.php:786
 #, php-format
 msgid "%s gives %s to you.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:721
+#: dpuniverse/std/DpLiving.php:790
 #, php-format
 msgid "You give %s to %s.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:741
+#: dpuniverse/std/DpLiving.php:810
 msgid "Tell who what?<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:747
+#: dpuniverse/std/DpLiving.php:816
 #, php-format
 msgid "User %s was not found.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:751
+#: dpuniverse/std/DpLiving.php:820
 #, php-format
 msgid "%s tells you: %s<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:753
+#: dpuniverse/std/DpLiving.php:822
 #, php-format
 msgid "You tell %s: %s<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:775
+#: dpuniverse/std/DpLiving.php:844
 #, php-format
 msgid "%s shouts from nowhere: %s<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:777
+#: dpuniverse/std/DpLiving.php:846
 #, php-format
 msgid "%s shouts from %s: %s<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:786
+#: dpuniverse/std/DpLiving.php:855
 #, php-format
 msgid "You shout: %s<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:799
+#: dpuniverse/std/DpLiving.php:868
 msgid "You smile happily.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:801
+#: dpuniverse/std/DpLiving.php:870
 #, php-format
 msgid "%s smiles happily.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:816
+#: dpuniverse/std/DpLiving.php:885
 msgid "You grin evilly.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:818
+#: dpuniverse/std/DpLiving.php:887
 #, php-format
 msgid "%s grins evilly.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:833
+#: dpuniverse/std/DpLiving.php:902
 msgid "You fall down on the floor laughing.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:836
+#: dpuniverse/std/DpLiving.php:905
 #, php-format
 msgid "%s falls down on the floor laughing.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:852
+#: dpuniverse/std/DpLiving.php:921
 msgid "You jump up and down cheering.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:855
+#: dpuniverse/std/DpLiving.php:924
 #, php-format
 msgid "%s jumps up and down cheering.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:863 dpuniverse/std/DpLiving.php:931
-#: dpuniverse/std/DpLiving.php:965 dpuniverse/std/DpLiving.php:999
-#: dpuniverse/std/DpLiving.php:1030 dpuniverse/std/DpLiving.php:1064
+#: dpuniverse/std/DpLiving.php:932 dpuniverse/std/DpLiving.php:1000
+#: dpuniverse/std/DpLiving.php:1034 dpuniverse/std/DpLiving.php:1068
+#: dpuniverse/std/DpLiving.php:1099 dpuniverse/std/DpLiving.php:1133
 #, php-format
 msgid "Couldn't find: %s<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:868
+#: dpuniverse/std/DpLiving.php:937
 msgid "Cheer on who?<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:872
+#: dpuniverse/std/DpLiving.php:941
 #, php-format
 msgid "You jump up and down cheering on %s.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:875
+#: dpuniverse/std/DpLiving.php:944
 #, php-format
-msgid "%s jump up and down cheering on %s.<br />"
+msgid "%s jumps up and down cheering on %s.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:880
+#: dpuniverse/std/DpLiving.php:949
 #, php-format
-msgid "%s jump up and down cheering you on.<br />"
+msgid "%s jumps up and down cheering you on.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:895
+#: dpuniverse/std/DpLiving.php:964
 msgid "You nod solemnly.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:897
+#: dpuniverse/std/DpLiving.php:966
 #, php-format
 msgid "%s nods solemnly.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:912
+#: dpuniverse/std/DpLiving.php:981
 msgid "You shrug.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:914
+#: dpuniverse/std/DpLiving.php:983
 #, php-format
 msgid "%s shrugs.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:936
+#: dpuniverse/std/DpLiving.php:1005
 msgid "Pat who?<br />"
-msgstr ""
-
-#: dpuniverse/std/DpLiving.php:940
-#, php-format
-msgid "You pat %s on the head with a bone-crushing sound.<br />"
-msgstr ""
-
-#: dpuniverse/std/DpLiving.php:943
-#, php-format
-msgid "%s pats %s on the head with a bone-crushing sound.<br />"
-msgstr ""
-
-#: dpuniverse/std/DpLiving.php:948
-#, php-format
-msgid "%s pats you on the head with a bone-crushing sound.<br />"
-msgstr ""
-
-#: dpuniverse/std/DpLiving.php:970
-msgid "High5 who?<br />"
-msgstr ""
-
-#: dpuniverse/std/DpLiving.php:974
-#, php-format
-msgid "You jump up, and slap a thundering high-five with %s.<br />"
-msgstr ""
-
-#: dpuniverse/std/DpLiving.php:977
-#, php-format
-msgid "%s jumps up, and slaps a thundering high-five with %s.<br />"
-msgstr ""
-
-#: dpuniverse/std/DpLiving.php:982
-#, php-format
-msgid "%s jumps up, and slaps a thundering high-five with you.<br />"
-msgstr ""
-
-#: dpuniverse/std/DpLiving.php:1004
-msgid "Hug who?<br />"
-msgstr ""
-
-#: dpuniverse/std/DpLiving.php:1007
-#, php-format
-msgid "You hug %s.<br />"
 msgstr ""
 
 #: dpuniverse/std/DpLiving.php:1009
 #, php-format
-msgid "%s hugs %s.<br />"
+msgid "You pat %s on the head with a bone-crushing sound.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:1013
+#: dpuniverse/std/DpLiving.php:1012
 #, php-format
-msgid "%s hugs you.<br />"
+msgid "%s pats %s on the head with a bone-crushing sound.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:1035
-msgid "Kiss who?<br />"
+#: dpuniverse/std/DpLiving.php:1017
+#, php-format
+msgid "%s pats you on the head with a bone-crushing sound.<br />"
 msgstr ""
 
 #: dpuniverse/std/DpLiving.php:1039
-#, php-format
-msgid "You give %s a deep and passionate kiss... It seems to last forever...<br />"
+msgid "High5 who?<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:1042
+#: dpuniverse/std/DpLiving.php:1043
 #, php-format
-msgid "%s gives %s a deep and passionate kiss... It seems to last forever...<br />"
+msgid "You jump up, and slap a thundering high-five with %s.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:1047
+#: dpuniverse/std/DpLiving.php:1046
 #, php-format
-msgid "%s gives you a deep and passionate kiss... It seems to last forever...<br />"
+msgid "%s jumps up, and slaps a thundering high-five with %s.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:1069
-msgid "Dance with who?<br />"
+#: dpuniverse/std/DpLiving.php:1051
+#, php-format
+msgid "%s jumps up, and slaps a thundering high-five with you.<br />"
 msgstr ""
 
 #: dpuniverse/std/DpLiving.php:1073
-#, php-format
-msgid "You take %s for a dance... The tango!<br />"
+msgid "Hug who?<br />"
 msgstr ""
 
 #: dpuniverse/std/DpLiving.php:1076
 #, php-format
+msgid "You hug %s.<br />"
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:1078
+#, php-format
+msgid "%s hugs %s.<br />"
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:1082
+#, php-format
+msgid "%s hugs you.<br />"
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:1104
+msgid "Kiss who?<br />"
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:1108
+#, php-format
+msgid "You give %s a deep and passionate kiss... It seems to last forever...<br />"
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:1111
+#, php-format
+msgid "%s gives %s a deep and passionate kiss... It seems to last forever...<br />"
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:1116
+#, php-format
+msgid "%s gives you a deep and passionate kiss... It seems to last forever...<br />"
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:1138
+msgid "Dance with who?<br />"
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:1142
+#, php-format
+msgid "You take %s for a dance... The tango!<br />"
+msgstr ""
+
+#: dpuniverse/std/DpLiving.php:1145
+#, php-format
 msgid "%s takes %s for a dance... The tango!<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:1081
+#: dpuniverse/std/DpLiving.php:1150
 #, php-format
 msgid "%s takes you for a dance... The tango!<br />"
 msgstr ""
 
-#: dpuniverse/std/DpLiving.php:1100
+#: dpuniverse/std/DpLiving.php:1169
 msgid "Try: emote <i>text</i><br />"
 msgstr ""
 
@@ -1685,500 +1731,635 @@ msgstr ""
 msgid "a NPC"
 msgstr ""
 
-#: dpuniverse/std/DpNpc.php:162 lib/dpcurrentrequest.php:701
+#: dpuniverse/std/DpNpc.php:162 lib/dpcurrentrequest.php:764
 #, php-format
 msgid "%s enters the site.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpNpc.php:166 lib/dpcurrentrequest.php:762
+#: dpuniverse/std/DpNpc.php:166 lib/dpcurrentrequest.php:851
 #, php-format
 msgid "%s leaves to %s.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpNpc.php:170 lib/dpcurrentrequest.php:767
+#: dpuniverse/std/DpNpc.php:170 lib/dpcurrentrequest.php:856
 #, php-format
 msgid "%s arrives from %s.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:215
+#: dpuniverse/std/DpObject.php:218
 msgid "object"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:246
+#: dpuniverse/std/DpObject.php:249
 msgid "You see nothing special.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:272
+#: dpuniverse/std/DpObject.php:275
 msgid "initialized object"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:273
+#: dpuniverse/std/DpObject.php:276
 msgid "the initialized object"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:274
+#: dpuniverse/std/DpObject.php:277
 msgid "an initialized object"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:360
+#: dpuniverse/std/DpObject.php:363
 #, php-format
 msgid "__destruct() called in object %s (%s).\n"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:377
+#: dpuniverse/std/DpObject.php:380
 msgid "removeDpObject() called in object "
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:896 dpuniverse/std/DpObject.php:1490
-#: dpuniverse/std/DpObject.php:1521
+#: dpuniverse/std/DpObject.php:903 dpuniverse/std/DpObject.php:1543
+#: dpuniverse/std/DpObject.php:1574
 msgid "a#an#the"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:982 dpuniverse/std/DpObject.php:1001
+#: dpuniverse/std/DpObject.php:989 dpuniverse/std/DpObject.php:1008
 #, php-format
 msgid "the %s"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:990
+#: dpuniverse/std/DpObject.php:997
 msgid "aeioux"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:992
+#: dpuniverse/std/DpObject.php:999
 #, php-format
 msgid "a %s"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:993
+#: dpuniverse/std/DpObject.php:1000
 #, php-format
 msgid "an %s"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:1116
+#: dpuniverse/std/DpObject.php:1117
 msgid "Getting mailman contents\n"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:1211 lib/dpuniverse.php:1277
-#: lib/dpuniverse.php:1463 lib/dpcurrentrequest.php:889
+#: dpuniverse/std/DpObject.php:1215 lib/dpcurrentrequest.php:1010
+#: lib/dpuniverse.php:1282 lib/dpuniverse.php:1469
 msgid "Logout"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:1213 lib/dpcurrentrequest.php:891
+#: dpuniverse/std/DpObject.php:1217 lib/dpcurrentrequest.php:1012
 msgid "Go to Bottom"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:1217 lib/dpcurrentrequest.php:893
+#: dpuniverse/std/DpObject.php:1221 lib/dpcurrentrequest.php:1014
 #, php-format
 msgid "Welcome %s"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:1247
+#: dpuniverse/std/DpObject.php:1255
 #, php-format
 msgid "You have been %s on this site."
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:1249
+#: dpuniverse/std/DpObject.php:1257
 #, php-format
 msgid "This session, you have been %s on this site."
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:1253
+#: dpuniverse/std/DpObject.php:1261
 #, php-format
 msgid "%s has been %s on this site."
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:1256
+#: dpuniverse/std/DpObject.php:1264
 #, php-format
 msgid "This session, %s has been %s on this site."
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:1265
+#: dpuniverse/std/DpObject.php:1273
 #, php-format
 msgid "In total, you have been %s on this site."
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:1267
+#: dpuniverse/std/DpObject.php:1275
 #, php-format
 msgid "In total, %s has been %s on this site."
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:1273
+#: dpuniverse/std/DpObject.php:1281
 #, php-format
 msgid "%s has been inactive for %s."
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:1281
+#: dpuniverse/std/DpObject.php:1289
 #, php-format
 msgid "%s is carrying:"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:1468
+#: dpuniverse/std/DpObject.php:1292
+msgid "Nothing"
+msgstr ""
+
+#: dpuniverse/std/DpObject.php:1379
+msgid "Click me!"
+msgstr ""
+
+#: dpuniverse/std/DpObject.php:1521
 #, php-format
 msgid "examine %s"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:2400
+#: dpuniverse/std/DpObject.php:2653
 msgid "Click for menu"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:2950 dpuniverse/std/DpObject.php:2959
+#: dpuniverse/std/DpObject.php:2850 dpuniverse/std/DpObject.php:2859
 #, php-format
 msgid "handleCleanup() called in %s: not removed"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:2965
+#: dpuniverse/std/DpObject.php:2865
 #, php-format
 msgid "handleCleanup() called in %s: removing\n"
 msgstr ""
 
-#: dpuniverse/std/DpObject.php:3005
+#: dpuniverse/std/DpObject.php:2905
 #, php-format
 msgid "%s moves %s around.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpPage.php:73
+#: dpuniverse/std/DpPage.php:73 dpuniverse/std/DpUser.php:1146
 msgid "page"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:134
+#: dpuniverse/std/DpPage.php:537
+msgid "hide after use"
+msgstr ""
+
+#: dpuniverse/std/DpPage.php:538
+msgid "mode once"
+msgstr ""
+
+#: dpuniverse/std/DpPage.php:539
+msgid "show while on this page"
+msgstr ""
+
+#: dpuniverse/std/DpPage.php:540
+msgid "mode page"
+msgstr ""
+
+#: dpuniverse/std/DpPage.php:541
+msgid "always show"
+msgstr ""
+
+#: dpuniverse/std/DpPage.php:542
+msgid "mode always"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:152
 msgid "user"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:147
+#: dpuniverse/std/DpUser.php:168
 msgid "User"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:153 dpuniverse/std/DpUser.php:666
-#: lib/dpcurrentrequest.php:521
+#: dpuniverse/std/DpUser.php:174 dpuniverse/std/DpUser.php:757
+#: lib/dpcurrentrequest.php:579
 msgid "A user."
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:156
+#: dpuniverse/std/DpUser.php:177
 msgid "who"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:156
+#: dpuniverse/std/DpUser.php:177
 msgid "who's here?"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:157
-msgid "settings"
+#: dpuniverse/std/DpUser.php:178
+msgid "avatar & other settings"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:157
+#: dpuniverse/std/DpUser.php:178
 msgid "settings#config"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:157 dpuniverse/std/DpUser.php:158
-#: dpuniverse/std/DpUser.php:159
+#: dpuniverse/std/DpUser.php:178 dpuniverse/std/DpUser.php:179
+#: dpuniverse/std/DpUser.php:180 dpuniverse/std/DpUser.php:181
+#: dpuniverse/std/DpUser.php:182 dpuniverse/std/DpUser.php:183
+#: dpuniverse/std/DpUser.php:184 dpuniverse/std/DpUser.php:185
 msgid "tools"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:158
-msgid "source"
+#: dpuniverse/std/DpUser.php:179
+msgid "my home"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:159
+#: dpuniverse/std/DpUser.php:179
+msgid "myhome"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:180
+msgid "myhome set"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:180
+msgid "set my home"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:181
+msgid "login/register"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:182
+msgid "logout"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:183 dpuniverse/std/DpUser.php:184
+#: dpuniverse/std/DpUser.php:185
+msgid "advanced"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:183
+msgid "mode"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:184
 msgid "links"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:159
-msgid "page links"
+#: dpuniverse/std/DpUser.php:184
+msgid "show page links"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:162 dpuniverse/std/DpUser.php:163
-#: dpuniverse/std/DpUser.php:164 dpuniverse/std/DpUser.php:165
-#: dpuniverse/std/DpUser.php:166
-msgid "admin"
+#: dpuniverse/std/DpUser.php:185
+msgid "show source"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:162
+#: dpuniverse/std/DpUser.php:185
+msgid "source"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:188
 msgid "goto"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:162
+#: dpuniverse/std/DpUser.php:188
 msgid "goto..."
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:163
+#: dpuniverse/std/DpUser.php:189
 msgid "reset"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:164
+#: dpuniverse/std/DpUser.php:190
 msgid "svars"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:165
+#: dpuniverse/std/DpUser.php:191
 msgid "force"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:165
+#: dpuniverse/std/DpUser.php:191
 msgid "force..."
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:166
+#: dpuniverse/std/DpUser.php:192
 msgid "move"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:166
+#: dpuniverse/std/DpUser.php:192
 msgid "move..."
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:169
+#: dpuniverse/std/DpUser.php:195
 msgid "help"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:230
+#: dpuniverse/std/DpUser.php:293
 msgid "away"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:319
+#: dpuniverse/std/DpUser.php:382
 msgid "Message skipped, no longer in page\n"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:378
+#: dpuniverse/std/DpUser.php:520
 #, php-format
-msgid "Telling %s: %s\n"
+msgid "say %s"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:444
-msgid ""
-"<b>Standard commands:</b><br />\n"
-"Avatar and display settings: <tt>settings, config</tt><br />\n"
-"Examine stuff: <tt>examine <i>item</i>, look at <i>item</i></tt><br />\n"
-"Pick up stuff: <tt>take <i>item</i>, take all, get <i>item</i>, get all</tt><br />\n"
-"What am I carrying?: <tt>inventory, inv, i</tt><br />\n"
-"Drop stuff: <tt>drop <i>item</i>, drop all</tt><br />\n"
-"Give stuff to others: <tt>give <i>item</i> to <i>user</i></tt><br />\n"
-"Say something to users on this page: <tt>say <i>what</i>, '<i>what</i></tt><br />\n"
-"Tell to another user anywhere: <tt>tell <i>user</i> <i>what</i>, \"<i>user</i> <i>what</i></tt><br />\n"
-"Shout something to all users on the site: <tt>shout <i>what</i></tt><br />\n"
-"Emotions: <tt>smile, grin, laugh, shrug, pat, emote</tt><br />\n"
-"Read something readable: <tt>read <i>item</i></tt><br />\n"
-"List of people on this site: <tt>who</tt><br />\n"
-"View source of page: <tt>source</tt><br /><br />\n"
-"<tt><i>item</i></tt> can be something like <tt>beer, cool beer</tt> or <tt>beer 3</tt> to refer to the third beer. All commands are case insensitive!<br /><br />\n"
-"Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to guest#2, drink beer 2</tt>"
-msgstr ""
-
-#: dpuniverse/std/DpUser.php:479 dpuniverse/std/DpUser.php:510
+#: dpuniverse/std/DpUser.php:569 dpuniverse/std/DpUser.php:600
 #, php-format
 msgid "Can't find: %s<br />"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:517
+#: dpuniverse/std/DpUser.php:607
 #, php-format
 msgid "No links found in %s"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:521
+#: dpuniverse/std/DpUser.php:611
 #, php-format
 msgid "Links found in: %s"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:549
+#: dpuniverse/std/DpUser.php:639
 msgid "No one is on this site."
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:554
+#: dpuniverse/std/DpUser.php:644
 msgid "People currently on this site:"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:627
+#: dpuniverse/std/DpUser.php:718
 msgid "Choose your avatar:"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:629
+#: dpuniverse/std/DpUser.php:720
 msgid "People and items on the page are displayed in:"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:630
+#: dpuniverse/std/DpUser.php:721
 msgid "Graphical mode"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:631
+#: dpuniverse/std/DpUser.php:722
 msgid "Abstract mode"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:632
+#: dpuniverse/std/DpUser.php:723
 msgid "Alert me of the following events:"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:633
+#: dpuniverse/std/DpUser.php:724
 msgid "People entering this site"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:634
+#: dpuniverse/std/DpUser.php:725
 msgid "People leaving this site"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:635
+#: dpuniverse/std/DpUser.php:726
 msgid "Search engines indexing pages"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:658
+#: dpuniverse/std/DpUser.php:749
 msgid "Error receiving settings.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:741 dpuniverse/std/DpUser.php:792
-#: dpuniverse/std/DpUser.php:907
+#: dpuniverse/std/DpUser.php:833 dpuniverse/std/DpUser.php:904
+#: dpuniverse/std/DpUser.php:1019
 #, php-format
 msgid "Target %s not found.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:747
+#: dpuniverse/std/DpUser.php:839
 #, php-format
 msgid "Server variables of %s:"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:750
+#: dpuniverse/std/DpUser.php:842
 #, php-format
 msgid "Properties of %s:"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:760
+#: dpuniverse/std/DpUser.php:859
 msgid "Goto where?<br />"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:780
+#: dpuniverse/std/DpUser.php:879
 msgid "Syntax: force <i>who what</i>.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:797 dpuniverse/std/DpUser.php:918
+#: dpuniverse/std/DpUser.php:909 dpuniverse/std/DpUser.php:1030
 #, php-format
 msgid "You give %s the old \"Jedi mind-trick\" stink eye.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:800 dpuniverse/std/DpUser.php:922
+#: dpuniverse/std/DpUser.php:912 dpuniverse/std/DpUser.php:1034
 #, php-format
 msgid "%s gives %s the old \"Jedi mind-trick\" stink eye.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:805 dpuniverse/std/DpUser.php:928
+#: dpuniverse/std/DpUser.php:917 dpuniverse/std/DpUser.php:1040
 #, php-format
 msgid "%s gives you the old \"Jedi mind-trick\" stink eye.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:839 dpuniverse/std/DpUser.php:881
+#: dpuniverse/std/DpUser.php:951 dpuniverse/std/DpUser.php:993
 msgid "Syntax: move <i>what where</i>.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:865
+#: dpuniverse/std/DpUser.php:977
 #, php-format
 msgid "Object to move %s not found.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:890
+#: dpuniverse/std/DpUser.php:1002
 #, php-format
 msgid "Can't move object %s to this location: you have no environment.<br />"
 msgstr ""
 
-#: dpuniverse/std/DpUser.php:913
+#: dpuniverse/std/DpUser.php:1025
 msgid "You cannot move yourself into yourself.<br />"
 msgstr ""
 
-#: lib/dpserver.php:130 lib/dpserver.php:150 lib/dpclient.php:66
-#: lib/dpclient.php:83
+#: dpuniverse/std/DpUser.php:1097
+msgid "You have no home location set. Set your home location first.<br />"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:1106
+msgid "set"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:1117
+msgid "Your home location has been set to the current page.<br />"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:1121
+msgid "Syntax: myhome [set]<br />"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:1140
+msgid "cmd#command"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:1144
+msgid "once"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:1148
+msgid "always"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:1151
+msgid "Invalid action mode (valid modes are: say and cmd).<br />"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:1171
+msgid "The input field is now in command mode. Enter <tt>help</tt> for more information.<br />"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:1172
+msgid "The input field is now in page chat mode. Enter <tt>/help</tt> for more information.<br />"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:1182
+msgid "command mode"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:1199
+#, php-format
+msgid "Private message to %s:"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:1227
+msgid "Message to everybody on this site:"
+msgstr ""
+
+#: dpuniverse/std/DpUser.php:1255
+msgid "Emotion to everybody on this page:"
+msgstr ""
+
+#: lib/dpclient-js-src.php:34 public/dpclient-js.php:33
+msgid "You must have (session) cookies enabled in order to view this site"
+msgstr ""
+
+#: lib/dpclient-js-src.php:35 public/dpclient-js.php:33
+msgid "Invalid event count"
+msgstr ""
+
+#: lib/dpclient-js-src.php:36 public/dpclient-js.php:33
+msgid "Invalid event time"
+msgstr ""
+
+#: lib/dpclient-js-src.php:37 public/dpclient-js.php:33
+msgid "Invalid DutchPIPE XML (2), tagname:"
+msgstr ""
+
+#: lib/dpclient-js-src.php:39 public/dpclient-js.php:33
+msgid "Invalid DutchPIPE XML (1), tagname:"
+msgstr ""
+
+#: lib/dpclient-js-src.php:41 lib/dpclient.php:328 public/dpclient-js.php:33
+msgid "close"
+msgstr ""
+
+#: lib/dpclient.php:76 lib/dpclient.php:93 lib/dpserver.php:130
+#: lib/dpserver.php:150
 #, php-format
 msgid "socket_create(): unable to create socket [%u]: %s\n"
 msgstr ""
 
-#: lib/dpclient.php:73 lib/dpclient.php:91
+#: lib/dpclient.php:83 lib/dpclient.php:101
 #, php-format
 msgid "socket_create(): unable to connect [%u]: %s\n"
 msgstr ""
 
-#: lib/dpclient.php:97
+#: lib/dpclient.php:107
 msgid "Invalid socket protocol"
 msgstr ""
 
-#: lib/dpclient.php:330 public/dpclient-js.php:483
-msgid "close"
-msgstr ""
-
-#: lib/dpclient.php:379
+#: lib/dpclient.php:391
 msgid "Error fetching page. Invalid page XML."
 msgstr ""
 
-#: lib/dpuniverse.php:1299 lib/dpcurrentrequest.php:414
+#: lib/dpcurrentrequest.php:454 lib/dpuniverse.php:1304
 #, php-format
 msgid "Guest#%d"
 msgstr ""
 
-#: lib/dpcurrentrequest.php:540
-msgid "This is a search engine indexing this site.<br />"
-msgstr ""
-
-#: lib/dpcurrentrequest.php:558
+#: lib/dpcurrentrequest.php:554
 #, php-format
 msgid "User %s created\n"
 msgstr ""
 
-#: lib/dpcurrentrequest.php:705
-#, php-format
-msgid "%s enters the site from <span class=\"col2\">%s</span> using <span class=\"col2\">%s</span>.<br />"
+#: lib/dpcurrentrequest.php:608
+msgid "This is a search engine indexing this site.<br />"
 msgstr ""
 
-#: lib/dpcurrentrequest.php:718
-#, php-format
-msgid "%s enters the site at %s.<br />"
+#: lib/dpcurrentrequest.php:772
+msgid "unknown remote address"
 msgstr ""
 
-#: lib/dpcurrentrequest.php:723
-#, php-format
-msgid "%s enters the site at %s from <span class=\"col2\">%s</span> using <span class=\"col2\">%s</span>.<br />"
+#: lib/dpcurrentrequest.php:773 lib/dpuniverse.php:460
+msgid "%H:%M"
 msgstr ""
 
-#: lib/dpcurrentrequest.php:748
+#: lib/dpcurrentrequest.php:775
 #, php-format
-msgid "%s indexes %s.<br />"
+msgid "<span class=\"col2\">%s</span> %s <span class=\"col2\">(%s)</span> enters the site from <span class=\"col2\">%s</span> using <span class=\"col2\">%s</span>.<br />"
 msgstr ""
 
-#: lib/dpfunctions.php:215
+#: lib/dpcurrentrequest.php:793
+#, php-format
+msgid "<span class=\"col2\">%s</span> %s enters the site at %s.<br />"
+msgstr ""
+
+#: lib/dpcurrentrequest.php:799
+#, php-format
+msgid "<span class=\"col2\">%s</span> %s <span class=\"col2\">(%s)</span> enters the site at %s from <span class=\"col2\">%s</span> using <span class=\"col2\">%s</span>.<br />"
+msgstr ""
+
+#: lib/dpcurrentrequest.php:828
+#, php-format
+msgid "<span class=\"col2\">%s</span> %s indexes %s.<br />"
+msgstr ""
+
+#: lib/dpcurrentrequest.php:834
+#, php-format
+msgid "<span class=\"col2\">%s</span> %s <span class=\"col2\">(%s)</span> indexes %s.<br />"
+msgstr ""
+
+#: lib/dpfunctions.php:240
 #, php-format
 msgid "%d years"
 msgstr ""
 
-#: lib/dpfunctions.php:215
+#: lib/dpfunctions.php:240
 msgid "1 year"
 msgstr ""
 
-#: lib/dpfunctions.php:220
+#: lib/dpfunctions.php:245
 #, php-format
 msgid "%d days"
 msgstr ""
 
-#: lib/dpfunctions.php:220
+#: lib/dpfunctions.php:245
 msgid "1 day"
 msgstr ""
 
-#: lib/dpfunctions.php:225
+#: lib/dpfunctions.php:250
 #, php-format
 msgid "%d hours"
 msgstr ""
 
-#: lib/dpfunctions.php:225
+#: lib/dpfunctions.php:250
 msgid "1 hour"
 msgstr ""
 
-#: lib/dpfunctions.php:232
+#: lib/dpfunctions.php:257
 msgid "1 minute"
 msgstr ""
 
-#: lib/dpfunctions.php:233
+#: lib/dpfunctions.php:258
 #, php-format
 msgid "%d minutes"
 msgstr ""
 
-#: lib/dpfunctions.php:237
+#: lib/dpfunctions.php:262
 msgid "1 second"
 msgstr ""
 
-#: lib/dpfunctions.php:238
+#: lib/dpfunctions.php:263
 #, php-format
 msgid "%d seconds"
 msgstr ""
 
-#: lib/dpfunctions.php:249
+#: lib/dpfunctions.php:274
 msgid "and"
 msgstr ""
 
@@ -2231,114 +2412,114 @@ msgstr ""
 msgid "%uKB\t%s\n"
 msgstr ""
 
-#: lib/dpuniverse.php:186 script/make_captcha.php:57
+#: lib/dpuniverse.php:187 script/make_captcha.php:57
 #, php-format
 msgid "Could not connect: %s\n"
 msgstr ""
 
-#: lib/dpuniverse.php:189 script/make_captcha.php:60
+#: lib/dpuniverse.php:190 script/make_captcha.php:60
 #, php-format
 msgid "Failed to select database: %s\n"
 msgstr ""
 
-#: lib/dpuniverse.php:245
+#: lib/dpuniverse.php:246
 msgid "Your browser did not report a User Agent string to the server. This is required.<br />"
 msgstr ""
 
-#: lib/dpuniverse.php:449
+#: lib/dpuniverse.php:450
 #, php-format
 msgid "%s left the site.<br />"
 msgstr ""
 
-#: lib/dpuniverse.php:458
+#: lib/dpuniverse.php:459
 #, php-format
-msgid "%s left the site at %s.<br />"
+msgid "<span class=\"col2\">%s</span> %s left the site at %s.<br />"
 msgstr ""
 
-#: lib/dpuniverse.php:719
+#: lib/dpuniverse.php:721
 msgid "Illegal object requested!\n"
 msgstr ""
 
-#: lib/dpuniverse.php:764
+#: lib/dpuniverse.php:766
 #, php-format
-msgid "made new object %s\n"
-msgstr ""
-
-#: lib/dpuniverse.php:953
-#, php-format
-msgid "getDpObject(): returning new object for location %s, no sublocation\n"
+msgid "Made new object %s\n"
 msgstr ""
 
 #: lib/dpuniverse.php:955
 #, php-format
+msgid "getDpObject(): returning new object for location %s, no sublocation\n"
+msgstr ""
+
+#: lib/dpuniverse.php:957
+#, php-format
 msgid "getDpObject(): returning new object for location %s, sublocation %s\n"
 msgstr ""
 
-#: lib/dpuniverse.php:1199 lib/dpuniverse.php:1516
+#: lib/dpuniverse.php:1201 lib/dpuniverse.php:1522
 msgid "No username was given"
 msgstr ""
 
-#: lib/dpuniverse.php:1204
+#: lib/dpuniverse.php:1206
 #, php-format
 msgid "You are already logged in as %s"
 msgstr ""
 
-#: lib/dpuniverse.php:1209 lib/dpuniverse.php:1567
+#: lib/dpuniverse.php:1211 lib/dpuniverse.php:1573
 msgid "No password was given"
 msgstr ""
 
-#: lib/dpuniverse.php:1218
+#: lib/dpuniverse.php:1220
 msgid "That username doesn't exist"
 msgstr ""
 
-#: lib/dpuniverse.php:1222
+#: lib/dpuniverse.php:1224
 msgid "Invalid password"
 msgstr ""
 
-#: lib/dpuniverse.php:1229
+#: lib/dpuniverse.php:1231
 msgid "Invalid login"
 msgstr ""
 
-#: lib/dpuniverse.php:1285
+#: lib/dpuniverse.php:1290
 msgid "Welcome back"
 msgstr ""
 
-#: lib/dpuniverse.php:1286 lib/dpuniverse.php:1476
+#: lib/dpuniverse.php:1291 lib/dpuniverse.php:1482
 #, php-format
 msgid "You are now logged in as: <b>%s</b>"
 msgstr ""
 
-#: lib/dpuniverse.php:1327
+#: lib/dpuniverse.php:1332
 #, php-format
 msgid "Logged out %s"
 msgstr ""
 
-#: lib/dpuniverse.php:1328
+#: lib/dpuniverse.php:1333
 msgid "See you later!"
 msgstr ""
 
-#: lib/dpuniverse.php:1329
+#: lib/dpuniverse.php:1334
 #, php-format
 msgid "You are now: <b>%s</b>"
 msgstr ""
 
-#: lib/dpuniverse.php:1355
+#: lib/dpuniverse.php:1360
 msgid "Invalid registration"
 msgstr ""
 
-#: lib/dpuniverse.php:1356
+#: lib/dpuniverse.php:1361
 msgid "Please correct the following errors:"
 msgstr ""
 
-#: lib/dpuniverse.php:1371
+#: lib/dpuniverse.php:1376
 msgid "To complete registration, please enter the code you see above:"
 msgstr ""
 
-#: lib/dpuniverse.php:1376
+#: lib/dpuniverse.php:1381
 msgid "OK"
 msgstr ""
 
-#: lib/dpuniverse.php:1377
+#: lib/dpuniverse.php:1382
 msgid ""
 "This system is used to filter software robots from\n"
 "registrations submitted by individuals. If you are unable to validate the\n"
@@ -2346,54 +2527,54 @@ msgid ""
 "to complete registration."
 msgstr ""
 
-#: lib/dpuniverse.php:1409
+#: lib/dpuniverse.php:1414
 msgid "Failure validating code"
 msgstr ""
 
-#: lib/dpuniverse.php:1410
+#: lib/dpuniverse.php:1415
 msgid "Please try again."
 msgstr ""
 
-#: lib/dpuniverse.php:1474
+#: lib/dpuniverse.php:1480
 msgid "Thank you for registering and welcome to DutchPIPE!"
 msgstr ""
 
-#: lib/dpuniverse.php:1520
+#: lib/dpuniverse.php:1526
 #, php-format
 msgid "The username must be at least %d characters long"
 msgstr ""
 
-#: lib/dpuniverse.php:1524
+#: lib/dpuniverse.php:1530
 #, php-format
 msgid "The username must be at most %d characters long"
 msgstr ""
 
-#: lib/dpuniverse.php:1543
+#: lib/dpuniverse.php:1549
 msgid "Illegal character in username at position 1 (usernames must start with a letter, digits or other characters are not allowed)"
 msgstr ""
 
-#: lib/dpuniverse.php:1551
+#: lib/dpuniverse.php:1557
 #, php-format
 msgid "Illegal character in username at position %d (you can only use a-z and 0-9)"
 msgstr ""
 
-#: lib/dpuniverse.php:1561
+#: lib/dpuniverse.php:1567
 msgid "That username is already in use"
 msgstr ""
 
-#: lib/dpuniverse.php:1573
+#: lib/dpuniverse.php:1579
 msgid "Your password must be at least 6 characters long"
 msgstr ""
 
-#: lib/dpuniverse.php:1577
+#: lib/dpuniverse.php:1583
 msgid "Your password must be at most 32 characters long"
 msgstr ""
 
-#: lib/dpuniverse.php:1581
+#: lib/dpuniverse.php:1587
 msgid "You didn't repeat your password"
 msgstr ""
 
-#: lib/dpuniverse.php:1584
+#: lib/dpuniverse.php:1590
 msgid "The repeated password was different"
 msgstr ""
 
@@ -2415,26 +2596,6 @@ msgstr ""
 msgid "Failed to retrieve CAPTCHA image file.<br />"
 msgstr ""
 
-#: public/dpclient-js.php:194
-msgid "You must have (session) cookies enabled in order to view this site"
-msgstr ""
-
-#: public/dpclient-js.php:235
-msgid "Invalid event count"
-msgstr ""
-
-#: public/dpclient-js.php:245
-msgid "Invalid event time"
-msgstr ""
-
-#: public/dpclient-js.php:262
-msgid "Invalid DutchPIPE XML (2), tagname:"
-msgstr ""
-
-#: public/dpclient-js.php:381
-msgid "Invalid DutchPIPE XML (1), tagname:"
-msgstr ""
-
 #: script/make_captcha.php:107
 msgid "Cannot Initialize new GD image stream"
 msgstr ""
@@ -2444,31 +2605,23 @@ msgstr ""
 msgid "Created %s.gif\n"
 msgstr ""
 
-#: template/dpdefault.tpl:5
+#: template/dpdefault.tpl:5 template/dpdown.tpl:5 template/freemovement.tpl:5
 msgid "DutchPIPE - PHP/AJAX Interactive Virtual Environments on Websites"
 msgstr ""
 
-#: template/dpdefault.tpl:6
+#: template/dpdefault.tpl:6 template/dpdown.tpl:6 template/freemovement.tpl:6
 msgid "DutchPIPE"
 msgstr ""
 
-#: template/dpdefault.tpl:7
+#: template/dpdefault.tpl:7 template/dpdown.tpl:7 template/freemovement.tpl:7
 msgid "DutchPIPE, A Dutchman's Persistant Interactive Page Environments, PHP, AJAX, DOM, DHTML, PHP5, PHP 5, Virtual, Multi User, Object Oriented, Persistent State, Lennert Stock, Shoutbox"
 msgstr ""
 
-#: template/dpdefault.tpl:8
+#: template/dpdefault.tpl:8 template/dpdown.tpl:8 template/freemovement.tpl:8
 msgid "DutchPIPE stands for a Dutchman's Persistant Interactive Page Environments. With DutchPIPE, each page becomes an abstracted environment or location where visitors and other items on the page are visualized. This status is retained as visitors move around. A whole lot of real-time interaction is possible. DutchPIPE uses AJAX/DOM/PHP."
 msgstr ""
 
-#: template/dpdefault.tpl:13
+#: template/dpdefault.tpl:13 template/dpdown.tpl:12
+#: template/freemovement.tpl:13
 msgid "Your browser must have JavaScript enabled in order to view this page.<br />"
-msgstr ""
-
-#: template/dpdefault.tpl:26
-msgid "Go to Top"
-msgstr ""
-
-#: dpuniverse/std/DpLiving.php:322
-#, php-format
-msgid "Action by %s: %s\n"
 msgstr ""

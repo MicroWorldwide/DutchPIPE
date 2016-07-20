@@ -2,7 +2,7 @@
 /**
  * An object which is "alive", common code shared between users and NPCs
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpLiving.php 243 2007-07-08 16:26:23Z ls $
+ * @version    Subversion: $Id: DpLiving.php 252 2007-08-02 23:30:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -39,6 +39,7 @@ inherit(DPUNIVERSE_STD_PATH . 'DpObject.php');
  * - string <b>actionFailure</b> - Last action error message, "Read what?"
  * - string <b>actionDefaultFailure</b> - Default action error message, "What?"
  * - int <b>lastActionTime</b> - UNIX time stamp of last action performed
+ * - string <b>inputMode</b> - Input area mode, 'say' or 'cmd'
  *
  * @package    DutchPIPE
  * @subpackage dpuniverse_std
@@ -70,6 +71,7 @@ class DpLiving extends DpObject
         $this->isLiving = new_dp_property(TRUE);
         $this->displayMode = new_dp_property('graphical');
         $this->sessionAge = new_dp_property(0, FALSE);
+        $this->inputMode = new_dp_property('cmd');
         $this->isDraggable = FALSE;
 
         if (WEIGHT_TYPE_NONE !== WEIGHT_TYPE) {
@@ -167,28 +169,30 @@ class DpLiving extends DpObject
         $this->setBody(dptext("This description hasn't been set yet.<br />"));
 
         /* Actions for both NPCs and users */
-        $this->addAction(dptext('inventory'), explode('#', dptext('inventory#inv#i')), 'actionInventory', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('examine'), explode('#', dptext('examine#exam#exa#x#look#l')), 'actionExamine', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF | DP_ACTION_TARGET_LIVING | DP_ACTION_TARGET_OBJINV | DP_ACTION_TARGET_OBJENV, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
         $this->addAction(dptext('take'), explode('#', dptext('take#get')), 'actionTake', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_OBJENV, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
         $this->addAction(dptext('drop'), dptext('drop'), 'actionDrop', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_OBJINV, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(dptext('inventory'), explode('#', dptext('inventory#inv#i')), 'actionInventory', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(dptext('examine'), explode('#', dptext('examine#exam#exa#x#look#l')), 'actionExamine', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF | DP_ACTION_TARGET_LIVING | DP_ACTION_TARGET_OBJINV | DP_ACTION_TARGET_OBJENV, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
         //$this->addAction(array($this, 'getMenuGiveLabel'), dptext('give'), 'actionGive', DP_ACTION_OPERANT_METHOD_MENU, DP_ACTION_TARGET_OBJINV, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
         $this->addAction(dptext('give to...'), dptext('give'), 'actionGive', DP_ACTION_OPERANT_METHOD_MENU, DP_ACTION_TARGET_OBJINV, array($this, 'getMenuGiveAuth'), DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('say'), dptext('say'), 'actionSay', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('tell'), dptext('tell'), 'actionTell', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(dptext('shout'), dptext('shout'), 'actionShout', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(dptext('<div style="width: 81px; margin: 0px"><div style="float: left">page chat</div> <div style="float: right">TAB</div></div>'), dptext('say'), 'actionSay', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
 
-        $this->addAction(array(dptext('emotions'), dptext('smile')), dptext('smile'), 'actionSmile', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('emotions'), dptext('grin')), dptext('grin'), 'actionGrin', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('emotions'), dptext('laugh')), dptext('laugh'), 'actionLaugh', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('emotions'), dptext('cheer')), dptext('cheer'), 'actionCheer', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF | DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('emotions'), dptext('nod')), dptext('nod'), 'actionNod', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('emotions'), dptext('shrug')), dptext('shrug'), 'actionShrug', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('emotions'), dptext('pat')), dptext('pat'), 'actionPat', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('emotions'), dptext('high5')), dptext('high5'), 'actionHighFive', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('emotions'), dptext('hug')), dptext('hug'), 'actionHug', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('emotions'), dptext('kiss')), dptext('kiss'), 'actionKiss', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('emotions'), dptext('dance')), dptext('dance'), 'actionDance', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('emotions'), dptext('emote')), dptext('emote'), 'actionEmote', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('more chat'), dptext('emotions'), dptext('smile')), dptext('smile'), 'actionSmile', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('more chat'), dptext('emotions'), dptext('grin')), dptext('grin'), 'actionGrin', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('more chat'), dptext('emotions'), dptext('laugh')), dptext('laugh'), 'actionLaugh', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array($this, 'getEmotionsMenu'), dptext('cheer'), 'actionCheer', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF | DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('more chat'), dptext('emotions'), dptext('nod')), dptext('nod'), 'actionNod', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('more chat'), dptext('emotions'), dptext('shrug')), dptext('shrug'), 'actionShrug', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array($this, 'getEmotionsMenu'), dptext('pat'), 'actionPat', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array($this, 'getEmotionsMenu'), dptext('high5'), 'actionHighFive', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array($this, 'getEmotionsMenu'), dptext('hug'), 'actionHug', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array($this, 'getEmotionsMenu'), dptext('kiss'), 'actionKiss', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array($this, 'getEmotionsMenu'), dptext('dance'), 'actionDance', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('more chat'), dptext('emotions'), dptext('emote...')), dptext('emote'), 'actionEmote', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+
+        $this->addAction(array(dptext('more chat'), dptext('send message to...')), dptext('tell'), 'actionTell', DP_ACTION_OPERANT_METHOD_MENU, DP_ACTION_TARGET_SELF, array($this, 'getMenuTellAuth'), DP_ACTION_SCOPE_SELF);
+        $this->addAction(dptext('send message...'), dptext('tell'), 'actionTell', array($this, "getTellOperant"), DP_ACTION_TARGET_USER, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('more chat'), dptext('shout to site...')), dptext('shout'), 'actionShout', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
 
         $this->setTimeout('timeoutHeartBeat', 2);
 
@@ -240,12 +244,32 @@ class DpLiving extends DpObject
     {
     }
 
-    function eventDpObject($name)
+    /**
+     * Reports an event
+     *
+     * Called when certain events occur, given with $name.
+     *
+     * Calls the method 'eventDpLiving' in this living object.
+     *
+     * @param      object    $name       Name of event
+     * @param      mixed     $args       One or more arguments, depends on event
+     * @since      DutchPIPE 0.2.0
+     */
+    final function eventDpObject($name)
     {
         $args = func_get_args();
         call_user_func_array(array($this, 'eventDpLiving'), $args);
     }
 
+    /**
+     * Reports an event
+     *
+     * Called when certain events occur, given with $name.
+     *
+     * @param      object    $name       Name of event
+     * @param      mixed     $args       One or more arguments, depends on event
+     * @since      DutchPIPE 0.2.0
+     */
     function eventDpLiving($name)
     {
     }
@@ -260,6 +284,14 @@ class DpLiving extends DpObject
         $this->setTimeout('timeoutHeartBeat', 2);
     }
 
+    /**
+     * Gets the livings's age since it was created as an object in a string
+     *
+     * Returns the livings's age in a format like "6 hours and 14 minutes".
+     *
+     * @return  string  livings's age
+     * @see     DpUser::getInactive(), DpUser::isInactive(), DpUser::getStatus()
+     */
     function getSessionAge()
     {
         return get_age2string(time() - $this->creationTime);
@@ -408,7 +440,7 @@ class DpLiving extends DpObject
 
         if ($ob) {
             $description = $ob->getAppearance(0, TRUE, NULL, $this->displayMode,
-                FALSE, 'dpobinv');
+                FALSE, 'dpexamine');
         }
 
         $this->tell("<window>$description</window>");
@@ -441,7 +473,7 @@ class DpLiving extends DpObject
                 if (!isset($ob->isLiving) || TRUE !== $ob->isLiving) {
                     $result = $ob->moveDpObject($this);
                     $picked_up = TRUE;
-                    if (FALSE !== $result) {
+                    if (TRUE !== $result) {
                         if (E_MOVEOBJECT_HEAVY === $result) {
                             $this->tell(dptext("You can't carry more weight, drop something first.<br />"));
                         }
@@ -486,7 +518,7 @@ class DpLiving extends DpObject
             $title_indefinite = $ob->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE);
         }
 
-        if (FALSE !== $result) {
+        if (TRUE !== $result) {
             if (E_MOVEOBJECT_HEAVY === $result) {
                 $this->tell(ucfirst(
                     dptext("You can't carry more weight, drop something first.<br />")));
@@ -556,10 +588,10 @@ class DpLiving extends DpObject
 
         if ($ob->isHeap && preg_match("/^(\d+) /", $noun, $matches)
                 && $matches[1] > 0 && $matches[1] < $ob->amount) {
-            $result = $ob->moveDpObject($env, FALSE, $matches[1]);
+            $ob->moveDpObject($env, FALSE, $matches[1]);
             $title_definite = $title_indefinite = $noun;
         } else {
-            $result = $ob->moveDpObject($env);
+            $ob->moveDpObject($env);
             $title_definite = $ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE);
             $title_indefinite = $ob->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE);
         }
@@ -588,7 +620,7 @@ class DpLiving extends DpObject
         $carrying_str = dptext('You are carrying:');
         $inventory = str_replace($carrying_str, "<b>$carrying_str</b>",
             $inventory);
-        $this->tell("<window>$inventory</window>");
+        $this->tell("<window name=\"inventory\">$inventory</window>");
         return TRUE;
     }
 
@@ -614,6 +646,19 @@ class DpLiving extends DpObject
         return TRUE;
     }
 
+    function getEmotionsMenu($verb, &$defined_by, &$target, &$performer)
+    {
+        //echo "$verb: THIS: {$this->title} DEFINED: {$defined_by->title}; TARGET: " . $target->title . "; PERFORMER: " . $performer->title . "\n";
+        return $defined_by === $performer
+            ? array(dptext('more chat'), dptext('emotions'), $verb)
+            : array(dptext('emotions'), $verb);
+    }
+
+    function getTellOperant($verb, &$defined_by, &$target, &$performer)
+    {
+        return $defined_by->title;
+    }
+
     /**
      * Completes the give action performed by clicking on an object
      *
@@ -628,20 +673,35 @@ class DpLiving extends DpObject
      */
     function getActionOperantMenu($verb, &$menuobj)
     {
+        $user = get_current_dpuser();
+
         if ($verb === dptext('give')) {
-            $rval = sprintf(dptext('give %s to '),
-                strtolower($menuobj->getTitle()));
+            $ob_title = strtolower($menuobj->getTitle());
+            $rval = dptext('give %s to %s');
             if (FALSE !== ($env = $this->getEnvironment())) {
                 $menu = array();
                 $inv = $env->getInventory();
                 foreach ($inv as &$ob) {
-                    if ($ob->isLiving && $ob !== get_current_dpuser()) {
-                        $menu[$title = strtolower($ob->getTitle())] = $rval
-                            . $title;
+                    if ($ob->isLiving && $ob !== $user) {
+                        $to_title = strtolower($ob->getTitle());
+                        $menu[$to_title] = sprintf($rval, $ob_title, $to_title);
                     }
                 }
             }
-            return !count($menu) ? $rval : $menu;
+            return !count($menu) ? FALSE : $menu;
+        } elseif ($verb === dptext('tell')) {
+            $rval = dptext('tell %s');
+            $users = get_current_dpuniverse()->getUsers();
+            if (sizeof($users)) {
+                $menu = array();
+                foreach ($users as &$u) {
+                    if ($u !== $user) {
+                        $to_title = strtolower($u->getTitle());
+                        $menu[$to_title] = sprintf($rval, $to_title);
+                    }
+                }
+            }
+            return !count($menu) ? FALSE : $menu;
         }
         return FALSE;
     }
@@ -655,6 +715,15 @@ class DpLiving extends DpObject
                     return DP_ACTION_AUTHORIZED_ALL;
                 }
             }
+        }
+
+        return DP_ACTION_AUTHORIZED_DISABLED;
+    }
+
+    function getMenuTellAuth()
+    {
+        if (1 < get_current_dpuniverse()->getNrOfUsers()) {
+            return DP_ACTION_AUTHORIZED_ALL;
         }
 
         return DP_ACTION_AUTHORIZED_DISABLED;
@@ -725,7 +794,7 @@ class DpLiving extends DpObject
     }
 
     /**
-     * Makes this living object tell something to another living object
+     * Makes this living object tell something to another user object
      *
      * @param   string  $verb       the action, "tell"
      * @param   string  $noun       who and what to tell, could be empty
@@ -737,7 +806,7 @@ class DpLiving extends DpObject
             return FALSE;
         }
 
-        if (FALSE === ($pos = strpos($noun, ' ')) || $pos > strlen($noun) - 1) {
+        if (FALSE === ($pos = strpos($noun, ' '))) {
             $this->Tell(dptext('Tell who what?<br />'));
             return TRUE;
         }
@@ -765,7 +834,7 @@ class DpLiving extends DpObject
      */
     function actionShout($verb, $noun)
     {
-        if (empty($noun)) {
+        if (is_null($noun)) {
             return FALSE;
         }
 
@@ -872,12 +941,12 @@ class DpLiving extends DpObject
             dptext('You jump up and down cheering on %s.<br />'),
             $dest_ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
         $env->tell(ucfirst(sprintf(
-            dptext('%s jump up and down cheering on %s.<br />'),
+            dptext('%s jumps up and down cheering on %s.<br />'),
             $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
             $dest_ob->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))),
             $this, $dest_ob);
         $dest_ob->tell(ucfirst(sprintf(
-            dptext('%s jump up and down cheering you on.<br />'),
+            dptext('%s jumps up and down cheering you on.<br />'),
             $this->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE))));
 
         return TRUE;

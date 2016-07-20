@@ -117,20 +117,20 @@ ROADMAP
 
     A few of the things on the wish list:
 
-    The interface is still crude and must be made more user friendly. The verb
-    noun commands should only remain for power users and under the hood, input
-    fields for communications should pop up or whatever.
+    Drag & drop to take, drop and give items.
+
+    Improve free movement system, which is currently in test phase.
 
     Debugging and making DutchPIPE more secure.
 
-    Movable or even animated objects.
+    Animated objects.
 
     Debugging and enhancements on running DutchPIPE on .html pages. Making it
     possible to run DutchPIPE on pages on another server. For this we need a
     proxy script to forward AJAX requests as AJAX cannot be used across domains
     for security reasons.
 
-    Make options to let visitors make their own objects and "area".
+    Options to let visitors make their own objects and "area".
 
     Distributed DutchPIPE: Make it possible for DutchPIPE sites to see,
     communicate and switch to other DutchPIPE sites, making it one big,
@@ -140,6 +140,10 @@ ROADMAP
     basic now, and lots of functionality will be added.
 
     More showcases.
+
+    For all open tickets see:
+
+    http://dev.dutchpipe.org/trac/report/3
 
 CONTRIBUTING
 

@@ -2,7 +2,7 @@
 /**
  * A small note that users can read
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: note.php 243 2007-07-08 16:26:23Z ls $
+ * @version    Subversion: $Id: note.php 252 2007-08-02 23:30:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -49,8 +49,10 @@ final class Note extends DpObject
         $this->titleImg = DPUNIVERSE_IMAGE_URL . 'smallnote.gif';
         $this->addId(explode('#',
             dptext('note#paper note#small note#small paper note#small, paper note#a small note')));
-        $this->body =
-            dptext('This is a small paper note. You can read it.<br />');
+        $this->body = '<img src="' . DPUNIVERSE_IMAGE_URL
+            . 'smallnote_body.gif" width="35" height="46" border="0" alt="" '
+            . 'align="left" style="margin-right: 15px" /><br />'
+            . dptext('This is a small paper note. You can read it.<br />');
 
         $this->value = 0.99;
 

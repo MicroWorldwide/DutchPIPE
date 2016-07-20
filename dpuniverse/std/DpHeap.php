@@ -4,7 +4,7 @@
  *
  * When instances of these objects get the same environment, they will merge.
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -16,7 +16,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpHeap.php 243 2007-07-08 16:26:23Z ls $
+ * @version    Subversion: $Id: DpHeap.php 252 2007-08-02 23:30:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -128,7 +128,7 @@ class DpHeap extends DpObject
      *
      * @param   mixed   &$target_ob path or object to move into to
      * @param   boolean $simple     skip some checks
-     * @return  int     FALSE for success, an error code for failure
+     * @return  int     TRUE for success, an error code for failure
      */
     function moveDpObject(&$target_ob, $simple = FALSE, $heap_amount = FALSE)
     {
@@ -151,7 +151,7 @@ class DpHeap extends DpObject
                     $ob->amount += $heap_amount;
                     $this->amount -= $heap_amount;
                 }
-                return FALSE;
+                return TRUE;
             }
         }
 
@@ -164,7 +164,7 @@ class DpHeap extends DpObject
         $newheap->amount = $heap_amount;
         $newheap_move_result = $newheap->moveDpObject($target_ob, $simple);
 
-        if (FALSE !== $newheap_move_result) {
+        if (TRUE !== $newheap_move_result) {
             $newheap->removeDpObject();
         } else {
             $this->amount -= $heap_amount;
@@ -221,9 +221,8 @@ class DpHeap extends DpObject
                 'graphical' => '<changeDpElement id="'
                 . $this->getUniqueId() . '">'
                 . $this->getAppearance(1, FALSE, $this, 'graphical')
-                . '</changeDpElement>'), $this);
+                . '</changeDpElement>'));
         }
-
         return TRUE;
     }
 }

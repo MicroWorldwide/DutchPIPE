@@ -2,7 +2,7 @@
 /**
  * A user object, the object representing a real user
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpUser.php 243 2007-07-08 16:26:23Z ls $
+ * @version    Subversion: $Id: DpUser.php 254 2007-08-03 12:48:24Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpLiving
  */
@@ -57,6 +57,9 @@ inherit(DPUNIVERSE_INCLUDE_PATH . 'title_types.php');
  * - integer <b>avatarNr</b> - Avatar image number
  * - mixed <b>status</b> - FALSE for no special status, otherwise a descriptive
  *   string, 'away'
+ * - string <b>inputMode</b> - Input field mode, "say" or "cmd"
+ * - string <b>inputEnabled</b> - Is input field visibile? Either "on" or "off"
+ * - string <b>inputPersistent</b> - Input field options
  *
  * @package    DutchPIPE
  * @subpackage dpuniverse_std
@@ -120,10 +123,25 @@ class DpUser extends DpLiving
      */
     private $mEventCount = 0;
 
+    /**
+     * Status of last connection, for example 'busy', used to detect change
+     *
+     * @var         string
+     */
     private $mLastStatus = FALSE;
 
+    /**
+     * Events this user will be alerted of, such as people entering the site
+     *
+     * @var         array
+     */
     public $mAlertEvents = array();
 
+    /**
+     * History of input field actions, can be accesed by up and down arrow keys
+     *
+     * @var         array
+     */
     public $mActionHistory = array();
 
     /**
@@ -141,6 +159,9 @@ class DpUser extends DpLiving
         $this->age = new_dp_property(0, FALSE);
         $this->inactive = new_dp_property(FALSE, FALSE, 'getInactive');
         $this->isInactive = new_dp_property(FALSE, FALSE, 'isInactive');
+        $this->inputMode = 'say';
+        $this->inputEnabled = new_dp_property('off');
+        $this->inputPersistent = new_dp_property('page');
 
         $avatar_nr = $this->_getRandAvatarNr();
         $this->avatarNr = new_dp_property($avatar_nr);
@@ -154,15 +175,20 @@ class DpUser extends DpLiving
 
         /* Actions for everybody */
         $this->addAction(dptext("who's here?"), dptext('who'), 'actionWho', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('tools'), dptext('settings')), explode('#', dptext('settings#config')), 'actionSettings', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('tools'), dptext('source')), dptext('source'), 'actionSource', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('tools'), dptext('page links')), dptext('links'), 'actionLinks', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('tools'), dptext('avatar & other settings')), explode('#', dptext('settings#config')), 'actionSettings', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('tools'), dptext('my home')), dptext('myhome'), 'actionMyhome', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_REGISTERED, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('tools'), dptext('set my home')), dptext('myhome set'), 'actionMyhome', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_REGISTERED, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('tools'), dptext('login/register')), dptext('login'), 'actionLoginOut', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_GUEST, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('tools'), dptext('logout')), dptext('logout'), 'actionLoginOut', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_REGISTERED, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('tools'), dptext('advanced'), array($this, 'getModeChecked')), dptext('mode'), 'actionMode', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('tools'), dptext('advanced'), dptext('show page links')), dptext('links'), 'actionLinks', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('tools'), dptext('advanced'), dptext('show source')), dptext('source'), 'actionSource', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
 
         /* Actions for admin only */
-        $this->addAction(array(dptext('admin'), dptext('goto...')), dptext('goto'), 'actionGoto', '/page/.php', DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('admin'), dptext('goto...')), dptext('goto'), 'actionGoto', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
         $this->addAction(array(dptext('admin'), dptext('reset')), dptext('reset'), 'actionReset', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
         $this->addAction(array(dptext('admin'), dptext('svars')), dptext('svars'), 'actionSvars', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF | DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dptext('admin'), dptext('force...')), dptext('force'), 'actionForce', DP_ACTION_OPERANT_COMPLETE, DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dptext('admin'), dptext('force...')), dptext('force'), 'actionForce', array($this, 'actionMoveOperant'), DP_ACTION_TARGET_LIVING, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
         $this->addAction(array(dptext('admin'), dptext('move...')), dptext('move'), 'actionMove', array($this, 'actionMoveOperant'), DP_ACTION_TARGET_SELF | DP_ACTION_TARGET_LIVING | DP_ACTION_TARGET_OBJINV | DP_ACTION_TARGET_OBJENV, DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_SELF);
 
         /* Last action in menu */
@@ -188,6 +214,14 @@ class DpUser extends DpLiving
         return (mt_rand(51, 50 + $entries) - 50);
     }
 
+    /**
+     * Gets the user's age in a string
+     *
+     * Returns the user's age in a format like "1 day, 6 hours and 14 minutes".
+     *
+     * @return  string  user's age
+     * @see     getInactive, isInactive, getStatus, DpLiving::getSessionAge()
+     */
     protected function getAge()
     {
         if (!$this->isRegistered) {
@@ -195,7 +229,8 @@ class DpUser extends DpLiving
         }
 
         $result = mysql_query("SELECT userAge FROM Users WHERE "
-            . "userUsernameLower='" . strtolower($this->getTitle()) . "'");
+            . "userUsernameLower='" . addslashes(strtolower($this->getTitle()))
+             . "'");
 
         $age = !$result || !mysql_num_rows($result)
             ? 0 : mysql_result($result, 0, 0);
@@ -204,6 +239,15 @@ class DpUser extends DpLiving
 
     }
 
+    /**
+     * Gets inactive time of the user in a string
+     *
+     * Returns how long the user is inactive in a format like "2 hours and 14
+     * minutes".
+     *
+     * @return  string  user's inactivity
+     * @see     getAge, isInactive, getStatus, DpLiving::getSessionAge()
+     */
     function getInactive()
     {
         $inactive_time = time() - (!isset($this->lastActionTime)
@@ -216,6 +260,15 @@ class DpUser extends DpLiving
         return get_age2string($inactive_time);
     }
 
+    /**
+     * Is this user inactive?
+     *
+     * Inactive is defined as a user who hasn't shown activity in the last 5
+     * minutes.
+     *
+     * @return  status  TRUE if the user is inactive, FALSE if active
+     * @see     getAge, getInactive, getStatus, DpLiving::getSessionAge()
+     */
     function isInactive()
     {
         $inactive_time = time() - (!isset($this->lastActionTime)
@@ -224,6 +277,16 @@ class DpUser extends DpLiving
         return $inactive_time >= 300;
     }
 
+    /**
+     * Gets a descriptive user status string
+     *
+     * If the user has a special status like inactive, returns a string like
+     * "away", to use in user titles and such. If there is no special status,
+     * returns an empty string.
+     *
+     * @return  string  status description
+     * @see     getAge, getInactive, isInactive, DpLiving::getSessionAge()
+     */
     function getStatus()
     {
         if ($this->isInactive) {
@@ -374,10 +437,12 @@ class DpUser extends DpLiving
             if ($mtype_start !== '') {
                 $data = "<$mtype_start>$data</$mtype_end>";
             }
+            /*
             if ($data !== '1') {
                 echo sprintf(dptext("Telling %s: %s\n"), $this->getTitle(),
-                    (strlen($data) > 256 ? substr($data, 0, 256) : $data));
+                    (strlen($data) > 236 ? substr($data, 0, 236) : $data));
             }
+            */
             if ($mtype_end === '' || $mtype_end === 'header'
                     || $mtype_end === 'cookie' || $mtype_end === 'location') {
                 $universe->tellCurrentDpUserRequest($data);
@@ -389,6 +454,15 @@ class DpUser extends DpLiving
         }
     }
 
+    /**
+     * Reports an event
+     *
+     * Called when certain events occur, given with $name.
+     *
+     * @param      object    $name       Name of event
+     * @param      mixed     $args       One or more arguments, depends on event
+     * @since      DutchPIPE 0.2.0
+     */
     function eventDpLiving($name)
     {
         if (EVENT_DESTROYING_OBJ !== $name || !isset($this->isRegistered)
@@ -397,17 +471,26 @@ class DpUser extends DpLiving
         }
 
         $result = mysql_query("SELECT userAge FROM Users WHERE "
-            . "userUsernameLower='" . strtolower($this->getTitle()) . "'");
+            . "userUsernameLower='" . addslashes(strtolower($this->getTitle()))
+            . "'");
 
         $age = !$result || !mysql_num_rows($result)
             ? 0 : mysql_result($result, 0, 0);
 
         $new_age = $age + (time() - $this->creationTime);
         mysql_query($query = "UPDATE Users set userAge='{$new_age}' WHERE "
-            . "userUsernameLower='" . strtolower($this->getTitle()) . "'");
+            . "userUsernameLower='" . addslashes(strtolower($this->getTitle()))
+            . "'");
     }
 
-    function isDraggable($by_who)
+    /**
+     * Experimental, ignore.
+     *
+     * @access     private
+     * @since      DutchPIPE 0.2.0
+     */
+
+    function isDraggable(&$by_who)
     {
         if ($by_who === $this) {
             return TRUE;
@@ -416,20 +499,40 @@ class DpUser extends DpLiving
         return DpLiving::isDraggable($by_who);
     }
 
+    /**
+     * Tries to perform the action given by the user object
+     *
+     * Handles input area input mode and history. Uses DpLiving::performAction()
+     * for the real stuff. See DpLiving::performAction() for more information.
+     *
+     * @param   string  $action     the action given by the user object
+     * @return  boolean TRUE for success, FALSE for unsuccessful action
+     * @see     DpLiving::performAction()
+     */
     final public function performAction($action)
     {
-        $action = trim($action);
+        $action = $orig_action = trim($action);
+        if (!isset($this->_GET['menuaction']) && 'say' === $this->inputMode
+                && strlen($action)) {
+            if (strlen($action) && '/' === substr($action, 0, 1)) {
+                $action = $orig_action = substr($action, 1);
+            } else {
+                $action = sprintf(dptext('say %s'), $action);
+            }
+        }
+        $rval = DpLiving::performAction($action);
+
         if ('' !== $action && isset($this->_GET['cmdline'])
              && (!($sz = count($this->mActionHistory))
              || $this->mActionHistory[$sz - 1] !== $action)) {
-            $this->mActionHistory[] = $action;
+            $this->mActionHistory[] = $orig_action;
             if (count($this->mActionHistory) > 20) {
                 array_shift($this->mActionHistory);
             }
         }
-        return DpLiving::performAction($action);
-    }
 
+        return $rval;
+    }
 
     /**
      * Shows this living object a window with help information
@@ -440,23 +543,10 @@ class DpUser extends DpLiving
      */
     function actionHelp($verb, $noun)
     {
-        $this->tell("<window><div id=\"helptext\">"
-            . dptext("<b>Standard commands:</b><br />
-Avatar and display settings: <tt>settings, config</tt><br />
-Examine stuff: <tt>examine <i>item</i>, look at <i>item</i></tt><br />
-Pick up stuff: <tt>take <i>item</i>, take all, get <i>item</i>, get all</tt><br />
-What am I carrying?: <tt>inventory, inv, i</tt><br />
-Drop stuff: <tt>drop <i>item</i>, drop all</tt><br />
-Give stuff to others: <tt>give <i>item</i> to <i>user</i></tt><br />
-Say something to users on this page: <tt>say <i>what</i>, '<i>what</i></tt><br />
-Tell to another user anywhere: <tt>tell <i>user</i> <i>what</i>, \"<i>user</i> <i>what</i></tt><br />
-Shout something to all users on the site: <tt>shout <i>what</i></tt><br />
-Emotions: <tt>smile, grin, laugh, shrug, pat, emote</tt><br />
-Read something readable: <tt>read <i>item</i></tt><br />
-List of people on this site: <tt>who</tt><br />
-View source of page: <tt>source</tt><br /><br />
-<tt><i>item</i></tt> can be something like <tt>beer, cool beer</tt> or <tt>beer 3</tt> to refer to the third beer. All commands are case insensitive!<br /><br />
-Examples: <tt>say hello, tell guest#2 hello, get note, read note, give note to guest#2, drink beer 2</tt>")
+        $tmp = dp_file_get_contents(DPUNIVERSE_STD_PATH
+            . ('say' === $this->inputMode ? 'help.html' : 'commands.html'));
+
+        $this->tell("<window><div id=\"helptext\">" . $tmp
             . "<br clear=\"all\" /></div></window>");
         return TRUE;
     }
@@ -596,7 +686,7 @@ function send_settings()
         }
     }
 
-    $.ajax({
+    jQuery.ajax({
         url: "' . DPSERVER_CLIENT_URL . '",
         data: "location='
             . $this->getEnvironment()->location
@@ -604,7 +694,8 @@ function send_settings()
             + "&call_object="+escape("' . $this->getUniqueId() . '")
             + "&method=setSettings"
             + "&avatar_nr="+avatar_nr
-            + "&display_mode="+(_gel("display_mode1").checked ? _gel("display_mode1").value : _gel("display_mode2").value)
+            + "&display_mode="+(_gel("display_mode1").checked
+                ? _gel("display_mode1").value : _gel("display_mode2").value)
             + "&people_entering="+(_gel("people_entering").checked ? "1" : "0")
             + "&people_leaving="+(_gel("people_leaving").checked ? "1" : "0")
             + "&bots_entering="+(_gel("bots_entering").checked ? "1" : "0"),
@@ -632,8 +723,8 @@ function send_settings()
 . dptext('Alert me of the following events:') . '<br />
 <input type="checkbox" id="people_entering" name="people_entering" value="1"' . (isset($this->mAlertEvents['people_entering']) ? ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dptext('People entering this site') . '<br />
 <input type="checkbox" id="people_leaving" name="people_leaving" value="1"' . (isset($this->mAlertEvents['people_leaving']) ? ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dptext('People leaving this site') . '<br />
-<input type="checkbox" id="bots_entering" name="bots_entering" value="1"' . (isset($this->mAlertEvents['bots_entering']) ?  ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dptext('Search engines indexing pages') . '<br /><br />
-<div id="box"><a href="http://www.messdudes.com/" target="_blank"><b>Mess Dudes</b></a> has kindly allowed DutchPIPE to use a number of avatars.</div>
+<input type="checkbox" id="bots_entering" name="bots_entering" value="1"' . (isset($this->mAlertEvents['bots_entering']) ?  ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dptext('Search engines indexing pages') . '<br /><br />'
+. '<div id="box"><a href="http://www.messdudes.com/" target="_blank"><b>Mess Dudes</b></a> has kindly allowed DutchPIPE to use a number of avatars.</div>
 </window>');
 
         return TRUE;
@@ -690,18 +781,19 @@ function send_settings()
             unset($this->mAlertEvents['bots_entering']);
             get_current_dpuniverse()->removeAlertEvent('bots_entering', $this);
         }
+
         if ($this->isRegistered) {
             mysql_query($query = "UPDATE Users set "
                 . "userAvatarNr='" . addslashes($avatar_nr)
+                . "',userDisplayMode='" . addslashes($display_mode)
                 . "',userEventPeopleEntering='"
                 . (!isset($this->mAlertEvents['people_entering']) ? '0' : '1')
                 . "',userEventPeopleLeaving='"
                 . (!isset($this->mAlertEvents['people_leaving']) ? '0' : '1')
                 . "',userEventBotsEntering='"
                 . (!isset($this->mAlertEvents['bots_entering']) ? '0' : '1')
-                . "',userDisplayMode='" . addslashes($display_mode)
                 . "' WHERE userUsernameLower='"
-                . strtolower($this->getTitle()) . "'");
+                . addslashes(strtolower($this->getTitle())) . "'");
         }
 
         if (FALSE !== ($body = $this->getEnvironment()->
@@ -754,6 +846,13 @@ function send_settings()
         return TRUE;
     }
 
+    /**
+     * Go to a given location
+     *
+     * @param   string  $verb       the action, "goto"
+     * @param   string  $noun       the location, for example "/page/about.php"
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
     function actionGoto($verb, $noun)
     {
         if (!strlen($noun)) {
@@ -780,8 +879,21 @@ function send_settings()
                 dptext('Syntax: force <i>who what</i>.<br />'));
             return FALSE;
         }
-        $who = substr($noun, 0, $pos);
-        $what = substr($noun, $pos + 1);
+
+        $noun = str_replace('&quot;', '"', $noun);
+
+        if (substr($noun, 0, 1) == '"') {
+            $noun = trim(substr($noun, 1));
+            if (FALSE !== ($pos2 = strpos($noun, '"'))) {
+                $who = substr($noun, 0, $pos2);
+                $what = substr($noun, $pos2 + 1);
+            }
+        }
+        if (!isset($who)) {
+            $who = substr($noun, 0, $pos);
+            $what = substr($noun, $pos + 1);
+        }
+
         if (FALSE === ($who_ob = $this->isPresent($who))) {
             if (FALSE !== ($env = $this->getEnvironment())) {
                 $who_ob = $env->isPresent($who);
@@ -820,7 +932,7 @@ function send_settings()
     {
         $title = strtolower($menuobj->getTitle());
 
-        return (FALSE === strpos($title, ' ') ? $title : '&quot;' . $title . '&quot;')
+        return (FALSE === strpos($title, ' ') ? $title : '"' . $title . '"')
             . ' ';
     }
 
@@ -932,11 +1044,226 @@ function send_settings()
         return TRUE;
     }
 
-    function actionReset($verb, $noun)
+    /**
+     * Resets the environment.
+     *
+     * @return  boolean TRUE
+     */
+    function actionReset()
     {
         $this->getEnvironment()->__reset();
         $this->tell('Resetted.<br />');
         return TRUE;
+    }
+
+    /**
+     * Go to the login page, logout if logon on.
+     *
+     * @return  boolean TRUE
+     */
+    function actionLoginOut()
+    {
+        $this->tell('<location>/page/login.php'
+            . ($this->isRegistered ? '&act=logout' : '')
+            . '</location>');
+        return TRUE;
+    }
+
+    /**
+     * Moves to or sets personal home location
+     *
+     * @param   string  $verb       the action, "myhome"
+     * @param   string  $noun       empty to go home, "set" to set home
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
+    function actionMyhome($verb, $noun)
+    {
+        if (is_null($noun)) {
+            $result = mysql_query("
+                SELECT
+                    userHomeLocation,userHomeSublocation
+                FROM
+                    Users
+                WHERE
+                    userUsernameLower='"
+                    . addslashes(strtolower($this->getTitle())) . "'
+                ");
+
+            if (empty($result) || !($row = mysql_fetch_array($result))) {
+                return FALSE;
+            }
+
+            if (is_null($row[0])) {
+                $this->tell(dptext('You have no home location set. Set your home location first.<br />'));
+                return TRUE;
+            }
+
+            $this->tell('<location>' . $row[0] . (is_null($row[1]) ? ''
+                : '&sublocation=' . $row[1]) . '</location>');
+            return TRUE;
+        }
+
+        if (dptext("set") === $noun) {
+            $env = $this->getEnvironment();
+            if (!$env || !strlen($loc = $env->location)) {
+                return FALSE;
+            }
+            $subloc = $env->sublocation;
+
+            mysql_query($query = "UPDATE Users set userHomeLocation='{$loc}',"
+                . "userHomeSublocation=" . (is_null($subloc) || !strlen($subloc) ?
+                'NULL' : "'{$subloc}'") . " WHERE userUsernameLower='"
+                . addslashes(strtolower($this->getTitle())) . "'");
+            $this->tell(dptext('Your home location has been set to the current page.<br />'));
+            return TRUE;
+        }
+
+        $this->actionFailure = dptext('Syntax: myhome [set]<br />');
+        return FALSE;
+    }
+
+    /**
+     * Sets the input field mode
+     *
+     * Without an argument, switches between the two modes "cmd" and "say".
+     * Otherwise switches to the given mode (if it is valid). The input field
+     * stays visible between page changes with mode "pin".
+     *
+     * @param   string  $verb       the action, "mode"
+     * @param   string  $noun       empty or a mode
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
+    function actionMode($verb, $noun)
+    {
+        if (is_null($noun)) {
+            $this->inputMode = 'cmd' !== $this->inputMode ? 'cmd' : 'say';
+        } elseif (in_array($noun, explode('#', dptext('cmd#command')))) {
+            $this->inputMode = 'cmd';
+        } elseif (in_array($noun, explode('#', dptext('say')))) {
+            $this->inputMode = 'say';
+        } elseif (in_array($noun, explode('#', dptext('once')))) {
+            $ip = 'once';
+        } elseif (in_array($noun, explode('#', dptext('page')))) {
+            $ip = 'page';
+        } elseif (in_array($noun, explode('#', dptext('always')))) {
+            $ip = 'always';
+        } else {
+            $this->actionFailure = dptext('Invalid action mode (valid modes are: say and cmd).<br />');
+            return FALSE;
+        }
+
+        if (isset($ip)) {
+            $this->inputPersistent = $ip;
+            if ($this->isRegistered) {
+                mysql_query($query = "UPDATE Users set "
+                    . "userInputPersistent='{$ip}' WHERE userUsernameLower='"
+                    . addslashes(strtolower($this->getTitle())) . "'");
+            }
+            return TRUE;
+        }
+
+        if ($this->isRegistered) {
+            mysql_query("UPDATE Users set userInputMode='{$this->inputMode}' "
+                . "WHERE userUsernameLower='"
+                . addslashes(strtolower($this->getTitle())) . "'");
+        }
+        $this->tell('cmd' === $this->inputMode
+            ? dptext('The input field is now in command mode. Enter <tt>help</tt> for more information.<br />')
+            : dptext('The input field is now in page chat mode. Enter <tt>/help</tt> for more information.<br />'));
+        return TRUE;
+    }
+
+    function getModeChecked()
+    {
+        return ('cmd' !== $this->inputMode ? '' : '<img src="'
+            . DPUNIVERSE_IMAGE_URL . 'checked.gif" width="7" '
+            . 'height="7" border="0" alt="" title="" />#'
+            . DPUNIVERSE_IMAGE_URL . 'checked_over.gif#')
+            . dptext('command mode');
+    }
+
+    /**
+     * Makes this user object tell something to another user object
+     *
+     * @param   string  $verb       the action, "tell"
+     * @param   string  $noun       who and what to tell, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
+    function actionTell($verb, $noun)
+    {
+        if (FALSE === ($pos = strpos($noun, ' '))) {
+            $this->tell('<script>
+setTimeout("bind_input(); _gel(\'dptell\').focus();", 50);
+</script>');
+            $this->tell('<window styleclass="dpwindow_tell">
+<b>' . sprintf(dptext('Private message to %s:'), $noun) . '</b><br /><br />
+<form onSubmit="send_action2server(\''
+                . addslashes($verb) . ' ' . addslashes($noun)
+                . ' \' + jQuery(\'#dptell\').val()); close_dpwindow(); '
+                . 'return false">
+<input id="dptell" type="text" value="" size="50" maxlength="255"
+class="dpcomm" /> <input type="submit" value=" &gt; " /></form>
+</window>');
+            return TRUE;
+        }
+
+        return DpLiving::actionTell($verb, $noun);
+    }
+
+    /**
+     * Makes this user object shout something to everyone on the site
+     *
+     * @param   string  $verb       the action, "shout"
+     * @param   string  $noun       what to shout, could be empty
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
+    function actionShout($verb, $noun)
+    {
+        if (is_null($noun)) {
+            $this->tell('<script>
+setTimeout("bind_input(); _gel(\'dpshout\').focus();", 50);
+</script>');
+            $this->tell('<window styleclass="dpwindow_shout">
+<b>' . dptext('Message to everybody on this site:') . '</b><br /><br />
+<form onSubmit="send_action2server(\''
+                . addslashes($verb)
+                . ' \' + jQuery(\'#dpshout\').val()); close_dpwindow(); '
+                . 'return false">
+<input id="dpshout" type="text" value="" size="50" maxlength="255"
+class="dpcomm" /> <input type="submit" value=" &gt; " /></form>
+</window>');
+            return TRUE;
+        }
+
+        return DpLiving::actionShout($verb, $noun);
+    }
+
+    /**
+     * Makes this living object communicate a custom message to its environment
+     *
+     * @param   string  $verb       the action, "emote"
+     * @param   string  $noun       string to "emote"
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     */
+    function actionEmote($verb, $noun)
+    {
+        if (is_null($noun)) {
+            $this->tell('<script>
+setTimeout("bind_input(); _gel(\'dpemote\').focus();", 50);
+</script>');
+            $this->tell('<window styleclass="dpwindow_emote">
+<b>' . dptext('Emotion to everybody on this page:') . '</b><br /><br />'
+                . $this->title . ' <form onSubmit="send_action2server(\''
+                . addslashes($verb)
+                . ' \' + jQuery(\'#dpemote\').val()); close_dpwindow(); '
+                . 'return false">
+<input id="dpemote" type="text" value="" size="50" maxlength="255"
+class="dpemote" /> <input type="submit" value=" &gt; " /></form>
+</window>');
+            return TRUE;
+        }
+
+        return DpLiving::actionEmote($verb, $noun);
     }
 }
 ?>

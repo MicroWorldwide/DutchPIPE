@@ -2,7 +2,7 @@
 /**
  * A Small Shop
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: shop.php 243 2007-07-08 16:26:23Z ls $
+ * @version    Subversion: $Id: shop.php 252 2007-08-02 23:30:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -55,8 +55,11 @@ align="left" />
             . sprintf(dptext('<p align="justify">You are in a small pawn shop
 where you can buy and sell things. Try this
 <a href="javascript:send_action2server(\'list\')">list</a> to view all items for
-sale.</p><p align="justify">An exit <a href="%s">west</a> leads back to the
-village square.</p>', DPSERVER_CLIENT_URL . '?location=/page/square.php')
+sale. Check out your
+<a href="javascript: send_action2server(\'inventory\')">inventory</a> to see
+what you can sell.</p><p align="justify">An exit <a href="%s">west</a> leads
+back to the village square.</p>',
+            DPSERVER_CLIENT_URL . '?location=/page/square.php')
             . '</div><br clear="all" />'), 'text');
         $this->setNavigationTrail(
             array(DPUNIVERSE_NAVLOGO, ''),
@@ -69,19 +72,37 @@ village square.</p>', DPSERVER_CLIENT_URL . '?location=/page/square.php')
         $this->addAction(dptext('list'), dptext('list'), 'actionList',
             DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
             DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY);
-        $this->addAction(dptext('inventory'),
-            explode('#', dptext('inventory#inv#i')), 'actionInventory',
+        $this->addAction(dptext('sell'), dptext('sell'), 'actionSell',
             DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
             DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY);
         $this->addAction(dptext('buy'), dptext('buy'), 'actionBuy',
             DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
             DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY);
-        $this->addAction(dptext('sell'), dptext('sell'), 'actionSell',
-            DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
-            DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY);
         $this->addAction(dptext('see'), dptext('see'), 'actionSee',
             DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
             DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_INVENTORY);
+
+        $store = get_current_dpuniverse()->getDpObject(DPUNIVERSE_PAGE_PATH
+            . 'store.php');
+        $store->addAction(dptext('buy'), dptext('buy'), 'actionBuy',
+            DP_ACTION_OPERANT_MENU, array($store, DP_ACTION_TARGET_OBJINV),
+            DP_ACTION_AUTHORIZED_ALL, array($this, DP_ACTION_SCOPE_INVENTORY));
+        $store->addAction(dptext('see'), dptext('see'), 'actionSee',
+            DP_ACTION_OPERANT_MENU, array($store, DP_ACTION_TARGET_OBJINV),
+            DP_ACTION_AUTHORIZED_ALL, array($this, DP_ACTION_SCOPE_INVENTORY));
+    }
+
+    function eventDpPage($name)
+    {
+        if (EVENT_ENTERED_INV == $name) {
+            $who = func_get_arg(1);
+            $who->addAction(dptext('sell'), dptext('sell'), 'actionSell',
+                DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_OBJINV,
+                DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        } elseif (EVENT_LEFT_INV == $name) {
+            $who = func_get_arg(1);
+            $who->removeAction('sell');
+        }
     }
 
     /**
@@ -94,36 +115,33 @@ village square.</p>', DPSERVER_CLIENT_URL . '?location=/page/square.php')
 
     public function actionList($verb, $noun)
     {
-        $user = get_current_dpuser();
-
         $store = get_current_dpuniverse()->getDpObject(DPUNIVERSE_PAGE_PATH
             . 'store.php');
 
-        $inventory = $store->getStoreList($user->displayMode, 'dpobinv');
+        $inventory = $store->getAppearance(0, TRUE, NULL,
+            get_current_dpobject()->displayMode, -1, 'dpobinv');
 
         $title = dptext('The shop has the following items for sale:');
-        $this->tell("<window>$title$inventory</window>");
+        get_current_dpobject()->tell(
+            "<window name=\"list\">$title$inventory</window>");
+
         return TRUE;
     }
 
-    /**
-     * Shows this living object a list of objects it is carrying
-     *
-     * @param   string  $verb       the action, "inventory"
-     * @param   string  $noun       empty string
-     * @return  boolean TRUE for action completed, FALSE otherwise
-     */
-    function actionInventory($verb, $noun)
+    function filterAppearance($level, &$from, $appearance, &$user)
     {
-        $user = get_current_dpuser();
+        if ($from[0]->getEnvironment() === $user && 1 === $level
+                && !$from[0]->isNoSell) {
+            $store = get_current_dpuniverse()->getDpObject(DPUNIVERSE_PAGE_PATH
+                . 'store.php');
 
-        $store = get_current_dpuniverse()->getDpObject(DPUNIVERSE_PAGE_PATH
-            . 'store.php');
+            $appearance .= '<br /><a href="javascript:send_action2server(\''
+                . sprintf(dptext('sell %s'), $from[0]->uniqueId) . '\')">'
+                . sprintf(dptext('sell for %d credits'),
+                $store->getSellValue($from[0]->value)) . '</a>';
+        }
 
-        $inventory = $store->getUserList($user, $user->displayMode, 'dpobinv');
-        $title = dptext('<b>You are carrying:</b>');
-        $user->tell("<window>$title$inventory</window>");
-        return TRUE;
+        return $appearance;
     }
 
     public function actionBuy($verb, $noun)
@@ -149,7 +167,7 @@ village square.</p>', DPSERVER_CLIENT_URL . '?location=/page/square.php')
             return TRUE;
         }
 
-        if (FALSE !== ($move_result = $item->moveDpObject($user))) {
+        if (TRUE !== ($move_result = $item->moveDpObject($user))) {
             switch ($move_result) {
             case E_MOVEOBJECT_HEAVY:
                 $err = sprintf(
@@ -179,6 +197,10 @@ village square.</p>', DPSERVER_CLIENT_URL . '?location=/page/square.php')
                 $user->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE),
                 $item->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE)), $user);
         }
+        $user->tell('<refreshDpWindow name="list" action="' . dptext('list')
+            . '">&nbsp;</refreshDpWindow>');
+        $user->tell('<refreshDpWindow name="inventory" action="'
+            . dptext('inventory') . '">&nbsp;</refreshDpWindow>');
         return TRUE;
     }
 
@@ -209,7 +231,7 @@ village square.</p>', DPSERVER_CLIENT_URL . '?location=/page/square.php')
         if ($item->isNoStore) {
             $item->removeDpObject();
         } elseif ($item->isNoSell
-                || FALSE !== ($move_result = $item->moveDpObject($store))) {
+                || TRUE !== ($move_result = $item->moveDpObject($store))) {
             $user->tell(sprintf(dptext("%s cannot be sold.<br />"),
                 $item->getTitle(DPUNIVERSE_TITLE_TYPE_DEFINITE)));
             return TRUE;

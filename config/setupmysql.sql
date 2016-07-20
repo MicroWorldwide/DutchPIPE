@@ -2,7 +2,7 @@
 #
 # Import this file into MySQL when first installing DutchPIPE.
 #
-# DutchPIPE version 0.2; PHP version 5
+# DutchPIPE version 0.3; PHP version 5
 #
 # LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
 # If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -12,9 +12,9 @@
 # @package    DutchPIPE
 # @subpackage config
 # @author     Lennert Stock <ls@dutchpipe.org>
-# @copyright  2006 Lennert Stock
+# @copyright  2006, 2007 Lennert Stock
 # @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
-# @version    Subversion: $Id: setupmysql.sql 238 2007-07-08 15:40:07Z ls $
+# @version    Subversion: $Id: setupmysql.sql 252 2007-08-02 23:30:58Z ls $
 # @link       http://dutchpipe.org/manual/package/DutchPIPE
 
 CREATE DATABASE IF NOT EXISTS `dutchpipe`;
@@ -34,6 +34,11 @@ CREATE TABLE `Users` (
   `userEventPeopleLeaving` enum('0','1') NOT NULL default '0',
   `userEventPeopleEntering` enum('0','1') NOT NULL default '0',
   `userEventBotsEntering` enum('0','1') NOT NULL default '0',
+  `userHomeLocation` varchar(128) default NULL,
+  `userHomeSublocation` varchar(128) default NULL,
+  `userInputMode` enum('say','cmd') default 'say',
+  `userInputEnabled` enum('off', 'on') default 'off',
+  `userInputPersistent` enum('once','page','always') NOT NULL default 'page',
   PRIMARY KEY  (`userId`),
   KEY `userCookieId` (`userCookieId`,`userCookiePassword`)
 );

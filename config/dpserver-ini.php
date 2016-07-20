@@ -8,7 +8,7 @@
  * and the user's browser. See {@link dpuniverse-ini.php} for settings dealing
  * with the "universe".
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -20,9 +20,8 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpserver-ini.php 238 2007-07-08 15:40:07Z ls $
+ * @version    Subversion: $Id: dpserver-ini.php 252 2007-08-02 23:30:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
- * @tutorial   DutchPIPE/DutchPIPE.pkg
  * @see        dpserver.php, dpclient.php, dpuniverse-ini.php
  */
 
@@ -209,7 +208,7 @@ define('DPSERVER_DPUNIVERSECLASS_PATH', DPSERVER_LIB_PATH . 'dpuniverse.php');
  *
  * Leave this untouched if the DutchPIPE directory structure wasn't changed.
  *
- * @see        DPSERVER_TEMPLATE_FILE
+ * @see        DPSERVER_TEMPLATE_FILE, DPSERVER_TEMPLATE_DOWN_FILE
  */
 define('DPSERVER_TEMPLATE_PATH', DPSERVER_ROOT_PATH . 'template/');
 
@@ -218,10 +217,18 @@ if (!defined('DPSERVER_TEMPLATE_FILE')) {
      * Filename of the default template in the {@link DPSERVER_TEMPLATE_PATH}
      * directory
      *
-     * @see        DPSERVER_TEMPLATE_PATH
+     * @see        DPSERVER_TEMPLATE_PATH, DPSERVER_TEMPLATE_DOWN_FILE
      */
     define('DPSERVER_TEMPLATE_FILE', 'dpdefault.tpl');
 }
+
+/**
+ * Filename of the template in the {@link DPSERVER_TEMPLATE_PATH}
+ * directory used when the DutchPIPE server is down.
+ *
+ * @see        DPSERVER_TEMPLATE_PATH, DPSERVER_TEMPLATE_FILE
+ */
+define('DPSERVER_TEMPLATE_DOWN_FILE', 'dpdown.tpl');
 
 /**
  * Enable internationalization/localization support with dynamic gettext?

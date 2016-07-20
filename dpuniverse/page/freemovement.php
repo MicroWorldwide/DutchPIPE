@@ -2,7 +2,7 @@
 /**
  * The Free Movement Demo page
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: freemovement.php 243 2007-07-08 16:26:23Z ls $
+ * @version    Subversion: $Id: freemovement.php 252 2007-08-02 23:30:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -47,7 +47,7 @@ final class Freemovement extends DpPage
     {
         // This page has it's own template, but this is not necessary for
         // draggable objects:
-        $this->templateFile = DPSERVER_TEMPLATE_PATH . 'freemovement.tpl';
+        $this->template = DPSERVER_TEMPLATE_PATH . 'freemovement.tpl';
 
         // Set moving area to 1 or 2 for draggable objects.
         // 1: Only draggable within inventory area; 2: Dragganle on entire page.

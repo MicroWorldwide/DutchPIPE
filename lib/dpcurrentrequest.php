@@ -2,7 +2,7 @@
 /**
  * Handles the current HTTP page or AJAX request by the user
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,10 +14,15 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpcurrentrequest.php 243 2007-07-08 16:26:23Z ls $
+ * @version    Subversion: $Id: dpcurrentrequest.php 252 2007-08-02 23:30:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php
  */
+
+/**
+ * Common functions for templates available to universe objects and dpclient.php
+ */
+require_once(DPUNIVERSE_LIB_PATH . 'dptemplates.php');
 
 /**
  * Handles the current HTTP page or AJAX request by the user
@@ -122,6 +127,24 @@ class DpCurrentRequest
     private $mUserAlertEvents = FALSE;
 
     /**
+     * @var         string     Input area mode, "say" or "cmd"
+     * @access      private
+     */
+    private $mUserInputMode = FALSE;
+
+    /**
+     * @var         string     Is input field visibile? Either "on" or "off"
+     * @access      private
+     */
+    private $mUserInputEnabled = FALSE;
+
+    /**
+     * @var         string     Show input area after page changes?
+     * @access      private
+     */
+    private $mUserInputPersistent = FALSE;
+
+    /**
      * The 'cookie id' of the user client behind the current request
      *
      * We don't store the users real username and password in his cookie, but
@@ -185,13 +208,13 @@ class DpCurrentRequest
     /**
      * Sets up the object handling the current user request
      *
-     * @param   array   $rDpUniverse  Reference to the universe object
-     * @param   array   $rServerVars  User server variables
-     * @param   array   $rSessionVars User session variables
-     * @param   array   $rCookieVars  User cookie variables
-     * @param   array   $rGetVars     User get variables
-     * @param   array   $rPostVars    User post variables
-     * @param   array   $rFilesVars   User files variables
+     * @param   array   &$rDpUniverse  Reference to the universe object
+     * @param   array   &$rServerVars  User server variables
+     * @param   array   &$rSessionVars User session variables
+     * @param   array   &$rCookieVars  User cookie variables
+     * @param   array   &$rGetVars     User get variables
+     * @param   array   &$rPostVars    User post variables
+     * @param   array   &$rFilesVars   User files variables
      */
     function __construct(&$rDpUniverse, &$rServerVars, &$rSessionVars,
                          &$rCookieVars, &$rGetVars, &$rPostVars, &$rFilesVars)
@@ -261,9 +284,18 @@ class DpCurrentRequest
             return TRUE;
         }
 
+        /* This only works with tight cache expire control, otherwise you get a
+           false "no cookies" message when someone enters a cached DutchPIPE
+           page after leaving the site. Advantage: cookieless people don't get
+           an avatar.
         if (isset($this->__GET) && isset($this->__GET['ajax']) &&
                 (!isset($this->__GET['standalone']) ||
                 (isset($this->__GET['seq']) && (int)$this->__GET['seq'] > 0))) {
+         */
+
+        if (isset($this->__GET) && isset($this->__GET['ajax']) &&
+                isset($this->__GET['seq']) && (int)$this->__GET['seq'] > 0) {
+
             /*
              * There's an AJAX request coming from someone without cookies.
              * The DutchPIPE cookie should have been set in the page request
@@ -278,13 +310,16 @@ class DpCurrentRequest
          * for either a registered user (by obtaining a cookie) or a guest
          * user.
          */
-        if (FALSE === $this->_findAndInitRegisteredDpUser() &&
-                FALSE === $this->_initDpGuest()) {
+        if ((!isset($this->mCookieId) || !isset($this->mCookiePass)
+                || FALSE === $this->findAndInitRegisteredDpUser(
+                $this->mCookieId, $this->mCookiePass))
+                && FALSE === $this->_initDpGuest()) {
             return FALSE;
         }
 
         /* Create the new user object with the initialized data */
-        $this->_createDpUser();
+        $this->_newDpUser();
+
         return TRUE;
     }
 
@@ -316,7 +351,7 @@ class DpCurrentRequest
     /**
      * Initializes this request's user data for an existing user in the universe
      *
-     * @param   array   $user       information about this user in the universe
+     * @param   array   &$user      information about this user in the universe
      */
     private function _initExistingDpUser(&$user)
     {
@@ -337,16 +372,18 @@ class DpCurrentRequest
      * If cookie data was sent by the browser and it is valid data for a
      * registered user, TRUE is returned, otherwise FALSE is returned.
      *
+     * @param      string    $cookieId   'cookie id' of current user
+     * @param      string    $cookiePass 'cookie password' of the current user
      * @return  boolean TRUE for request from registered user, FALSE otherwise
      */
-    private function _findAndInitRegisteredDpUser()
+    function findAndInitRegisteredDpUser($cookieId, $cookiePass)
     {
         /*
          * A registered user. Skip Ajax database check for now, but what
          * are the security implications?
          */
 
-        if (!isset($this->mCookieId) || !isset($this->mCookiePass)) {
+        if (empty($cookieId) || empty($cookiePass)) {
             return FALSE;
         }
 
@@ -354,13 +391,14 @@ class DpCurrentRequest
             SELECT
                 userUsername,userAvatarNr,userDisplayMode,
                 userEventPeopleEntering,userEventPeopleLeaving,
-                userEventBotsEntering
+                userEventBotsEntering,userInputMode,userInputEnabled,
+                userInputPersistent
             FROM
                 Users
             WHERE
-                userCookieId='" . addslashes($this->mCookieId) . "'
+                userCookieId='" . addslashes($cookieId) . "'
             AND
-                userCookiePassword='" . addslashes($this->mCookiePass) . "'
+                userCookiePassword='" . addslashes($cookiePass) . "'
             ");
 
         if (empty($result) || !($row = mysql_fetch_array($result))) {
@@ -383,10 +421,12 @@ class DpCurrentRequest
         if (count($alert_events)) {
             $this->mUserAlertEvents = $alert_events;
         }
-
+        $this->mUserInputMode = $row[6];
+        $this->mUserInputEnabled = $row[7];
+        $this->mUserInputPersistent = $row[8];
         $this->mIsRegistered = TRUE;
 
-        return TRUE;
+        return $row;
     }
     /**
      * Initializes guest variables, sets cookie
@@ -503,11 +543,29 @@ class DpCurrentRequest
      * values set in this object. After this method was called, the user object
      * has been fully set-up, but has no environment yet.
      */
-    function _createDpUser()
+    private function _newDpUser()
     {
-        //echo "_createDpUser()\n";
         $this->mrUser = $this->mrDpUniverse->newDpObject(DPUNIVERSE_STD_PATH
             . 'DpUser.php');
+        $this->initDpUser();
+
+        $this->mrDpUniverse->addDpUser($this->mrUser, $this->mUsername,
+            $this->mCookieId, $this->mCookiePass, $this->mIsRegistered);
+        echo sprintf(dptext("User %s created\n"), $this->mUsername);
+    }
+
+    /**
+     * Creates a new user object in the universe
+     *
+     * An object to represent either a guest or a registered user in the
+     * universe is created, and added to the universe's user list. This method
+     * should only be called if the user does not exist yet in the universe,
+     * that is, the user entered the site. The user is created based on member
+     * values set in this object. After this method was called, the user object
+     * has been fully set-up, but has no environment yet.
+     */
+    function initDpUser()
+    {
         $this->mrUser->addId($this->mUsername);
         $this->mrUser->setTitle(ucfirst($this->mUsername));
 
@@ -532,6 +590,16 @@ class DpCurrentRequest
             }
         }
 
+        if (FALSE !== $this->mUserInputMode) {
+            $this->mrUser->inputMode = $this->mUserInputMode;
+        }
+        if (FALSE !== $this->mUserInputEnabled) {
+            $this->mrUser->inputEnabled = $this->mUserInputEnabled;
+        }
+        if (FALSE !== $this->mUserInputPersistent) {
+            $this->mrUser->inputPersistent = $this->mUserInputPersistent;
+        }
+
         if (FALSE !== $this->mIsKnownBot) {
             $this->mrUser->setTitleImg(DPUNIVERSE_IMAGE_URL . 'bot.gif');
             $this->mrUser->setBody('<img src="' . DPUNIVERSE_IMAGE_URL
@@ -551,11 +619,6 @@ class DpCurrentRequest
         if (FALSE === $this->mCookieId) {
             $this->mrUser->noCookies = TRUE;
         }
-
-        $this->mrDpUniverse->addDpUser($this->mrUser, $this->mUsername,
-            $this->mCookieId, $this->mCookiePass, $this->mIsRegistered);
-
-        echo sprintf(dptext("User %s created\n"), $this->mUsername);
     }
 
     /**
@@ -701,32 +764,49 @@ class DpCurrentRequest
             $arrive_msg = sprintf(dptext("%s enters the site.<br />"),
                 ucfirst($this->mrUser->getTitle(
                 DPUNIVERSE_TITLE_TYPE_DEFINITE)));
-            $admin_msg = sprintf(
-                dptext("%s enters the site from <span class=\"col2\">%s</span> using <span class=\"col2\">%s</span>.<br />"),
+            $remote_address = isset($this->__SERVER['REMOTE_ADDR'])
+                ? '<a href="http://www.ipandroid.com/mediumllmap.php?newip=' .
+                $this->__SERVER['REMOTE_ADDR'] . '" target="_blank" '
+                . 'class="col2">'
+                . gethostbyaddr($this->__SERVER['REMOTE_ADDR']) . '</a>'
+                : '<em>' . dptext('unknown remote address') . '</em>';
+            $time = strftime(dptext('%H:%M'));
+            $admin_msg = ' ' . sprintf(
+                dptext("<span class=\"col2\">%s</span> %s <span class=\"col2\">(%s)</span> enters the site from <span class=\"col2\">%s</span> using <span class=\"col2\">%s</span>.<br />"),
+                $time,
                 ucfirst($this->mrUser->getTitle(
                 DPUNIVERSE_TITLE_TYPE_DEFINITE)),
+                $remote_address,
                 (!isset($this->__SERVER['HTTP_REFERER'])
                 || !strlen($this->__SERVER['HTTP_REFERER']) ? '-'
-                : $this->__SERVER['HTTP_REFERER']),
+                : '<a href="' . $this->__SERVER['HTTP_REFERER']
+                . '" target="_blank" class="col2">'
+                . $this->__SERVER['HTTP_REFERER'] . '</a>'),
                 (!isset($this->__SERVER['HTTP_USER_AGENT'])
                 || !strlen($this->__SERVER['HTTP_USER_AGENT']) ? '-'
                 : $this->__SERVER['HTTP_USER_AGENT']));
             if (!$this->mIsKnownBot) {
-                $listeners = get_current_dpuniverse()->getAlertEvent('people_entering');
+                $listeners = get_current_dpuniverse()->getAlertEvent(
+                    'people_entering');
                 if (is_array($listeners)) {
-                    $listener_msg = sprintf(
-                        dptext("%s enters the site at %s.<br />"),
+                    $listener_msg = ' ' . sprintf(
+                        dptext("<span class=\"col2\">%s</span> %s enters the site at %s.<br />"),
+                        $time,
                         ucfirst($this->mrUser->getTitle(
                         DPUNIVERSE_TITLE_TYPE_DEFINITE)),
                         $this->mrEnvironment->title);
-                    $listener_admin_msg = sprintf(
-                        dptext("%s enters the site at %s from <span class=\"col2\">%s</span> using <span class=\"col2\">%s</span>.<br />"),
+                    $listener_admin_msg = ' ' . sprintf(
+                        dptext("<span class=\"col2\">%s</span> %s <span class=\"col2\">(%s)</span> enters the site at %s from <span class=\"col2\">%s</span> using <span class=\"col2\">%s</span>.<br />"),
+                        $time,
                         ucfirst($this->mrUser->getTitle(
                         DPUNIVERSE_TITLE_TYPE_DEFINITE)),
+                        $remote_address,
                         $this->mrEnvironment->title,
                         (!isset($this->__SERVER['HTTP_REFERER'])
                         || !strlen($this->__SERVER['HTTP_REFERER']) ? '-'
-                        : $this->__SERVER['HTTP_REFERER']),
+                        : '<a href="' . $this->__SERVER['HTTP_REFERER']
+                        . '" target="_blank" class="col2">'
+                        . $this->__SERVER['HTTP_REFERER'] . '</a>'),
                         (!isset($this->__SERVER['HTTP_USER_AGENT'])
                         || !strlen($this->__SERVER['HTTP_USER_AGENT']) ? '-'
                         : $this->__SERVER['HTTP_USER_AGENT']));
@@ -744,16 +824,25 @@ class DpCurrentRequest
                 $listeners = get_current_dpuniverse()->getAlertEvent(
                     'bots_entering');
                 if (is_array($listeners)) {
-                    $listener_msg = sprintf(
-                        dptext("%s indexes %s.<br />"), ucfirst(
-                        $this->mrUser->getTitle(
+                    $listener_msg = ' ' . sprintf(
+                        dptext("<span class=\"col2\">%s</span> %s indexes %s.<br />"),
+                        $time,
+                        ucfirst($this->mrUser->getTitle(
                         DPUNIVERSE_TITLE_TYPE_DEFINITE)),
+                        $this->mrEnvironment->title);
+                    $listener_admin_msg = ' ' . sprintf(
+                        dptext("<span class=\"col2\">%s</span> %s <span class=\"col2\">(%s)</span> indexes %s.<br />"),
+                        $time,
+                        ucfirst($this->mrUser->getTitle(
+                        DPUNIVERSE_TITLE_TYPE_DEFINITE)),
+                        $remote_address,
                         $this->mrEnvironment->title);
                     foreach ($listeners as &$listener) {
                         if ($listener !== $this->mrUser
                                 && $listener->getEnvironment() !==
                                 $this->mrEnvironment) {
-                            $listener->tell($listener_msg);
+                            $listener->tell(!$listener->isAdmin ? $listener_msg
+                            : $listener_admin_msg);
                         }
                     }
                 }
@@ -786,12 +875,17 @@ class DpCurrentRequest
             ? new_dp_property(time()) : time();
 
         if (FALSE !== ($body = $this->mrEnvironment->getAppearance(0, TRUE,
-                NULL, $this->mrUser->displayMode))) {
-            if (!is_null($this->mrEnvironment->getTemplateFile())) {
-                $this->mrUser->tell('<xhtml>' . $body . '</xhtml>');
-            } else {
-                $this->mrUser->tell('<div id="dppage">' . $body . '</div>');
-            }
+            NULL, $this->mrUser->displayMode))) {
+            $template_file = is_null($this->mrEnvironment->template) ? ''
+                : ' template="' . $this->mrEnvironment->template . '"';
+
+            $this->mrUser->tell('<div id="dppage"' . $template_file . '>'
+                . $body . '</div>');
+            $this->mrUser->tell('<inputpersistent persistent="'
+                . ('once' === $this->mrUser->inputPersistent
+                || 'off' === $this->mrUser->inputEnabled
+                ? $this->mrUser->inputPersistent : 'always') . '">&nbsp;'
+                . '</inputpersistent>');
             if ($type = $this->mrEnvironment->isMovingArea) {
                 $this->mrUser->tell('<script type="text/javascript" ' .
                     'src="' . DPUNIVERSE_WWW_URL
@@ -867,16 +961,43 @@ function init_drag() {
                     $this->mrUser->displayMode));
             } elseif ($getdiv == 'dpmessagearea') {
                 $this->mrUser->tell('<div id="dpmessagearea">'
-                    . '<div id="dpmessagearea_inner"><div id="messages">'
-                    . '<br clear="all" /></div><br clear="all" />'
-                    . '<form id="actionform" method="get" onSubmit="return '
-                    . 'action_dutchpipe()"><input id="dpaction" type="text" '
-                    . 'name="dpaction" value="" size="40" maxlength="255" '
-                    . 'style="float: left; margin-top: 0px" '
-                    . 'autocomplete="off" /></form></div>'
-                    . '<br clear="all" />&#160;</div>');
-                $this->mrUser->tell("<script>\$('#dpaction').bind('keydown', "
-                    ."bindKeyDown); \$('#dpaction').focus();</script>");
+                    . '<div id="dpmessagearea_inner">'
+                    . '<div id="messages"></div><div class="dpclr">&nbsp;'
+                    . '</div>');
+            } elseif ($getdiv == 'dpinput_wrap') {
+                $template_file = is_null($this->mrEnvironment->template)
+                    ? FAlSE : $this->mrEnvironment->template;
+                $subtemplates = dp_get_subtemplates(array('input', 'input_say'),
+                    $template_file);
+                $inputpersistent = $this->mrUser->inputPersistent;
+
+                ob_start();
+                include($subtemplates['input']);
+                if ('always' === $inputpersistent) {
+                    $dpinput_say = ob_get_contents();
+                } else {
+                    $dpinput = ob_get_contents();
+                }
+                ob_end_clean();
+
+                ob_start();
+                include($subtemplates['input_say']);
+                if ('always' === $inputpersistent) {
+                    $dpinput = ob_get_contents();
+                } else {
+                    $dpinput_say = ob_get_contents();
+                }
+                ob_end_clean();
+
+                $this->mrUser->tell('<div id="dpinput_wrap"><div id="dpinput">'
+                    . '<div id="dpinput_inner">' . $dpinput . '</div></div>'
+                    . '<div id="dpinput_say"><div id="dpinput_inner">'
+                    . $dpinput_say . '</div></div></div>');
+                $this->mrUser->tell("<script>jQuery('#dpaction').bind("
+                    . "'keydown', bindKeyDown); focus_input(); "
+                    . "if (!jQuery('#dpinput[input]').length) jQuery(document)."
+                    . "bind('keypress', show_input); else jQuery(document)."
+                    . "unbind('keypress', show_input)</script>");
             } elseif ($getdiv == 'dploginout') {
                 $login_link = !isset($this->mrUser->isRegistered) ||
                     TRUE !== $this->mrUser->isRegistered
@@ -965,12 +1086,12 @@ function init_drag() {
         if (isset($this->__GET['ajax']) && !isset($this->__GET['method'])) {
             if (FALSE === $this->mToldSomething) {
                 $this->mrUser->tell("empty");
-            } else {
+            }/* else {
                 echo "---------------------------\n";
-            }
-        } else {
+            }*/
+        }/* else {
             echo "---------------------------\n";
-        }
+        }*/
     }
 
     /**

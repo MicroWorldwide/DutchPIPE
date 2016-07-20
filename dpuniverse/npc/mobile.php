@@ -2,7 +2,7 @@
 /**
  * 'Mobile' class to create a mobile computer generated character
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: mobile.php 243 2007-07-08 16:26:23Z ls $
+ * @version    Subversion: $Id: mobile.php 252 2007-08-02 23:30:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpNpc
  */
@@ -69,8 +69,8 @@ final class Mobile extends DpNpc
         $this->addAction(dptext('kick'), dptext('kick'), 'actionKick',
             DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
             DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_ENVIRONMENT);
-        $this->addAction('silence!', 'silence!', 'actionSilence',
-            DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
+        $this->addAction(array(dptext('admin'), dptext('silence')), 'silence',
+            'actionSilence', DP_ACTION_OPERANT_MENU, DP_ACTION_TARGET_SELF,
             DP_ACTION_AUTHORIZED_ADMIN, DP_ACTION_SCOPE_ENVIRONMENT);
         $this->isSilent = new_dp_property(FALSE);
         $this->isNoCleanUp = new_dp_property(TRUE);

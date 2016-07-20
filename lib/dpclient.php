@@ -8,7 +8,7 @@
  * dpclient-js.php. It talks to the PHP server using a fast file socket
  * connection.
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -20,7 +20,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpclient.php 238 2007-07-08 15:40:07Z ls $
+ * @version    Subversion: $Id: dpclient.php 255 2007-08-03 13:15:59Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver-ini.php, dpserver.php, dpclient.css
  */
@@ -32,6 +32,16 @@ if (!defined('DPSERVER_HOST_URL')) {
     require_once(realpath(dirname($_SERVER['SCRIPT_FILENAME']) . '/..')
         . '/config/dpserver-ini.php');
 }
+
+/**
+ * Universe paths used by templates
+ */
+require_once(DPSERVER_DPUNIVERSE_CONFIG_PATH . 'dpuniverse-ini.php');
+
+/**
+ * Common functions for templates available to universe objects and dpclient.php
+ */
+require_once(DPSERVER_LIB_PATH . 'dptemplates.php');
 
 error_reporting(DPSERVER_ERROR_REPORTING);
 
@@ -117,7 +127,7 @@ function talk2server()
       put the remainder in $output */
     $cookie_set = $remove_guest_cookie = $remove_registered_cookie = FALSE;
 
-    for ($output = ''; $buf = socket_read($socket, DPSERVER_CLIENT_CHUNK); ) {
+    for ($output = ''; $buf = @socket_read($socket, DPSERVER_CLIENT_CHUNK); ) {
         $output .= $buf;
     }
 
@@ -155,7 +165,8 @@ function talk2server()
                 $remove_registered_cookie = TRUE;
             }
             else {
-                setcookie(DPSERVER_COOKIE_NAME, $cookie_data, time() + 630720000, '/');
+                setcookie(DPSERVER_COOKIE_NAME, $cookie_data, time()
+                    + 630720000, '/');
                 $cookie_set = TRUE;
             }
         }
@@ -268,31 +279,21 @@ function handle_cookies(&$xml)
                 if (!isset($path)) {
                     if (!isset($expire)) {
                         setcookie($name, $cookie, FALSE, '/');
-                        $cookie_debug = "setcookie($name, $cookie)";
                     } else {
                         setcookie($name, $cookie, $expire, '/');
-                        $cookie_debug = "setcookie($name, $cookie, $expire)";
                     }
                 } else {
                     setcookie($name, $cookie,
                         (!isset($expire) ? FALSE : $expire), $path);
-                    $cookie_debug = "setcookie($name, $cookie, "
-                        . (!isset($expire) ? 'FALSE' : $expire) . ", $path)";
                 }
             } else {
                 setcookie($name, $cookie, (!isset($expire) ? FALSE : $expire),
                     (!isset($path) ? '' : $path), $domain);
-                $cookie_debug = "setcookie($name, $cookie, " . (!isset($expire)
-                    ? 'FALSE' : $expire) . ", " . (!isset($path) ? '' : $path)
-                    .  ", $domain)";
             }
         } else {
             setcookie($name, $cookie, (!isset($expire) ? FALSE : $expire),
                 (!isset($path) ? '' : $path), (!isset($domain) ? '' : $domain),
                 $secure);
-            $cookie_debug = "setcookie($name, $cookie, " . (!isset($expire) ?
-                'FALSE' : $expire) . ", " . (!isset($path) ? '' : $path) .  ", "
-                . (!isset($domain) ? '' : $domain) . ", $secure)";
         }
     }
 }
@@ -307,13 +308,11 @@ function handle_normal_request($output)
     global $gLastErrorMsg;
 
     if (FALSE === $output) {
-        $body = "<h1>$gLastErrorMsg</h1>";
-        $dpelements = $windows = $messages = $scripts = '';
-        $inputtopmargin = '0';
+        $body = $gLastErrorMsg;
 
         /* Otherwise serve the page with the retrieved content in it */
         echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-        require_once(DPSERVER_TEMPLATE_PATH . DPSERVER_TEMPLATE_FILE);
+        require_once(DPSERVER_TEMPLATE_PATH . DPSERVER_TEMPLATE_DOWN_FILE);
         exit;
     }
     $xml = simplexml_load_string($str = '<?xml version="1.0" encoding="UTF-8" '
@@ -323,11 +322,13 @@ function handle_normal_request($output)
         echo '<pre>' . htmlentities($str) . '</pre>';
         exit;
     }
-    handle_cookies($xml);
 
     $messages = $windows = array();
-    $body = $dpelements = $html = $scripts = '';
+    $body = $dpelements = $scripts = '';
     $closetext = dptext('close');
+    $inputpersistent = $template_file = FALSE;
+
+    handle_cookies($xml);
 
     foreach ($xml->event as $e) {
         foreach ($e as $type => $data) {
@@ -359,15 +360,26 @@ function handle_normal_request($output)
                 $scripts .= $tmp;
                 break;
             case 'div':
-                $body .= $data;
-                break;
-            case 'xhtml':
-                $html .= $data;
+                foreach ($data->attributes() as $a => $b) {
+                    if ('template' === $a) {
+                        $template_file = $b;
+
+                    }
+                }
+                $body .= str_replace(' template="' . (!$template_file ? ''
+                    : $template_file) . '"', '', $data);
                 break;
             case 'window':
                 $windows[] = '<div class="dpwindow_default" id="dpwindow">'
                     . $data . '<p align="right"><a href="javascript:'
                     . 'close_dpwindow()">' . $closetext . '</a></p></div>';
+                break;
+            case 'inputpersistent':
+                foreach ($data->attributes() as $a => $b) {
+                    if ('persistent' === $a) {
+                        $inputpersistent = $b;
+                    }
+                }
                 break;
             default:
                 break;
@@ -382,30 +394,65 @@ function handle_normal_request($output)
 
     if (strlen($dpelements)) {
         $dpelements = "        <script type=\"text/javascript\">
-            function load_elements()
+            function dp_load_xml(text)
+            {
+                var xmlDoc = '';
+                if (window.ActiveXObject) {
+                    xmlDoc = new ActiveXObject('Microsoft.XMLDOM');
+                    xmlDoc.async='false';
+                    xmlDoc.loadXML(text);
+                }
+                else if (document.implementation &&
+                        document.implementation.createDocument) {
+                        var parser = new DOMParser();
+                    var xmlDoc=parser.parseFromString(text,'text/xml');
+                }
+                else {
+                    /* alert('Your browser cannot handle this script'); */
+                    return false;
+                }
+                return xmlDoc;
+            }
+
+            function dp_load_elements()
             {
                 var content = '<?xml version=\"1.0\"?><dutchpipe>"
             . "<event count=\"-1\" time=\"-1\">" . addslashes($dpelements)
-            . "</event></dutchpipe>'; handle_response(content);
+            . "</event></dutchpipe>'; handle_response(dp_load_xml(content));
             }
             </script>\n";
     }
 
-    $inputtopmargin = !sizeof($messages) ? '0' : '10';
+    $messages_style = !sizeof($messages) ? ''
+        : ' style="display: block; padding-top: 12px"';
+
     $windows = implode("\n", $windows);
     $messages = implode("\n", $messages);
 
+    $subtemplates = dp_get_subtemplates(array('input', 'input_say'),
+        $template_file);
+    ob_start();
+    include($subtemplates['input']);
+    if ('always' == $inputpersistent) {
+        $dpinput_say = ob_get_contents();
+    } else {
+        $dpinput = ob_get_contents();
+    }
+    ob_end_clean();
+
+    ob_start();
+    include($subtemplates['input_say']);
+    if ('always' == $inputpersistent) {
+        $dpinput = ob_get_contents();
+    } else {
+        $dpinput_say = ob_get_contents();
+    }
+    ob_end_clean();
+
     /* Otherwise serve the page with the retrieved content in it */
     echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-    if (strlen($html)) {
-        $html = str_replace(
-            array('{$dpelements}', '{$windows}', '{$messages}',
-            '{$inputtopmargin}', '{$scripts}'),
-            array($dpelements, $windows, $messages, $inputtopmargin, $scripts),
-            $html);
-        echo $html;
-    } else {
-        require_once(DPSERVER_TEMPLATE_PATH . DPSERVER_TEMPLATE_FILE);
-    }
+    require_once(!$template_file
+        ? DPSERVER_TEMPLATE_PATH . DPSERVER_TEMPLATE_FILE : $template_file);
 }
+
 ?>

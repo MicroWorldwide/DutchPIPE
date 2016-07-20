@@ -2,7 +2,7 @@
 /**
  * A DutchPIPE enabled web page
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpPage.php 243 2007-07-08 16:26:23Z ls $
+ * @version    Subversion: $Id: DpPage.php 252 2007-08-02 23:30:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -65,7 +65,7 @@ class DpPage extends DpObject
     /**
      * Creates this page
      *
-     * Calls the method 'createDpPage' in this page, if it exists.
+     * Calls the method 'createDpPage' in this page.
      */
     final function createDpObject()
     {
@@ -80,7 +80,7 @@ class DpPage extends DpObject
     }
 
     /**
-     * Creates this object
+     * Creates this page
      *
      * @see        createDpObject
      */
@@ -89,9 +89,9 @@ class DpPage extends DpObject
     }
 
     /**
-     * Creates this page
+     * Resets this page
      *
-     * Calls the method 'createDpPage' in this page, if it exists.
+     * Calls the method 'resetDpPage' in this page.
      */
     final function resetDpObject()
     {
@@ -99,20 +99,40 @@ class DpPage extends DpObject
     }
 
     /**
-     * Creates this object
+     * Resets this object
      *
-     * @see        createDpObject
+     * @see        resetDpObject
      */
     function resetDpPage()
     {
     }
 
-    function eventDpObject($name)
+    /**
+     * Reports an event
+     *
+     * Called when certain events occur, given with $name.
+     *
+     * Calls the method 'eventDpPage' in this page.
+     *
+     * @param      object    $name       Name of event
+     * @param      mixed     $args       One or more arguments, depends on event
+     * @since      DutchPIPE 0.2.0
+     */
+    final function eventDpObject($name)
     {
         $args = func_get_args();
         call_user_func_array(array($this, 'eventDpPage'), $args);
     }
 
+    /**
+     * Reports an event
+     *
+     * Called when certain events occur, given with $name.
+     *
+     * @param      object    $name       Name of event
+     * @param      mixed     $args       One or more arguments, depends on event
+     * @since      DutchPIPE 0.2.0
+     */
     function eventDpPage($name)
     {
     }
@@ -128,6 +148,7 @@ class DpPage extends DpObject
      * @param       string    $direction    Command to use link, "home", "bar"
      * @param       array     $direction    Multiple directions, "bar", "north"
      * @param       string    $destination  URL
+     * @see         removeExit, setExits
      */
     final function addExit($direction, $destination, $method = NULL,
         $mapArea = NULL, $mapAreaActionTitle = NULL)
@@ -193,6 +214,12 @@ class DpPage extends DpObject
             $mapArea);
     }
 
+    /**
+     * Removes the given "exit" from the page
+     *
+     * @param       string    $direction    Command to use link, "home", "bar"
+     * @see         addExit, setExits
+     */
     function removeExit($direction)
     {
         if (isset($this->mExitAliases[$direction])) {
@@ -217,6 +244,7 @@ class DpPage extends DpObject
      * controlled character to wander around the site.
      *
      * @param       array     $exits      Direction/destination pairs
+     * @see         addExit, removeExit
      */
     final function setExits($exits)
     {
@@ -298,6 +326,11 @@ class DpPage extends DpObject
         return (array)$this->mExits;
     }
 
+    /**
+     * Gets all aliases for exits
+     *
+     * @return     array                 Alias/direction pairs
+     */
     final function getExitAliases()
     {
         return (array)$this->mExitAliases;
@@ -466,7 +499,7 @@ class DpPage extends DpObject
     function _getNavigationTrailHtmlElement($navitem)
     {
         if (FALSE === is_array($navitem)) {
-            return $navitem;
+            return '<div id="navlink">' . $navitem . '</div>';
         }
 
         if (strlen($navitem[1]) >= 6 && substr($navitem[1], 0, 6) == 'uri://') {
@@ -482,6 +515,101 @@ class DpPage extends DpObject
             : '<div id="navlink"><a class="navtrail" href="' . $link
                 . '" style="cursor: pointer">' . dptext(DPUNIVERSE_NAVLOGO)
                 . '</a></div>';
+    }
+
+    /**
+     * Tells the current user the HTML with the input area options menu
+     */
+    function getInputAreaOptions()
+    {
+        /*
+         * A checksum is bounced back so the client can find the right
+         * response
+         */
+        if (!($user = get_current_dpuser())
+                || !isset($user->_GET['checksum'])) {
+            return;
+        }
+
+        $user->tell('<actions id="' . $this->uniqueId
+            . '" level="0" checksum="' . $user->_GET['checksum'] . '">'
+            . '<div class="actionwindow_inner">'
+            . $this->_getInputAreaOption(dptext('hide after use'), 'once',
+            dptext('mode once'), 'once' === $user->inputPersistent)
+            . $this->_getInputAreaOption(dptext('show while on this page'),
+            'page', dptext('mode page'), 'page' === $user->inputPersistent)
+            . $this->_getInputAreaOption(dptext('always show'), 'always',
+            dptext('mode always'), 'always' === $user->inputPersistent)
+            . '</div></actions>');
+    }
+
+    /**
+     * Gets the HTML for a single input area option in the menu
+     *
+     * @access     private
+     * @param      string    $text       text label of this entry in menu
+     * @param      string    $persistent input field option
+     * @param      string    $command    full command to perform when selected
+     * @param      boolean   $enabled    is this option enabled?
+     * @return     string    HTML for navigation trail element
+     * @see        getInputAreaOptions
+     */
+    private function _getInputAreaOption($text, $persistent, $command, $enabled)
+    {
+        return '<div id="action_menu0" class="am" onMouseOver="'
+            . 'if (action_over(this)) { jQuery(\'div.am_deep_selected\').'
+            . 'removeClass(\'am_deep_selected am_selected\')}'
+            . (!$enabled ? '' : "; jQuery('span.am_icon', this).attr('id', '"
+            . DPUNIVERSE_IMAGE_URL . "bullet.gif'); "
+            . "jQuery('span.am_icon > img', this).attr('src', '"
+            . DPUNIVERSE_IMAGE_URL . "bullet_over.gif')")
+            . '" onMouseOut="am_target_out = this" '
+            . 'onClick="jQuery(\'#dpinputpersistent\').attr(\'value\', \''
+            . $persistent . '\'); send_action2server(\'' . $command . '\')">'
+            . (!$enabled ? '<span class="am_icon">&nbsp;</span>'
+            : '<span class="am_icon" id="'. DPUNIVERSE_IMAGE_URL
+            . 'bullet_over.gif"><img src="' . DPUNIVERSE_IMAGE_URL
+            . 'bullet.gif" width="5" height="5" border="0" alt="" title="" '
+            . 'style="margin-left: 2px" /></span>') . '<span class="am_title">'
+            . $text . '</span>'
+            . '<span class="am_submenu">&nbsp;</span>&nbsp;<br clear="all" />'
+            . '</div>';
+    }
+
+    /**
+     * Enables the input area called from client-side JavaScript
+     */
+    function openInputArea()
+    {
+        if (!($user = get_current_dpuser())) {
+            return;
+        }
+
+        $user->inputEnabled = 'on';
+
+        if ($user->isRegistered) {
+            mysql_query("UPDATE Users set userInputEnabled='on' WHERE "
+                . "userUsernameLower='"
+                . addslashes(strtolower($user->getTitle())) . "'");
+        }
+    }
+
+    /**
+     * Closes the input area, called from client-side JavaScript
+     */
+    function closeInputArea()
+    {
+        if (!($user = get_current_dpuser())) {
+            return;
+        }
+
+        $user->inputEnabled = 'off';
+
+        if ($user->isRegistered) {
+            mysql_query("UPDATE Users set userInputEnabled='off' WHERE "
+                . "userUsernameLower='"
+                . addslashes(strtolower($user->getTitle())) . "'");
+        }
     }
 }
 ?>

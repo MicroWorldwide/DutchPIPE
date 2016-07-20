@@ -2,7 +2,7 @@
 /**
  * Common functions available to all objects in the universe
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -14,9 +14,9 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpfunctions.php 238 2007-07-08 15:40:07Z ls $
+ * @version    Subversion: $Id: dpfunctions.php 252 2007-08-02 23:30:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
- * @see        dpuniverse.php
+ * @see        dpuniverse.php, dptemplates.php
  */
 
 /**
@@ -164,6 +164,31 @@ function parse_dp_callable(&$var)
 
     $args = array_slice(func_get_args(), 1);
     $var = call_user_func_array(array($var[0], $var[1]), $args);
+}
+
+/**
+ * Reads entire file within the universe directory into a string
+ *
+ * Reads and returns the given file. The file should be within the directory
+ * defined by DPUNIVERSE_PATH, for example /page/foo.txt. When translations
+ * are enabled an alternative file can be created and used instead. For this to
+ * work, the file must be placed in the directory defined by DPSERVER_LOCALE in
+ * the directory defined by DPSERVER_GETTEXT_LOCALE_PATH, for example
+ * /home/dutchpipe/locale/nl_NL/page/foo.txt.
+ *
+ * @param      string    $path        path within the universe directory
+ * @return     mixed     string with file contents or FALSE on failure
+ * @see        DPUNIVERSE_PATH, DPSERVER_GETTEXT_ENABLED, DPSERVER_LOCALE,
+ 8             DPSERVER_GETTEXT_LOCALE_PATH, dptext
+ */
+function dp_file_get_contents($path)
+{
+    return file_get_contents(
+        (DPSERVER_GETTEXT_ENABLED && DPSERVER_LOCALE != '0'
+        && file_exists(DPSERVER_GETTEXT_LOCALE_PATH . DPSERVER_LOCALE . $path)
+        ? DPSERVER_GETTEXT_LOCALE_PATH . DPSERVER_LOCALE
+        : DPUNIVERSE_PREFIX_PATH)
+        . $path);
 }
 
 /**

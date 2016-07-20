@@ -5,7 +5,7 @@
  * Used by the {@link Dpobject::addAction} and {@link DpObject::getActions}
  * methods.
  *
- * DutchPIPE version 0.2; PHP version 5
+ * DutchPIPE version 0.3; PHP version 5
  *
  * LICENSE: This source file is subject to version 1.0 of the DutchPIPE license.
  * If you did not receive a copy of the DutchPIPE license, you can obtain one at
@@ -17,7 +17,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: actions.php 241 2007-07-08 15:59:39Z ls $
+ * @version    Subversion: $Id: actions.php 252 2007-08-02 23:30:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject::addAction(), DpObject::getActionData()
  */
@@ -72,46 +72,63 @@ define('DP_ACTION_OPERANT_METHOD_MENU', 16);
  * Action appears on this objects' action menu
  *
  * @see        DpObject::addAction(), DpObject::getActionData(),
- *             DP_ACTION_TARGET_LIVING, DP_ACTION_TARGET_OBJINV,
- *             DP_ACTION_TARGET_OBJENV, DP_ACTION_TARGET_NONE
+ *             DP_ACTION_TARGET_LIVING, DP_ACTION_TARGET_USER,
+ *             DP_ACTION_TARGET_OBJINV, DP_ACTION_TARGET_OBJENV,
+ *            DP_ACTION_TARGET_NONE
  */
 define('DP_ACTION_TARGET_SELF', 1);
 
 /**
- * Action appears on livings' action menu in this objects environment
+ * Action appears on livings' action menu in this objects environment or
+ * inventory
  *
  * @see        DpObject::addAction(), DpObject::getActionData(),
- *             DP_ACTION_TARGET_SELF, DP_ACTION_TARGET_OBJINV,
- *             DP_ACTION_TARGET_OBJENV, DP_ACTION_TARGET_NONE
+ *             DP_ACTION_TARGET_SELF, DP_ACTION_TARGET_USER,
+ *             DP_ACTION_TARGET_OBJINV, DP_ACTION_TARGET_OBJENV,
+ *             DP_ACTION_TARGET_NONE
  */
 define('DP_ACTION_TARGET_LIVING', 2);
+
+/**
+ * Action appears on users' action menu in this objects environment or
+ * inventory
+ *
+ * @see        DpObject::addAction(), DpObject::getActionData(),
+ *             DP_ACTION_TARGET_SELF, DP_ACTION_TARGET_LIVING,
+ *             DP_ACTION_TARGET_OBJINV, DP_ACTION_TARGET_OBJENV,
+ *             DP_ACTION_TARGET_NONE
+ */
+define('DP_ACTION_TARGET_USER', 4);
 
 /**
  * Action appears on action menu of objects in inventory of this object
  *
  * @see        DpObject::addAction(), DpObject::getActionData(),
  *             DP_ACTION_TARGET_SELF, DP_ACTION_TARGET_LIVING,
- *             DP_ACTION_TARGET_OBJENV, DP_ACTION_TARGET_NONE
+ *             DP_ACTION_TARGET_USER, DP_ACTION_TARGET_OBJENV,
+ *             DP_ACTION_TARGET_NONE
  */
-define('DP_ACTION_TARGET_OBJINV', 4);
+define('DP_ACTION_TARGET_OBJINV', 8);
 
 /**
  * Action appears on action menu of objects in environment of this object
  *
  * @see        DpObject::addAction(), DpObject::getActionData(),
  *             DP_ACTION_TARGET_SELF, DP_ACTION_TARGET_LIVING,
- *             DP_ACTION_TARGET_OBJINV, DP_ACTION_TARGET_NONE
+ *             DP_ACTION_TARGET_USER, DP_ACTION_TARGET_OBJINV,
+ 8             DP_ACTION_TARGET_NONE
  */
-define('DP_ACTION_TARGET_OBJENV', 8);
+define('DP_ACTION_TARGET_OBJENV', 16);
 
 /**
  * Action doesn't appear on any action menu
  *
  * @see        DpObject::addAction(), DpObject::getActionData(),
  *             DP_ACTION_TARGET_SELF, DP_ACTION_TARGET_LIVING,
- *             DP_ACTION_TARGET_OBJINV, DP_ACTION_TARGET_OBJENV
+ *             DP_ACTION_TARGET_USER,  DP_ACTION_TARGET_OBJINV,
+ *             DP_ACTION_TARGET_OBJENV
  */
-define('DP_ACTION_TARGET_NONE', 16);
+define('DP_ACTION_TARGET_NONE', 32);
 
 /**
  * The action is restricted to guests only
