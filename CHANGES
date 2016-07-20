@@ -1,11 +1,11 @@
 CONTENTS
 
     Introduction
+    0.4.1 (03 Sep 2007)
     0.4.0 (21 Aug 2007)
     0.3.0 (03 Aug 2007)
     0.2.1 (08 Jul 2007)
     0.2.0 (11 Jun 2007)
-    0.1.3 (13 Aug 2006)
     ... and older
 
 INTRODUCTION
@@ -14,6 +14,13 @@ INTRODUCTION
     of changes, see:
 
     http://dev.dutchpipe.org/trac/timeline
+
+0.4.1 (03 SEP 2007)
+
+    - Added a custom avatar upload feature using AJAX upload
+    - Object images do no longer need a fixed height, this was previously a
+      requirement to make images float to the left correctly
+    - Various other bug fixes and improvements
 
 0.4.0 (21 AUG 2007)
 
@@ -53,7 +60,7 @@ INTRODUCTION
       1.5/2.0, Internet Explorer 6/7, Opera 9 and Safari 3
     - There can now be multiple open in-page windows (like when you check your
       inventory) of different types
-    - Various bug fixes and improvements
+    - Various other bug fixes and improvements
 
 0.2.1 (08 JUL 2007)
 

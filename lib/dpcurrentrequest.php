@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpcurrentrequest.php 281 2007-08-20 21:45:53Z ls $
+ * @version    Subversion: $Id: dpcurrentrequest.php 311 2007-09-03 12:48:09Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php
  */
@@ -113,6 +113,12 @@ class DpCurrentRequest
      * @access      private
      */
     private $mUserAvatarNr = FALSE;
+
+    /**
+     * @var         string     File name of custom avatar, if any
+     * @access      private
+     */
+    private $mUserAvatarCustom = FALSE;
 
     /**
      * @var         string     The user's display mode (abstract or graphical)
@@ -392,7 +398,7 @@ class DpCurrentRequest
                 userUsername,userAvatarNr,userDisplayMode,
                 userEventPeopleEntering,userEventPeopleLeaving,
                 userEventBotsEntering,userInputMode,userInputEnabled,
-                userInputPersistent
+                userInputPersistent,userAvatarCustom
             FROM
                 Users
             WHERE
@@ -425,6 +431,11 @@ class DpCurrentRequest
         $this->mUserInputEnabled = $row[7];
         $this->mUserInputPersistent = $row[8];
         $this->mIsRegistered = TRUE;
+        if (DPUNIVERSE_AVATAR_CUSTOM_ENABLED && function_exists('gd_info')
+                && $row[9] && file_exists(DPUNIVERSE_AVATAR_CUSTOM_REG_PATH
+                . $row[9])) {
+            $this->mUserAvatarCustom = $row[9];
+        }
 
         return $row;
     }
@@ -572,11 +583,24 @@ class DpCurrentRequest
         $this->mrUser->addId($this->mUsername);
         $this->mrUser->setTitle(ucfirst($this->mUsername));
 
-        if (FALSE !== $this->mUserAvatarNr) {
+        if (DPUNIVERSE_AVATAR_CUSTOM_ENABLED && function_exists('gd_info')
+                && FALSE !== $this->mUserAvatarCustom) {
+            $this->mrUser->avatarCustom = $this->mUserAvatarCustom;
             $this->mrUser->avatarNr = $this->mUserAvatarNr;
-            $this->mrUser->setTitleImg(DPUNIVERSE_AVATAR_URL . 'user'
+            $this->mrUser->setTitleImg((!$this->mIsRegistered
+                ? DPUNIVERSE_AVATAR_CUSTOM_GUEST_URL
+                : DPUNIVERSE_AVATAR_CUSTOM_REG_URL) . $this->mUserAvatarCustom);
+            $this->mrUser->setBody('<img src="' . (!$this->mIsRegistered
+                ? DPUNIVERSE_AVATAR_CUSTOM_GUEST_URL
+                : DPUNIVERSE_AVATAR_CUSTOM_REG_URL) . $this->mUserAvatarCustom
+                . '" border="0" alt="" align="left" '
+                . 'style="margin-right: 15px" />' . dp_text('A user.')
+                . '<br />');
+        } elseif (FALSE !== $this->mUserAvatarNr) {
+            $this->mrUser->avatarNr = $this->mUserAvatarNr;
+            $this->mrUser->setTitleImg(DPUNIVERSE_AVATAR_STD_URL . 'user'
                 . $this->mUserAvatarNr . '.gif');
-            $this->mrUser->setBody('<img src="' . DPUNIVERSE_AVATAR_URL
+            $this->mrUser->setBody('<img src="' . DPUNIVERSE_AVATAR_STD_URL
                 . 'user' . $this->mUserAvatarNr . '_body.gif" border="0" '
                 . 'alt="" align="left" style="margin-right: 15px" />'
                 . dp_text('A user.') . '<br />');
@@ -855,11 +879,11 @@ class DpCurrentRequest
             $from_env->tell(sprintf(dp_text("%s leaves to %s.<br />"),
                 ucfirst($this->mrUser->getTitle(
                 DPUNIVERSE_TITLE_TYPE_DEFINITE)),
-                $this->mrEnvironment->getTitle()), $this->mrUser);
+                $this->mrEnvironment->title), $this->mrUser);
             $arrive_msg = $admin_msg = sprintf(
                 dp_text("%s arrives from %s.<br />"),
                 ucfirst($this->mrUser->getTitle(
-                DPUNIVERSE_TITLE_TYPE_DEFINITE)), $from_env->getTitle());
+                DPUNIVERSE_TITLE_TYPE_DEFINITE)), $from_env->title);
         }
         $this->mrUser->moveDpObject($this->mrEnvironment);
         $inv = $this->mrEnvironment->getInventory();
@@ -1020,7 +1044,7 @@ function init_drag() {
                 $bottom = dp_text('Go to Bottom');
                 $this->mrUser->tell('<div id="dploginout">' . sprintf(
                         dp_text('Welcome %s'), '<span id="username">'
-                        . $this->mrUser->getTitle() . '</span>')
+                        . $this->mrUser->title . '</span>')
                         . ' <span id="loginlink">'
                         . $login_link . '</span>&#160;&#160;&#160;&#160;'
                         . '<img id="butbottom" src="/images/bottom.gif" '
@@ -1040,6 +1064,12 @@ function init_drag() {
     function handleUser()
     {
         $this->mrUser->isAjaxCapable = isset($this->__GET['ajax']);
+
+        if ($this->mrUser->isAjaxCapable
+                && !empty($this->mrUser->browseAvatarCustom)) {
+            echo "Unsetting browseAvatarCustom\n";
+            unset($this->mrUser->browseAvatarCustom);
+        }
 
         /*
          * Skip once if the user has moved and hence the request died. Need to

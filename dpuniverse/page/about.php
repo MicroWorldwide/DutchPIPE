@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: about.php 278 2007-08-19 22:52:25Z ls $
+ * @version    Subversion: $Id: about.php 308 2007-09-02 19:18:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -69,6 +69,8 @@ final class About extends DpPage
             $this->mrFlowerObj->titleDefinite = dp_text('the purple flower');
             $this->mrFlowerObj->titleIndefinite = dp_text('a purple flower');
             $this->mrFlowerObj->titleImg = DPUNIVERSE_IMAGE_URL . 'flower.gif';
+            $this->mrFlowerObj->titleImgWidth = 48;
+            $this->mrFlowerObj->titleImgHeight = 55;
             $this->mrFlowerObj->body = '<img src="' . DPUNIVERSE_IMAGE_URL
                 . 'flower_body.jpg" width="190" height="216" border="0" '
                 . 'alt="" align="left" style="margin-right: 15px; border: solid '

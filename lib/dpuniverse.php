@@ -16,7 +16,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpuniverse.php 291 2007-08-22 20:42:12Z ls $
+ * @version    Subversion: $Id: dpuniverse.php 311 2007-09-03 12:48:09Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        currentdpuserrequest.php, dpserver.php, dpfunctions.php
  */
@@ -197,6 +197,15 @@ final class DpUniverse
             require_once(DPUNIVERSE_LIB_PATH . 'dpdb_mysql.php');
         } else {
             require_once(DPUNIVERSE_LIB_PATH . 'dpdb_mdb2.php');
+        }
+
+        // Clean up guest avatar directory
+        if (DPUNIVERSE_AVATAR_CUSTOM_ENABLED
+                && ($dir = @opendir(DPUNIVERSE_AVATAR_CUSTOM_GUEST_PATH))) {
+            while (FALSE !== ($entry = readdir($dir))) {
+                if ('.' != $entry && '..' != $entry)
+                    @unlink(DPUNIVERSE_AVATAR_CUSTOM_GUEST_PATH . $entry);
+            }
         }
     }
 
@@ -432,13 +441,16 @@ final class DpUniverse
              * simple for now.
              */
             $lastrequest_time = $u[_DPUSER_TIME_LASTREQUEST];
-            $ajax_capable = isset($u[_DPUSER_OBJECT]->isAjaxCapable)
-                && TRUE === $u[_DPUSER_OBJECT]->isAjaxCapable;
+            $ajax_capable = (isset($u[_DPUSER_OBJECT]->isAjaxCapable)
+                && TRUE === $u[_DPUSER_OBJECT]->isAjaxCapable)
+                || !empty($u[_DPUSER_OBJECT]->browseAvatarCustom);
 
             /* The "linkdeath" check */
-            if (($ajax_capable && $lastrequest_time < $linkdeath_time)
+            if (($ajax_capable && $lastrequest_time < $linkdeath_time
+                    && (empty($u[_DPUSER_OBJECT]->browseAvatarCustom)
+                    || $lastrequest_time < $cur_time
+                    - DPSERVER_OBJECT_IMAGE_CUSTOM_MAX_BROWSETIME))
                     || (!$ajax_capable && $lastrequest_time < $botkick_time)) {
-
                 /*
                  * This method is called before an instance of
                  * CurrentDpUserRequest is created and the current http request
@@ -569,7 +581,12 @@ final class DpUniverse
                 $cur_time = time();
                 if ($this->mTimeouts[$i][2] <= $cur_time) {
                     $method = $this->mTimeouts[$i][1];
-                    $this->mTimeouts[$i][0]->$method();
+                    if (!isset($this->mTimeouts[$i][3])) {
+                        $this->mTimeouts[$i][0]->$method();
+                    } else {
+                        call_user_func_array(array(&$this->mTimeouts[$i][0],
+                            $method), $this->mTimeouts[$i][3]);
+                    }
                     unset($this->mTimeouts[$i][0]);
                     unset($this->mTimeouts[$i]);
                     break;
@@ -1172,12 +1189,19 @@ final class DpUniverse
      * @access     private
      * @param      object    &$ob        reference to object to call method in
      * @param      string    $method     name of method to call
+     * @param      mixed     $arg1, $arg2, ...  optional arguments for method
      * @param      int d     $secs       delay in seconds
      */
     function setTimeout(&$ob, $method, $secs)
     {
         if (is_object($ob) && method_exists($ob, $method) && $secs > 0) {
-            $this->mTimeouts[] = array(&$ob, $method, time() + $secs);
+            $timeout_info = array(&$ob, $method, time() + $secs);
+            if (func_num_args() > 3) {
+                $args = func_get_args();
+                $tmp = array_slice($args, 3);
+                $timeout_info[] = $tmp;
+            }
+            $this->mTimeouts[] =& $timeout_info;
         }
     }
 
@@ -1276,6 +1300,8 @@ final class DpUniverse
         $user->setTitle(ucfirst($user->_GET['username']));
         $user->isRegistered = TRUE;
         if ($user === get_current_dpuser()) {
+            $user->titleImgWidth = NULL;
+            $user->titleImgHeight = NULL;
             $row = $this->mrCurrentDpUserRequest->findAndInitRegisteredDpUser(
                 $cookie_id, $cookie_pass);
             $this->mrCurrentDpUserRequest->initDpUser();
@@ -1341,6 +1367,18 @@ final class DpUniverse
         $user->removeId($oldtitle);
         $user->addId($username);
         $user->setTitle(ucfirst($username));
+        if ($user->avatarCustom) {
+            $user->avatarCustom = NULL;
+            $user->titleImgWidth = NULL;
+            $user->titleImgHeight = NULL;
+            $user->avatarNr = $this->getRandAvatarNr();
+            $user->titleImg = DPUNIVERSE_AVATAR_STD_URL . 'user'
+                . $user->avatarNr . '.gif';
+            $user->body = '<img src="' . DPUNIVERSE_AVATAR_STD_URL
+                . 'user' . $user->avatarNr . '_body.gif" border="0" '
+                . 'alt="" align="left" style="margin-right: 15px" />'
+                . dp_text('A user.') . '<br />';
+        }
         $user->isRegistered = FALSE;
         $user->isAdmin = FALSE;
         if ($user === get_current_dpuser()) {
@@ -1633,6 +1671,47 @@ to complete registration.') . '</form></window>');
         }
 
         return 0 === sizeof($this->mLastNewUserErrors);
+    }
+
+    /**
+     * Gets a random avatar image number in order to give guests an avatar
+     *
+     * Checks the avatar image directory for images with the format:
+     * public/avatar/user<number>.gif
+     * for possible numbers.
+     *
+     * @return  int     random avatar image number
+     * @see     getNrOfAvatars
+     */
+    function getRandAvatarNr()
+    {
+        $entries = $this->getNrOfAvatars();
+        if (0 === $entries) {
+            return 1;
+        }
+        return (mt_rand(51, 50 + $entries) - 50);
+    }
+
+    /**
+     * Gets the available number of avatars images
+     *
+     * Searches the DPUNIVERSE_AVATAR_STD_PATH directory for files ending with
+     * "_body.gif".
+     *
+     * @return  int     the number of available avatar images
+     * @see     getRandAvatarNr
+     */
+    function getNrOfAvatars()
+    {
+        $entries = 0;
+        $d = dir(DPUNIVERSE_AVATAR_STD_PATH);
+            while (false !== ($entry = $d->read())) {
+            if ($entry !== '.' && $entry !== '..' && dp_strlen($entry) > 13
+                    && dp_substr($entry, -9) == '_body.gif') {
+                $entries++;
+            }
+        }
+        return $entries;
     }
 
     /**

@@ -19,7 +19,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpdb_mysql.php 278 2007-08-19 22:52:25Z ls $
+ * @version    Subversion: $Id: dpdb_mysql.php 293 2007-08-25 23:11:20Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse-ini.php, dpdb_mdb2.php
  * @since      DutchPIPE 0.4.0
@@ -77,7 +77,7 @@ function &dp_db_connect()
  * Prints an error message to the server output in case of an error
  *
  * @param      string    $sql        SQL statement
- * @return     mixed     a MySQL resource or FALSE on FAILure
+ * @return     mixed     a MySQL resource or FALSE on failure
  * @see        http://www.php.net/mysql_query, dp_db_connect, dp_db_exec,
  *             dp_db_fetch_one, dp_db_fetch_row, dp_db_quote, dp_db_num_rows,
  *             dp_db_free
@@ -103,7 +103,7 @@ function dp_db_query($sql)
  * Prints an error message to the server output in case of an error
  *
  * @param      string    $sql        SQL statement
- * @return     mixed     number of affected rows or FALSE on FAILure
+ * @return     mixed     number of affected rows or FALSE on failure
  * @see        http://www.php.net/mysql_query, dp_db_connect, dp_db_query,
  *             dp_db_quote, dp_db_next_id
  */
@@ -208,7 +208,7 @@ function dp_db_num_rows($result)
  *
  * @param      string    $table      table name
  * @param      string    $idColumn   field name
- * @return     mixed     integer with next id, or FALSE on FAILure
+ * @return     mixed     integer with next id, or FALSE on failure
  * @see        dp_db_exec
  */
 function dp_db_next_id($table, $idColumn)

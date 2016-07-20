@@ -20,7 +20,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpserver-ini.php 292 2007-08-23 08:13:56Z ls $
+ * @version    Subversion: $Id: dpserver-ini.php 308 2007-09-02 19:18:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver.php, dpclient.php, dpuniverse-ini.php
  */
@@ -490,4 +490,43 @@ define('DPSERVER_MEMORY_LIMIT', '32M');
  */
 define('DPSERVER_APACHE_GZIP_MIN', FALSE);
 //define('DPSERVER_APACHE_GZIP_MIN', 200);
+
+/**
+ * Maximum width of object images in pixels
+ *
+ * @see        DPSERVER_OBJECT_IMAGE_MAX_HEIGHT
+ */
+define('DPSERVER_OBJECT_IMAGE_MAX_WIDTH', 95);
+
+/**
+ * Maximum height of object images in pixels
+ *
+ * @see        DPSERVER_OBJECT_IMAGE_MAX_WIDTH
+ */
+define('DPSERVER_OBJECT_IMAGE_MAX_HEIGHT', 100);
+
+/**
+ * Comma separated list of file extensions allowed for custom avatars and images
+ *
+ * @see        DPSERVER_OBJECT_IMAGE_CUSTOM_MAX_SIZE
+ */
+define('DPSERVER_OBJECT_IMAGE_VALID_TYPES', 'gif,jpg,png');
+
+/**
+ * Maximum size in bytes of custom image uploads for avatars and other images
+ *
+ * @see        DPSERVERE_OBJECT_IMAGE_VALID_TYPES
+ */
+define('DPSERVER_OBJECT_IMAGE_CUSTOM_MAX_SIZE', 1048576);
+
+/**
+ * Maximum time in seconds the user can browse for a file during AJAX upload
+ *
+ * Browsing causes scripts to halt in a browser, and we don't want to throw
+ * people out. This should be a bigger number than
+ * DPUNIVERSE_LINKDEATH_KICKTIME.
+ *
+ * @see        DPUNIVERSE_LINKDEATH_KICKTIME
+ */
+define('DPSERVER_OBJECT_IMAGE_CUSTOM_MAX_BROWSETIME', 60);
 ?>

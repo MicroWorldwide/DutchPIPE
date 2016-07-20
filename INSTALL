@@ -57,6 +57,9 @@ REQUIREMENTS FOR USING AND INSTALLING DUTCHPIPE
        DutchPIPE.org is currently running PHP 5.2.3. The simple_xml extension is
        supported by default in PHP 5.
 
+       To enable the avatar upload feature the gd extension is required. The gd
+       extension also makes image handling a bit faster.
+
     4. A database
 
        DutchPIPE supports MySQL, MySQLi, PostgreSQL, Oracle, Frontbase,
@@ -116,6 +119,9 @@ INSTRUCTIONS FOR INSTALLING DUTCHPIPE ON LINUX, BSD, UNIX, ...
        Run the script by entering in the shell:
 
        script/setupdb.php
+
+       This script does not (yet) update an old installation. If you don't want
+       to lose data, use a different database name in dpuniverse-ini.php.
 
     5. Configure your web server
 
@@ -235,6 +241,13 @@ INSTRUCTIONS FOR INSTALLING DUTCHPIPE ON WINDOWS 2000, XP, ...
 
        so that php_sockets is enabled.
 
+       To enable the avatar upload feature and in general faster image handling,
+       select:
+
+       PHP settings -> PHP extensions -> php_gd2
+
+       so that php_gd2 is enabled.
+
        Click on the WAMP5 tray bar icon and select:
 
        Config files -> httpd.conf
@@ -302,6 +315,9 @@ INSTRUCTIONS FOR INSTALLING DUTCHPIPE ON WINDOWS 2000, XP, ...
        and enter the following line:
 
        c:\wamp\php\php.exe -c c:\wamp\apache2\bin c:\dutchpipe\script\setupdb.php
+
+       This script does not (yet) update an old installation. If you don't want
+       to lose data, use a different database name in dpuniverse-ini.php.
 
     7. Restart WAMP5
 

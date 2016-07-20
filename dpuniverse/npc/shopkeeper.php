@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: shopkeeper.php 278 2007-08-19 22:52:25Z ls $
+ * @version    Subversion: $Id: shopkeeper.php 308 2007-09-02 19:18:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpNpc
  */
@@ -54,8 +54,10 @@ final class Shopkeeper extends DpNpc
         $this->titleDefinite = dp_text('the shopkeeper');
         $this->titleIndefinite = dp_text('a shopkeeper');
         $this->titleImg = DPUNIVERSE_IMAGE_URL . 'shopkeeper.gif';
+        $this->titleImgWidth = 58;
+        $this->titleImgHeight = 100;
         $this->body = '<img src="' . DPUNIVERSE_IMAGE_URL
-            . 'shopkeeper_body.gif" width="85" height="200" border="0" alt="" '
+            . 'shopkeeper_body.gif" width="115" height="200" border="0" alt="" '
             . 'align="left" style="margin-right: 15px" />'
             . dp_text('A shopkeeper selling and buying items.<br />');
     }

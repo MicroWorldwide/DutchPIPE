@@ -28,7 +28,7 @@
         <div id="dpdebug"></div>
         <div id="dpfooter">
             <a href="<?php echo DPSERVER_CLIENT_URL; ?>?location=/page/copyright.php">Legal
-            Notices</a> | Running <a href="http://dutchpipe.org/" target="_blank">DutchPIPE</a> 0.4.0 by Lennert Stock.
+            Notices</a> | Running <a href="http://dutchpipe.org/" target="_blank">DutchPIPE</a> 0.4.1 by Lennert Stock.
         </div>
         &#160;<a name="bottom"></a>
     </body>

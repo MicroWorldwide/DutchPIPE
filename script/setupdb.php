@@ -15,7 +15,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: setupdb.php 287 2007-08-21 18:47:19Z ls $
+ * @version    Subversion: $Id: setupdb.php 293 2007-08-25 23:11:20Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php
  */
@@ -88,7 +88,7 @@ function setup_mysql()
     }
 
     $sql_setup = array(
-        "CREATE TABLE `Users` (`userId` int(11) UNSIGNED NOT NULL auto_increment,`userUsername` varchar(32) NOT NULL,`userPassword` varchar(32) default NULL,`userCookieId` varchar(32) NOT NULL default '',`userCookiePassword` varchar(32) NOT NULL default '',`userUsernameLower` varchar(32) NOT NULL,`userAvatarNr` tinyint(3) UNSIGNED NOT NULL default '1',`userAge` int(11) UNSIGNED NOT NULL default '0',`userDisplayMode` varchar(32) NOT NULL default 'graphical',`userEventPeopleLeaving` enum('0','1') NOT NULL default '0',`userEventPeopleEntering` enum('0','1') NOT NULL default '0',`userEventBotsEntering` enum('0','1') NOT NULL default '0',`userHomeLocation` varchar(128) default NULL,`userHomeSublocation` varchar(128) default NULL,`userInputMode` enum('say','cmd') default 'say',`userInputEnabled` enum('off','on') default 'off',`userInputPersistent` enum('once','page','always') NOT NULL default 'page',PRIMARY KEY  (`userId`),KEY `userCookieId` (`userCookieId`,`userCookiePassword`)) DEFAULT CHARSET=utf8",
+        "CREATE TABLE `Users` (`userId` int(11) UNSIGNED NOT NULL auto_increment,`userUsername` varchar(32) NOT NULL,`userPassword` varchar(32) default NULL,`userCookieId` varchar(32) NOT NULL default '',`userCookiePassword` varchar(32) NOT NULL default '',`userUsernameLower` varchar(32) NOT NULL,`userAvatarNr` tinyint(3) UNSIGNED NOT NULL default '1',`userAvatarCustom` varchar(9) default NULL,`userAge` int(11) UNSIGNED NOT NULL default '0',`userDisplayMode` varchar(32) NOT NULL default 'graphical',`userEventPeopleLeaving` enum('0','1') NOT NULL default '0',`userEventPeopleEntering` enum('0','1') NOT NULL default '0',`userEventBotsEntering` enum('0','1') NOT NULL default '0',`userHomeLocation` varchar(128) default NULL,`userHomeSublocation` varchar(128) default NULL,`userInputMode` enum('say','cmd') default 'say',`userInputEnabled` enum('off','on') default 'off',`userInputPersistent` enum('once','page','always') NOT NULL default 'page',PRIMARY KEY  (`userId`),KEY `userCookieId` (`userCookieId`,`userCookiePassword`)) DEFAULT CHARSET=utf8",
         "CREATE TABLE `Captcha` (`captchaId` int(11) UNSIGNED NOT NULL auto_increment,`captchaFile` varchar(32) NOT NULL,`captchaTimestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,PRIMARY KEY  (`captchaId`)) DEFAULT CHARSET=utf8",
         "INSERT INTO `Captcha` VALUES ('1', 'avyrjy.gif', now())",
         "CREATE TABLE `UserAgents` (`userAgentId` int(11) UNSIGNED NOT NULL auto_increment,`userAgentString` varchar(255) NOT NULL,`userAgentRemoteAddress` varchar(15) default NULL,PRIMARY KEY  (`userAgentId`),KEY `userAgentString` (`userAgentString`)) DEFAULT CHARSET=utf8",
@@ -259,6 +259,11 @@ function setup_mdb2()
             'unsigned' => 1,
             'notnull' => TRUE,
             'default' => 1
+        ),
+        'userAvatarCustom' => array(
+            'type' => 'text',
+            'length' => 9,
+            'default' => null
         ),
         'userAge' => array(
             'type' => 'integer',

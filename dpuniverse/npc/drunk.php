@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: drunk.php 278 2007-08-19 22:52:25Z ls $
+ * @version    Subversion: $Id: drunk.php 308 2007-09-02 19:18:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpNpc
  */
@@ -69,9 +69,11 @@ final class Drunk extends DpNpc
         $this->titleDefinite = dp_text('the drunk man');
         $this->titleIndefinite = dp_text('a drunk man');
         $this->titleImg = DPUNIVERSE_IMAGE_URL . 'drunk.gif';
+        $this->titleImgWidth = 60;
+        $this->titleImgHeight = 100;
 
         $this->body = '<img src="' . DPUNIVERSE_IMAGE_URL
-            . 'drunk_body.gif" width="115" height="200" border="0" alt="" '
+            . 'drunk_body.gif" width="120" height="200" border="0" alt="" '
             . 'align="left" style="margin-right: 15px" />'
             . dp_text('A drunk man. He looks thirsty.<br />');
 
@@ -99,8 +101,10 @@ final class Drunk extends DpNpc
             $this->mrGoldenKeyObj->titleIndefinite = dp_text('a golden key');
             $this->mrGoldenKeyObj->titleImg = DPUNIVERSE_IMAGE_URL
                 . 'golden_key.png';
+            $this->mrGoldenKeyObj->titleImgWidth = 44;
+            $this->mrGoldenKeyObj->titleImgHeight = 46;
             $this->mrGoldenKeyObj->body = '<img src="' . DPUNIVERSE_IMAGE_URL
-                . 'golden_key.png" width="44" height="100" border="0" '
+                . 'golden_key.png" width="44" height="46" border="0" '
                 . 'alt="" align="left" style="margin-right: 15px" />'
                 . dp_text('A golden key.<br />You wonder what it can unlock...');
             $this->mrGoldenKeyObj->value = 180;

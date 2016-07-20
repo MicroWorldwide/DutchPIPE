@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: credits.php 278 2007-08-19 22:52:25Z ls $
+ * @version    Subversion: $Id: credits.php 308 2007-09-02 19:18:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpHeap
  */
@@ -52,6 +52,9 @@ final class Credits extends DpHeap
         $this->heapTitlePlural = dp_text('%d credits');
 
         $this->titleImg = DPUNIVERSE_IMAGE_URL . 'credits.gif';
+        $this->titleImgWidth = 30;
+        $this->titleImgHeight = 26;
+
         $this->addId(explode('#', dp_text('credit#credits')));
         $this->body = '<img src="' . DPUNIVERSE_IMAGE_URL
             . 'credits_body.gif" width="43" height="36" border="0" alt="" '

@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: barkeeper.php 278 2007-08-19 22:52:25Z ls $
+ * @version    Subversion: $Id: barkeeper.php 308 2007-09-02 19:18:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpNpc
  */
@@ -64,8 +64,10 @@ final class Barkeeper extends DpNpc
         $this->titleDefinite = dp_text('the barkeeper');
         $this->titleIndefinite = dp_text('a barkeeper');
         $this->titleImg = DPUNIVERSE_IMAGE_URL . 'barkeeper.gif';
+        $this->titleImgWidth = 58;
+        $this->titleImgHeight = 100;
         $this->body = '<img src="' . DPUNIVERSE_IMAGE_URL
-            . 'barkeeper_body.gif" width="125" height="200" border="0" alt="" '
+            . 'barkeeper_body.gif" width="116" height="200" border="0" alt="" '
             . 'align="left" style="margin-right: 15px" />'
             . dp_text('The barkeeper is serving free beer!<br />');
 
@@ -178,14 +180,16 @@ final class Barkeeper extends DpNpc
 
                 $beer_obj->addId(explode('#',
                     dp_text('beer#cool beer#fresh beer#cool fresh beer#cool,fresh beer#cool, fresh beer#glass')));
-                $beer_obj->setTitle(dp_text('cool, fresh beer'));
-                $beer_obj->setTitleDefinite(dp_text('the cool, fresh beer'));
-                $beer_obj->setTitleIndefinite(dp_text('a cool, fresh beer'));
-                $beer_obj->setTitleImg(DPUNIVERSE_IMAGE_URL . 'beer_full.gif');
-                $beer_obj->setBody('<img src="' . DPUNIVERSE_IMAGE_URL
-                    . 'beer_full_body.gif" alt="" border="0" align="left" style'
-                    . '="margin-right: 20px"/>'
-                    . dp_text('A cool, fresh beer.<br />'));
+                $beer_obj->title = dp_text('cool, fresh beer');
+                $beer_obj->titleDefinite = dp_text('the cool, fresh beer');
+                $beer_obj->titleIndefinite = dp_text('a cool, fresh beer');
+                $beer_obj->titleImg = DPUNIVERSE_IMAGE_URL . 'beer_full.gif';
+                $beer_obj->titleImgWidth = 33;
+                $beer_obj->titleImgHeight = 50;
+                $beer_obj->body = '<img src="' . DPUNIVERSE_IMAGE_URL
+                    . 'beer_full_body.gif" width="88" height="132" alt="" '
+                    . 'border="0" align="left" style="margin-right: 20px"/>'
+                    . dp_text('A cool, fresh beer.<br />');
 
                 $beer_obj->setEmptyIds(explode('#',
                     dp_text('glass#beer glass#empty glass#empty beer glass')));
@@ -197,8 +201,8 @@ final class Barkeeper extends DpNpc
                 $beer_obj->setEmptyTitleImg(DPUNIVERSE_IMAGE_URL
                     . 'beer_empty.gif');
                 $beer_obj->setEmptyBody('<img src="' . DPUNIVERSE_IMAGE_URL
-                    . 'beer_empty_body.gif" alt="" border="0" align="left" '
-                    . 'style="margin-right: 20px"/>'
+                    . 'beer_empty_body.gif" width="88" height="132" alt="" '
+                    . 'border="0" align="left" style="margin-right: 20px"/>'
                     . dp_text('An empty beer glass.<br />'));
 
                 $beer_obj->moveDpObject($env);

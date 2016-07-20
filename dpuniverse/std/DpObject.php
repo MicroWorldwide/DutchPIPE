@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpObject.php 291 2007-08-22 20:42:12Z ls $
+ * @version    Subversion: $Id: DpObject.php 311 2007-09-03 12:48:09Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  */
 
@@ -71,6 +71,10 @@ inherit(DPUNIVERSE_INCLUDE_PATH . 'mass.php');
  * - string <b>titleType</b> - Type of this object's title
  * - string <b>titleImg</b> - URL for the avatar or other image representing
  *   this object
+ * - int <b>titleImgWidth</b> - Width of the title image in pixels, you can
+ *   optionally set this by hand for extra speed but it is not mandatory
+ * - int <b>titleImgHeight</b> - Height of the title image in pixels, you can
+ *   optionally set this by hand for extra speed but it is not mandatory
  * - boolean <b>isDraggable</b> - Can we be dragged on the screen by a given
  *   user? Experimental
  * - string <b>body</b> - HTML content of this object
@@ -251,6 +255,9 @@ class DpObject extends DpProperties
          * Path to the avatar or object image
          */
         $this->titleImg = new_dp_property(DPUNIVERSE_IMAGE_URL . 'object.gif');
+        $this->titleImgWidth = new_dp_property(NULL);
+        $this->titleImgHeight = new_dp_property(NULL);
+
         $this->isDraggable = new_dp_property(TRUE);
 
         /*
@@ -391,7 +398,7 @@ class DpObject extends DpProperties
      */
     function removeDpObject()
     {
-        echo dp_text("removeDpObject() called in object " . $this->getTitle()
+        echo dp_text("removeDpObject() called in object " . $this->title
             . ".\n");
 
         foreach ($this->mCheckPresentObjects as $key => &$ob) {
@@ -565,7 +572,11 @@ class DpObject extends DpProperties
                         'graphical' => '<addDpElement id="'
                             . $this->uniqueId . '" where="'
                             . $target_ob->uniqueId
-                            . '" class="title_img draggable">'
+                            . '" class="title_img draggable" '
+                            . 'css="width: '
+                            . (DPSERVER_OBJECT_IMAGE_MAX_WIDTH + 5)
+                            . 'px; height: '
+                            . (DPSERVER_OBJECT_IMAGE_MAX_HEIGHT + 26) . 'px">'
                             . $this->getAppearance(1, FALSE, $new_page,
                             'graphical') . '</addDpElement>'));
                 } else {
@@ -590,7 +601,11 @@ class DpObject extends DpProperties
                         'graphical' => '<addDpElement id="'
                         . $this->uniqueId . '" where="'
                         . $target_ob->uniqueId
-                        . '" class="title_img draggable">'
+                        . '" class="title_img draggable" '
+                        . 'css="width: '
+                        . (DPSERVER_OBJECT_IMAGE_MAX_WIDTH + 5)
+                        . 'px; height: '
+                        . (DPSERVER_OBJECT_IMAGE_MAX_HEIGHT + 26) . 'px">'
                         . $this->getAppearance(1, FALSE, $new_page, 'graphical')
                         . '</addDpElement>'), $this);
                 }
@@ -606,7 +621,7 @@ class DpObject extends DpProperties
             $body = isset($this->_GET) && isset($this->_GET['ajax'])
                 /* Back/forward button is used */
                 ? $target_ob->getAppearanceInventory(0, TRUE, NULL,
-                    $this->displayMode)
+                    $this->displayMode) . '<div class="dpclr">&nbsp;</div>'
                 : $target_ob->getAppearance(0, TRUE, NULL,
                     $this->displayMode);
             if (FALSE !== $body) {
@@ -777,7 +792,15 @@ function init_drag() {
      */
     function setTimeout($method, $secs)
     {
-        get_current_dpuniverse()->setTimeout($this, $method, $secs);
+        if (func_num_args() <= 2) {
+            get_current_dpuniverse()->setTimeout($this, $method, $secs);
+        } else {
+            $args = func_get_args();
+
+            call_user_func_array(array(get_current_dpuniverse(), 'setTimeout'),
+                array_merge(array(&$this, $method, $secs),
+                array_slice($args, 2)));
+        }
     }
 
     /**
@@ -896,7 +919,7 @@ function init_drag() {
     {
         $id = trim($id);
         return dp_strlen($id) && (isset($this->mIds[$id = dp_strtolower($id)])
-            || $id == dp_strtolower($this->getTitle()))
+            || $id == dp_strtolower($this->title))
             || $id == $this->uniqueId
             || ($checkWithArticle && $this->_isIdWithArticle($id));
     }
@@ -1233,14 +1256,14 @@ function init_drag() {
                         $navtrail . '</div><div id='
                         . '"titlebarright">&#160;<div id="dploginout">'
                         .sprintf(dp_text('Welcome %s'), '<span id="username">'
-                        . $user->getTitle() . '</span>')
+                        . $user->title . '</span>')
                         . ' <span id="loginlink">'
                         . $login_link . '</span>&#160;&#160;&#160;&#160;'
                         . '<img id="butbottom" src="' . DPUNIVERSE_IMAGE_URL
                         . 'bottom.gif" '
                         . 'align="absbottom" width="11" height="11" border="0" '
                         . 'alt="' . $bottom . '" title="' . $bottom . '" '
-                        . 'onClick="_gel(\'dpaction\').focus(); '
+                        . 'onclick="_gel(\'dpaction\').focus(); '
                         . 'scroll(0, 999999)" /></div></div>';
                 }
                 $titlebar = '<div id="titlebar">' . $titlebar . '</div>';
@@ -1256,7 +1279,8 @@ function init_drag() {
                 . '</div><br />');
 
             $inventory = $this->getAppearanceInventory($level, $include_div,
-                $from, $displayMode, $displayTitlebar, $elementId);
+                $from, $displayMode, $displayTitlebar, $elementId)
+                . '<div class="dpclr">&nbsp;</div>';
 
             if (isset($this->isLiving) && TRUE === $this->isLiving) {
                 $reguser_age = $inactive_time = $session_age = '';
@@ -1322,7 +1346,10 @@ function init_drag() {
                 return FALSE === $include_div ? $title_img
                     : '<div id="' . $this->uniqueId . '" '
                     . 'class="title_img' . ($from !== $this ? '' : '_me')
-                    . ' draggable">' . $title_img . '</div>';
+                    . ' draggable" style="width: '
+                    . (DPSERVER_OBJECT_IMAGE_MAX_WIDTH + 5)
+                    . 'px; height: ' . (DPSERVER_OBJECT_IMAGE_MAX_HEIGHT + 26)
+                    . 'px">' . $title_img . '</div>';
             }
 
             $body = $from === $this ? '<span class="me">'
@@ -1339,8 +1366,8 @@ function init_drag() {
 
             return FALSE === $include_div ? $body . $inventory
                 : '<div id="' . $this->uniqueId
-                . '" class="dpobject" onClick="get_actions(\''
-                . $this->uniqueId . '\')">'
+                . '" class="dpobject" onclick="get_actions(\''
+                . $this->uniqueId . '\', event)">'
                 . $body . $inventory . '</div>';
         } elseif (2 === $level) {
             $status = !isset($this->status) || FALSE === $this->status
@@ -1349,7 +1376,7 @@ function init_drag() {
                 ? ucfirst($this->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE))
                 . $status
                 : '<div id="' . $this->uniqueId
-                . '" class="dpobject2" onClick="get_actions(\''
+                . '" class="dpobject2" onclick="get_actions(\''
                 . $this->uniqueId . '\')">'
                 . ucfirst($this->getTitle(DPUNIVERSE_TITLE_TYPE_INDEFINITE))
                 . $status . '</div>';
@@ -1392,11 +1419,20 @@ function init_drag() {
         }
         $alt = dp_text('Click me!');
 
+        $width_html = FALSE === ($width = $this->getTitleImgWidth()) ? ''
+            : ' width="' . $width . '"';
+        $height_html =  FALSE === ($height = $this->getTitleImgHeight()) ? ''
+            : ' height="' . $height . '"';
+        $margin_top = FALSE === $height
+            || $height >= DPSERVER_OBJECT_IMAGE_MAX_HEIGHT ? ''
+            : ' style="margin-top: '
+            . (DPSERVER_OBJECT_IMAGE_MAX_HEIGHT - $height) . 'px"';
+
         $img_title = '<img src="' . $this->titleImg . '" '
-            . 'border="0" class="' . $title_img_class . '" '
-            //. 'onMD="init_drag(\'' . $this->uniqueId . '\', event)" '
-            . 'onClick="get_actions(\'' . $this->uniqueId . '\', event)" '
-            . 'alt="' . $alt . '" title="' . $alt . '" /> <br />' . $title_pre
+            . 'border="0"' . $width_html . $height_html . $margin_top
+            . ' class="' . $title_img_class . '" ' . 'onclick="get_actions(\''
+            . $this->uniqueId . '\', event)" ' . 'alt="' . $alt . '" title="'
+            . $alt . '" /> <br />' . $title_pre  /* IE6 needs space before br */
             . ucfirst($this->getTitle( DPUNIVERSE_TITLE_TYPE_INDEFINITE))
             . $status . $title_post;
 
@@ -1442,7 +1478,7 @@ function init_drag() {
         return $inventory == '' ? ''
             : "<div id=\"$div_id\"><div class=\"dpinventory2\" id=\""
                 . "{$this->uniqueId}\">$inventory</div><div class=\"dpclr\">"
-                . "&nbsp;</div></div><div class=\"dpclr\">&nbsp;</div>";
+                . "&nbsp;</div></div>";
     }
 
     /**
@@ -1941,9 +1977,9 @@ function init_drag() {
 
             $action_menu .= '<div id="action_menu' . $lvl_cnt . '" '
                 . 'class="am' . (!$is_submenu ? '' : ' am_deep' . $gdstyle)
-                . $gstyle . '" onMouseOver="' . $mouseover
-                . '" onMouseOut="' . $mouseout
-                . '" onClick="' . $mouseclick . '">'
+                . $gstyle . '" onmouseover="' . $mouseover
+                . '" onmouseout="' . $mouseout
+                . '" onclick="' . $mouseclick . '">'
                 . '<span class="AM_ICON" id=' . $icon_over . '>' . $icon
                 . '</span>'
                 . '<span class="am_title">' . $action_menu_title . '</span>'
@@ -2671,7 +2707,7 @@ function init_drag() {
                 . "coords=\"{$map_area_data[1]}}\" "
                 . "href=\"javascript:void(0)\" "
                 . "alt=\"{$alt}\" title=\"{$alt}\" "
-                . "onClick=\"get_map_area_actions('{$mapName}', "
+                . "onclick=\"get_map_area_actions('{$mapName}', "
                 . "'{$map_area_id}', '{$this->uniqueId}', event)\" "
                 . "style=\"cursor: pointer\" />\n";
         }
@@ -2864,7 +2900,7 @@ function init_drag() {
             if ($ob->getEnvironment() !== $this) {
                 echo sprintf(
                     dp_text("handleCleanUp() called in %s: not removed",
-                    $this->getTitle()));
+                    $this->title));
                 return;
             }
         }
@@ -2874,13 +2910,13 @@ function init_drag() {
             if ($ob->isUser || $ob->isNoCleanUp) {
                 echo sprintf(
                     dp_text("handleCleanUp() called in %s: not removed",
-                    $this->getTitle()));
+                    $this->title));
                 return;
             }
         }
 
         echo sprintf(dp_text("handleCleanUp() called in %s: removing\n",
-            $this->getTitle()));
+            $this->title));
         $this->removeDpObject();
     }
 
@@ -3040,6 +3076,89 @@ function init_drag() {
     final function isValidClientCall($methodName)
     {
         return in_array($methodName, $this->mValidClientCalls, TRUE);
+    }
+
+    /**
+     * Gets the width in pixels of the title image
+     *
+     * @return     mixed     Integer with width in pixels, FALSE for unknown
+     * @see        getTitleImgHeight
+     * @since      DutchPIPE 0.4.1
+     */
+    function getTitleImgWidth()
+    {
+        $this->_initTitleImgDimensions();
+
+        $title_img_width = $this->getDpProperty('titleImgWidth');
+        return is_null($title_img_width) ? FALSE : $title_img_width;
+    }
+
+    /**
+     * Gets the height in pixels of the title image
+     *
+     * @return     mixed     Integer with height in pixels, FALSE for unknown
+     * @see        getTitleImgWidth
+     * @since      DutchPIPE 0.4.1
+     */
+    function getTitleImgHeight()
+    {
+        $this->_initTitleImgDimensions();
+
+        $title_img_height = $this->getDpProperty('titleImgHeight');
+        return is_null($title_img_height) ? FALSE : $title_img_height;
+    }
+
+    /**
+     * Sets the titleImgWidth and titleImgHeight properties
+     *
+     * Sets these properties in this object if they aren't set and if PHP is
+     * installed with the GD library.
+     *
+     * @access     private
+     * @see        getTitleImgWidth, getTitleImgHeight
+     * @since      DutchPIPE 0.4.1
+     */
+    private function _initTitleImgDimensions()
+    {
+        $title_img_width = $this->getDpProperty('titleImgWidth');
+        $title_img_height = $this->getDpProperty('titleImgHeight');
+
+        if (!is_null($title_img_width) && !is_null($title_img_height)) {
+            return;
+        }
+        if (!function_exists('gd_info')) {
+            return;
+        }
+        $url2path = array(
+            DPUNIVERSE_AVATAR_STD_URL
+                => DPUNIVERSE_AVATAR_STD_PATH,
+            DPUNIVERSE_AVATAR_CUSTOM_GUEST_URL
+                => DPUNIVERSE_AVATAR_CUSTOM_GUEST_PATH,
+            DPUNIVERSE_AVATAR_CUSTOM_REG_URL
+                => DPUNIVERSE_AVATAR_CUSTOM_REG_PATH,
+            DPUNIVERSE_IMAGE_URL
+                => DPUNIVERSE_IMAGE_PATH
+        );
+
+        foreach ($url2path as $url => $path) {
+            $title_img = str_replace($url, $path, $this->titleImg);
+            if ($this->titleImg !== $title_img) {
+                break;
+            }
+        }
+
+        $image_info = getimagesize($title_img);
+        if (!is_array($image_info)) {
+            return;
+        }
+
+        list($width, $height) = $image_info;
+        if (is_null($title_img_width)) {
+            $this->titleImgWidth = new_dp_property($width);
+        }
+        if (is_null($title_img_height)) {
+            $this->titleImgHeight = new_dp_property($height);
+        }
     }
 }
 ?>

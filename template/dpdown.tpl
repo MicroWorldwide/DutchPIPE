@@ -23,7 +23,7 @@
                 <div class="dppage_inner2" id="dppage_inner2">
                     <div id="dppage_body" style="text-align: center">
                         <div style="margin-top: 100px; margin-bottom: 100px; padding: 20px; width: 300px; border: solid 1px #000066; text-align: center; margin-left: auto; margin-right: auto" align="center">
-                            <img src="<?php echo DPUNIVERSE_AVATAR_URL; ?>user18.gif" border="0" alt="" title="" style="float: left" />
+                            <img src="<?php echo DPUNIVERSE_AVATAR_STD_URL; ?>user18.gif" border="0" alt="" title="" style="float: left" />
                             <?php echo $body ?><br clear="all" />
                         </div>
                     </div><br clear="all" />

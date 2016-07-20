@@ -20,7 +20,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpclient.php 280 2007-08-20 20:38:21Z ls $
+ * @version    Subversion: $Id: dpclient.php 307 2007-09-01 17:16:09Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpserver-ini.php, dpserver.php, dpclient.css
  */
@@ -58,7 +58,7 @@ error_reporting(DPSERVER_ERROR_REPORTING);
 $gLastErrorMsg = NULL;
 
 /* Deal with AJAX requests and normal page requests */
-if (isset($_GET) && (isset($_GET['ajax']) || isset($_GET['method']))) {
+if ((!isset($_GET['ie6']) || $_GET['ie6'] !== 'yes') && isset($_GET) && (isset($_GET['ajax']) || isset($_GET['method']))) {
     /* Output XML or '1' to "keep-alive" */
     handle_ajax_request(talk2server());
 } else {
@@ -118,6 +118,11 @@ function talk2server()
     /* Talk to the DutchPIPE server and write user variables to it */
     if (!isset($_SESSION)) {
         $_SESSION = array();
+    }
+
+    if (isset($_FILES['dpuploadimg'])
+            && isset($_FILES['dpuploadimg']['tmp_name'])) {
+        @chmod($_FILES['dpuploadimg']['tmp_name'], 0777);
     }
 
     /* Serialize $_SERVER, $_SESSION, ... variables so they can be sent */
@@ -258,6 +263,7 @@ function handle_ajax_request($output)
         header('Content-Type: text/xml');
         echo "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>
 <dutchpipe>$output</dutchpipe>\n";
+        exit;
     }
 }
 
@@ -328,6 +334,9 @@ function handle_normal_request($output)
 {
     global $gLastErrorMsg;
 
+    if (isset($_GET['ie6']) && 'yes' === $_GET['ie6']) {
+        return;
+    }
     if (FALSE === $output) {
         $body = $gLastErrorMsg;
 

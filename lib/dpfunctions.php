@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpfunctions.php 278 2007-08-19 22:52:25Z ls $
+ * @version    Subversion: $Id: dpfunctions.php 311 2007-09-03 12:48:09Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php, dptemplates.php
  */
@@ -194,11 +194,13 @@ function dp_file_get_contents($path)
 /**
  * Gets a 32-character random string
  *
- * @return     string    32 random characters
+ * @param      string    $length     optional different length <= 32
+ * @return     string    random characters
  */
-function make_random_id()
+function make_random_id($base = 16)
 {
-    return md5(uniqid(rand(), true));
+    $id = md5(uniqid(rand(), true));
+    return 16 === $base ? $id : base_convert($id, 16, $base);
 }
 
 /**
@@ -271,5 +273,131 @@ function get_age2string($age)
     $rval = array_slice($rval, 0, -1);
 
     return implode(', ', $rval) . ' ' . dp_text('and') . ' ' . $last;
+}
+
+/**
+ * Copies and processes an uploaded image for a given object
+ *
+ * Copies an image for a given user with the given file path to a given
+ * destination. Resizes the image if the width in pixels exceeds
+ * DPSERVER_OBJECT_IMAGE_MAX_WIDTH and/or the height exceeds
+ * DPSERVER_OBJECT_IMAGE_MAX_HEIGHT. The image type must defined in
+ * DPSERVER_OBJECT_IMAGE_VALID_TYPES ("gif", "jpg" or "png" by default).
+ *
+ * @param      string    &$object   user who will use yhis avatar
+ * @param      string    $from      path to uploaded avatar image
+ * @param      string    $to        path of copied/resulting image
+ * @return     boolean   TRUE for success, error string for failure
+ * @see        DpUser::actionAvatar, DPSERVER_OBJECT_IMAGE_MAX_WIDTH,
+ *             DPSERVER_OBJECT_IMAGE_MAX_HEIGHT,
+ *             DPSERVER_OBJECT_IMAGE_VALID_TYPES
+ * @since      DutchPIPE 0.4.1
+ */
+function dp_upload_image(&$object, $from, $to)
+{
+    if (!DPUNIVERSE_AVATAR_CUSTOM_ENABLED || !function_exists('gd_info')) {
+        return dp_text("Image upload is not enabled.");
+    }
+
+    $valid_types = explode(',', DPSERVER_OBJECT_IMAGE_VALID_TYPES);
+    if (!is_array($image_info = getimagesize($from))) {
+        $err = TRUE;
+    } else {
+        $type = image_type_to_extension($image_info[2], FALSE);
+
+        if (!in_array($type, $valid_types)
+                && !($type === 'jpg' && in_array('jpeg', $valid_types))
+                && !($type === 'jpeg' && in_array('jpg', $valid_types))) {
+            $err = TRUE;
+        }
+    }
+    if (isset($err)) {
+        return sprintf(dp_text('Invalid file type. The type of image must be one of the following: %s.'),
+            implode(dp_text(', '), $valid_types));
+    }
+
+    $copy_result = copy($from, $to);
+    @unlink($from);
+    if (TRUE !== $copy_result) {
+        return dp_text("Failed to upload image.");
+    }
+
+    list($width, $height) = $image_info;
+
+    // No resizing needed?
+    if ($width <= DPSERVER_OBJECT_IMAGE_MAX_WIDTH
+            && $height <= DPSERVER_OBJECT_IMAGE_MAX_HEIGHT) {
+        $object->titleImgWidth = $width;
+        $object->titleImgHeight = $height;
+
+        return TRUE;
+    }
+
+    // Resize image: determine new dimensions first
+    $new_width = $width;
+    $new_height = $height;
+    if ($new_width > DPSERVER_OBJECT_IMAGE_MAX_WIDTH) {
+        $new_height = round($new_height * DPSERVER_OBJECT_IMAGE_MAX_WIDTH
+            / $new_width);
+        $new_width = DPSERVER_OBJECT_IMAGE_MAX_WIDTH;
+    }
+    if ($new_height > DPSERVER_OBJECT_IMAGE_MAX_HEIGHT) {
+        $new_width = round($new_width * DPSERVER_OBJECT_IMAGE_MAX_HEIGHT
+            / $new_height);
+        $new_height = DPSERVER_OBJECT_IMAGE_MAX_HEIGHT;
+    }
+
+    // Resize image: resample with new dimensions
+    $image_p = imagecreatetruecolor($new_width, $new_height);
+    switch ($type) {
+        case 'gif':
+            $image = imagecreatefromgif($to);
+            $transparentIndex = imagecolortransparent($image);
+            $trans_colors = imagecolorsforindex($image, $transparentIndex);
+            $trans_color = imagecolorallocate($image, $trans_colors['red'],
+                $trans_colors['green'], $trans_colors['blue']);
+            imagecolortransparent($image, $trans_color);
+            imagecopyresampled($image_p, $image, 0, 0, 0, 0, $new_width,
+                $new_height, $width, $height);
+            $trans_color = imagecolorallocate($image_p,
+                $trans_colors['red'], $trans_colors['green'],
+                $trans_colors['blue']);
+            imagecolortransparent($image_p, $trans_color);
+            imagegif($image_p, $to);
+            break;
+        case 'jpg':
+        case 'jpeg':
+            $image = imagecreatefromjpeg($to);
+            imagecopyresampled($image_p, $image, 0, 0, 0, 0, $new_width,
+            $new_height, $width, $height);
+            $sharpenMatrix = array(array(-1, -1, -1), array(-1, 16, -1),
+                array(-1, -1, -1));
+            $divisor = 8;
+            $offset = 0;
+            imageconvolution($image_p, $sharpenMatrix, $divisor, $offset);
+            imagejpeg($image_p, $to, 90);
+            break;
+        case 'png':
+            $image = imagecreatefrompng($to);
+            imageantialias($image_p, TRUE);
+            imagealphablending($image_p, FALSE);
+            imagesavealpha($image_p, TRUE);
+            $transparent = imagecolorallocatealpha($image_p, 255, 255, 255,
+                127);
+            imagefilledrectangle($image_p, 0, 0, $new_width, $new_height,
+                $transparent);
+            imagecopyresampled($image_p, $image, 0, 0, 0, 0, $new_width,
+                $new_height, $width, $height);
+            imagepng($image_p, $to, 0);
+            break;
+        default:
+            unlink($to);
+            return dp_text("Failed to upload image because of a configuration error.");
+    }
+
+    $object->titleImgWidth = $new_width;
+    $object->titleImgHeight = $new_height;
+
+    return TRUE;
 }
 ?>

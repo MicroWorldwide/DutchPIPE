@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: mobile.php 278 2007-08-19 22:52:25Z ls $
+ * @version    Subversion: $Id: mobile.php 308 2007-09-02 19:18:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpNpc
  */
@@ -64,6 +64,9 @@ final class Mobile extends DpNpc
         $this->titleDefinite = dp_text('the mobile NPC');
         $this->titleIndefinite = dp_text('a mobile NPC');
         $this->titleImg = DPUNIVERSE_IMAGE_URL . 'npc.gif';
+        $this->titleImgWidth = 66;
+        $this->titleImgHeight = 100;
+
         $this->body =
             dp_text('A mobile computer generated character that runs around the website.<br />');
         $this->addAction(dp_text('kick'), dp_text('kick'), 'actionKick',

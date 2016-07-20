@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: store.php 278 2007-08-19 22:52:25Z ls $
+ * @version    Subversion: $Id: store.php 308 2007-09-02 19:18:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpPage
  */
@@ -77,8 +77,10 @@ can leave <a href="%s">west</a> to the shop.<br />'),
             $this->mrSilverKeyObj->titleIndefinite = dp_text('a silver key');
             $this->mrSilverKeyObj->titleImg = DPUNIVERSE_IMAGE_URL
                 . 'silver_key.png';
+            $this->mrSilverKeyObj->titleImgWidth = 44;
+            $this->mrSilverKeyObj->titleImgHeight = 46;
             $this->mrSilverKeyObj->body = '<img src="' . DPUNIVERSE_IMAGE_URL
-                . 'silver_key.png" width="44" height="100" border="0" '
+                . 'silver_key.png" width="44" height="46" border="0" '
                 . 'alt="" align="left" style="margin-right: 15px" />'
                 . dp_text('A plain silver key.<br />You wonder what it can unlock...');
             $this->mrSilverKeyObj->value = 50;
@@ -99,6 +101,8 @@ can leave <a href="%s">west</a> to the shop.<br />'),
             $this->mrTrophyObj->titleDefinite = dp_text('the DutchPIPE trophy');
             $this->mrTrophyObj->titleIndefinite = dp_text('a DutchPIPE trophy');
             $this->mrTrophyObj->titleImg = DPUNIVERSE_IMAGE_URL . 'trophy.gif';
+            $this->mrTrophyObj->titleImgWidth = 80;
+            $this->mrTrophyObj->titleImgHeight = 100;
             $this->mrTrophyObj->body = '<img src="' . DPUNIVERSE_IMAGE_URL
                 . 'trophy_body.gif" width="129" height="161" border="0" '
                 . 'alt="" align="left" style="margin-right: 15px" />'

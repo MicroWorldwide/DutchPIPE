@@ -6,9 +6,9 @@ body, td, th, input { font-family: verdana,'Bitstream Vera Sans',helvetica,sans-
 #dpobinv_inner1 { width: 100%; float: left }
 .dpobinv_inner2 { position: relative }
 #dpinventory { border: solid 1px #eee }
-.dpobject { background-color: #ffe0e0; width: 190px; padding: 10px; margin-top: 10px; margin-right: 10px; margin-bottom: 0px; float: left }
+.dpobject { cursor: pointer; background-color: #ffe0e0; width: 190px; padding: 10px; margin-top: 10px; margin-right: 10px; margin-bottom: 0px; float: left }
 .dpobject2 { background-color: #e0ffe0; width: 72px; padding: 5px; margin-top: 10px; margin-right: 10px; float: left }
-.title_img, .title_img_me { position: relative; text-align: center; width: 100px; height: 126px; font-size: 10px; font-family: verdana,arial,helvetica; margin-top: 1px; margin-right: 10px; margin-bottom: 0px; float: left }
+.title_img, .title_img_me { position: relative; text-align: center; font-size: 10px; font-family: verdana,arial,helvetica; margin-top: 1px; margin-right: 10px; margin-bottom: 0px; float: left }
 .title_img_me { font-weight: bold }
 .imgtxt { font-size: 10px; font-family: verdana,arial,helvetica }
 #navigation { }
@@ -106,6 +106,4 @@ a.col2:link, a.col2:visited { color: #666666; text-decoration: none }
 .dpinactive_txt { color: #6666A3 }
 .dpcomm { width: 375px }
 .dpemote { width: 320px }
-
-}
-
+.dpupload_button { font-family: arial,verdana,'Bitstream Vera Sans',helvetica,sans-serif; font-size: 11px; height: 20px; color: #000066 }

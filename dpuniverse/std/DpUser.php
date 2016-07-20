@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpUser.php 286 2007-08-21 11:24:10Z ls $
+ * @version    Subversion: $Id: DpUser.php 311 2007-09-03 12:48:09Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpLiving
  */
@@ -54,7 +54,11 @@ inherit(DPUNIVERSE_INCLUDE_PATH . 'title_types.php');
  * - string <b>inactive</b> - Descriptive inactive time of the user, empty
  *   string for active
  * - boolean <b>isInactive</b> - TRUE if the user in inactive, FALSE otherwise
- * - integer <b>avatarNr</b> - Avatar image number
+ * - integer <b>avatarNr</b> - Avatar image number, 0 for custom avatar
+ * - string <b>avatarCustom</b> - File name of custom avatar, if any
+ * - status <b>browseAvatarCustom</b> - TRUE if the user is browsing on his
+ *   computer for an image to upload (which causes scripts to halt), unset
+ *   otherwise
  * - mixed <b>status</b> - FALSE for no special status, otherwise a descriptive
  *   string, 'away'
  * - string <b>inputMode</b> - Input field mode, "say" or "cmd"
@@ -162,20 +166,23 @@ class DpUser extends DpLiving
         $this->inputMode = 'say';
         $this->inputEnabled = new_dp_property('off');
         $this->inputPersistent = new_dp_property('page');
+        $this->avatarCustom = new_dp_property(FALSE);
 
-        $avatar_nr = $this->_getRandAvatarNr();
+        $avatar_nr = get_current_dpuniverse()->getRandAvatarNr();
         $this->avatarNr = new_dp_property($avatar_nr);
         $this->setTitle(dp_text('User'));
         $this->titleType = DPUNIVERSE_TITLE_TYPE_NAME;
-        $this->titleImg = DPUNIVERSE_AVATAR_URL . 'user' . $avatar_nr . '.gif';
+        $this->titleImg = DPUNIVERSE_AVATAR_STD_URL . 'user' . $avatar_nr
+            . '.gif';
         $this->status = new_dp_property(FALSE, NULL, 'getStatus');
-        $this->setBody('<img src="' . DPUNIVERSE_AVATAR_URL . 'user'
+        $this->body = '<img src="' . DPUNIVERSE_AVATAR_STD_URL . 'user'
             . $avatar_nr . '_body.gif" border="0" alt="" align="left" '
-            . 'style="margin-right: 15px" />' . dp_text('A user.') . '<br />');
+            . 'style="margin-right: 15px" />' . dp_text('A user.') . '<br />';
 
         /* Actions for everybody */
         $this->addAction(dp_text("who's here?"), dp_text('who'), 'actionWho', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
-        $this->addAction(array(dp_text('tools'), dp_text('avatar & other settings')), explode('#', dp_text('settings#config')), 'actionSettings', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(dp_text("change avatar"), dp_text('avatar'), 'actionAvatar', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
+        $this->addAction(array(dp_text('tools'), dp_text('options')), explode('#', dp_text('options#settings#config')), 'actionSettings', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
         $this->addAction(array(dp_text('tools'), dp_text('my home')), dp_text('myhome'), 'actionMyhome', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_REGISTERED, DP_ACTION_SCOPE_SELF);
         $this->addAction(array(dp_text('tools'), dp_text('set my home')), dp_text('myhome set'), 'actionMyhome', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_REGISTERED, DP_ACTION_SCOPE_SELF);
         $this->addAction(array(dp_text('tools'), dp_text('login/register')), dp_text('login'), 'actionLoginOut', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_GUEST, DP_ACTION_SCOPE_SELF);
@@ -196,26 +203,13 @@ class DpUser extends DpLiving
         /* Last action in menu */
         $this->addAction(dp_text('help'), dp_text('help'), 'actionHelp', DP_ACTION_OPERANT_NONE, DP_ACTION_TARGET_SELF, DP_ACTION_AUTHORIZED_ALL, DP_ACTION_SCOPE_SELF);
 
+        $this->addValidClientCall('setAvatar');
         $this->addValidClientCall('setSettings');
-    }
-
-    /**
-     * Gets a random avatar image number in order to give guests an avatar
-     *
-     * Checks the avatar image directory for images with the format:
-     * public/avatar/user<number>.gif
-     * for possible numbers.
-     *
-     * @return  int     random avatar image number
-     * @see     _getNrOfAvatars
-     */
-    private function _getRandAvatarNr()
-    {
-        $entries = $this->_getNrOfAvatars();
-        if (0 === $entries) {
-            return 1;
+        if (DPUNIVERSE_AVATAR_CUSTOM_ENABLED && function_exists('gd_info')) {
+            $this->addValidClientCall('setBrowseAvatarCustom');
+            $this->addValidClientCall('uploadAvatarCustom');
+            $this->addValidClientCall('removeAvatarCustom');
         }
-        return (mt_rand(51, 50 + $entries) - 50);
     }
 
     /**
@@ -234,7 +228,7 @@ class DpUser extends DpLiving
 
         $result = dp_db_query('SELECT userAge FROM Users WHERE '
             . 'userUsernameLower='
-            . dp_db_quote(dp_strtolower($this->getTitle()), 'text'));
+            . dp_db_quote(dp_strtolower($this->title), 'text'));
 
         $age = !$result || !dp_db_num_rows($result)
             ? 0 : dp_db_fetch_one($result, 0, 0);
@@ -394,7 +388,7 @@ class DpUser extends DpLiving
         // a HTTP request from the user.
         if (TRUE === get_current_dpuniverse()->isNoDirectTell()
                 || $this !== get_current_dpuser()) {
-            //echo sprintf(dp_text("Storing %s: %s\n"), $this->getTitle(),
+            //echo sprintf(dp_text("Storing %s: %s\n"), $this->title,
             //    (dp_strlen($data) > 512 ? dp_substr($data, 0, 512) : $data));
             get_current_dpuniverse()->storeTell($this, $data, $binded_env);
             return;
@@ -445,7 +439,7 @@ class DpUser extends DpLiving
             }
             /*
             if ($data !== '1') {
-                echo sprintf(dp_text("Telling %s: %s\n"), $this->getTitle(),
+                echo sprintf(dp_text("Telling %s: %s\n"), $this->title,
                     (dp_strlen($data) > 236 ? dp_substr($data, 0, 236)
                     : $data));
             }
@@ -472,22 +466,27 @@ class DpUser extends DpLiving
      */
     function eventDpLiving($name)
     {
-        if (EVENT_DESTROYING_OBJ !== $name || !isset($this->isRegistered)
-                || TRUE !== $this->isRegistered) {
+        if (EVENT_DESTROYING_OBJ !== $name) {
             return;
         }
 
-        $result = dp_db_query('SELECT userAge FROM Users WHERE '
-            . 'userUsernameLower='
-            . dp_db_quote(dp_strtolower($this->getTitle()), 'text'));
-        $age = !$result || !dp_db_num_rows($result) ? 0
-            : dp_db_fetch_one($result, 0, 0);
-        dp_db_free($result);
+        if (TRUE === $this->isRegistered) {
+            $result = dp_db_query('SELECT userAge FROM Users WHERE '
+                . 'userUsernameLower='
+                . dp_db_quote(dp_strtolower($this->title), 'text'));
+            $age = !$result || !dp_db_num_rows($result) ? 0
+                : dp_db_fetch_one($result, 0, 0);
+            dp_db_free($result);
 
-        $new_age = $age + (time() - $this->creationTime);
-        dp_db_exec('UPDATE Users set userAge=' . dp_db_quote($new_age)
-            . ' WHERE userUsernameLower='
-            . dp_db_quote(dp_strtolower($this->getTitle()), 'text'));
+            $new_age = $age + (time() - $this->creationTime);
+            dp_db_exec('UPDATE Users set userAge=' . dp_db_quote($new_age)
+                . ' WHERE userUsernameLower='
+                . dp_db_quote(dp_strtolower($this->title), 'text'));
+        } elseif ($this->avatarCustom) {
+            unlink(DPUNIVERSE_AVATAR_CUSTOM_GUEST_PATH
+                . $this->avatarCustom);
+        }
+
     }
 
     /**
@@ -542,7 +541,7 @@ class DpUser extends DpLiving
     }
 
     /**
-     * Shows this living object a window with help information
+     * Shows this user a window with help information
      *
      * @param   string  $verb       the action, "help"
      * @param   string  $noun       empty string
@@ -559,7 +558,7 @@ class DpUser extends DpLiving
     }
 
     /**
-     * Shows this living object source code of environment or of another object
+     * Shows this user source code of environment or of another object
      *
      * @param   string  $verb       the action, "source"
      * @param   string  $noun       what to show source of, could be empty
@@ -616,7 +615,7 @@ class DpUser extends DpLiving
                 . '</b><br />';
         } else {
             $tell = '<b>' . sprintf(dp_text('Links found in: %s'),
-                $what->getTitle()) . '</b><br /><br />';
+                $what->title) . '</b><br /><br />';
             foreach ($links as $linktitle => $linkdata) {
                 if ($linktitle === DPUNIVERSE_NAVLOGO) {
                     $linkcommand = dp_text('home');
@@ -633,7 +632,7 @@ class DpUser extends DpLiving
     }
 
     /**
-     * Shows this living object a list of users on the site
+     * Shows this user a list of users on the site
      *
      * @param   string  $verb       the action, "who"
      * @param   string  $noun       empty string
@@ -659,12 +658,12 @@ class DpUser extends DpLiving
                 $loc = DPSERVER_CLIENT_URL . '?location=' . $loc;
             }
             $env = FALSE === $env ? '-' : '<a href="' . $loc . '">'
-                . $env->getTitle() . '</a>';
+                . $env->title . '</a>';
 
             $status = !isset($user->status) || FALSE === $user->status ? ''
                 : ' (' . $user->status . ')';
 
-            $tell .= '<tr><td>' . $user->getTitle() . $status
+            $tell .= '<tr><td>' . $user->title . $status
                 . '</td><td style="padding-left: 10px">' . $env . '</td></tr>';
         }
         $tell .= '</table>';
@@ -672,36 +671,474 @@ class DpUser extends DpLiving
         return TRUE;
     }
 
+    /**
+     * Shows this user a window with avatar settings
+     *
+     * @param   string  $verb       the action, "avatar"
+     * @param   string  $noun       empty string
+     * @return  boolean TRUE for action completed, FALSE otherwise
+     * @see     setAvatar, setBrowseAvatarCustom, uploadAvatarCustom,
+     *          removeAvatarCustom
+     * @since   DutchPIPE 0.4.1
+     */
+    function actionAvatar($verb, $noun)
+    {
+        if (DPUNIVERSE_AVATAR_CUSTOM_ENABLED && function_exists('gd_info')) {
+            $this->tell('<script src="' . DPUNIVERSE_WWW_URL
+                . 'ajaxfileupload.js">&nbsp;</script>');
+        }
+        $this->tell('<script>' . (!DPUNIVERSE_AVATAR_CUSTOM_ENABLED
+            || !function_exists('gd_info') ? '' : '
+function set_browse_avatar_custom()
+{
+    jQuery.ajax({
+        url: "' . DPSERVER_CLIENT_URL . '",
+        data: "location="+encodeURIComponent(\''
+            . $this->getEnvironment()->location
+            . '\')+"&rand="+Math.round(Math.random()*9999)
+            + "&call_object="+encodeURIComponent("' . $this->getUniqueId() . '")
+            + "&method=setBrowseAvatarCustom",
+        success: handle_response
+    });
+
+    return false;
+}
+function upload_avatar_custom()
+{
+	jQuery("#dpuploading").show();
+	jQuery.ajaxFileUpload
+	(
+		{
+			url: "' . DPSERVER_CLIENT_URL . '?location="+encodeURIComponent(\''
+                . $this->getEnvironment()->location
+                . '\')+"&rand="+Math.round(Math.random()*9999)
+                + "&call_object="+encodeURIComponent("' . $this->getUniqueId()
+                . '") + "&method=uploadAvatarCustom"
+                + "&ie6="+(jQuery.browser.msie
+                && 6 == parseInt(jQuery.browser.version) ? "yes" : "no"),
+			secureuri: false,
+			fileElementId: "dpuploadimg",
+			dataType: "xml",
+            timeout: 10000,
+			success: function(resp) { handle_response(resp); },
+			error: function (data, status, e) { jQuery("#dpuploading").hide(); }
+		}
+	)
+
+	return false;
+}
+function remove_avatar_custom()
+{
+    jQuery.ajax({
+        url: "' . DPSERVER_CLIENT_URL . '",
+        data: "location="+encodeURIComponent(\''
+            . $this->getEnvironment()->location
+            . '\')+"&rand="+Math.round(Math.random()*9999)
+            + "&call_object="+encodeURIComponent("' . $this->getUniqueId() . '")
+            + "&method=removeAvatarCustom",
+        success: handle_response
+    });
+
+    return false;
+}
+') . '
+function set_avatar(avatar_nr)
+{
+    jQuery.ajax({
+        url: "' . DPSERVER_CLIENT_URL . '",
+        data: "location="+encodeURIComponent(\''
+            . $this->getEnvironment()->location
+            . '\')+"&rand="+Math.round(Math.random()*9999)
+            + "&call_object="+encodeURIComponent("' . $this->getUniqueId() . '")
+            + "&method=setAvatar"
+            + "&avatar_nr="+avatar_nr,
+        success: handle_response
+    });
+
+    return false;
+}
+</script>');
+        $nr_of_avatars = get_current_dpuniverse()->getNrOfAvatars();
+        $cur_avatar_nr = (int)$this->avatarNr;
+
+        $avatar_settings =
+            '<table cellpadding="0" cellspacing="0" border="0"><tr>';
+
+        $i = DPUNIVERSE_AVATAR_CUSTOM_ENABLED && function_exists('gd_info') &&
+            $this->avatarCustom ? 0 : 1;
+        for ($done = 0; $i <= $nr_of_avatars; $i++) {
+            $done++;
+            $avatar_settings .= '<td align="center" valign="bottom" '
+                . 'style="text-align: center">'
+                . $this->_getAvatarSettingsHtml($i) . '</td>';
+            if ($done % 3 == 0) {
+                $avatar_settings .= '</tr>';
+                if ($i < $nr_of_avatars) {
+                    $avatar_settings .= '<tr>';
+                }
+            }
+        }
+        $avatar_settings .= '</tr></table>';
+        $this->tell('<window>'
+            . ('http://dutchpipe.org' !== DPSERVER_HOST_URL
+            && 'http://dev.dutchpipe.org' !== DPSERVER_HOST_URL
+            ? dp_text('Choose your avatar:')
+            : dp_text('Choose your avatar (kindly provided by <a href="http://www.messdudes.com/" target="_blank">Mess Dudes</a>):'))
+            . '<br />
+<div style="width: 100%; height: 170px; overflow: auto; margin-top: 7px">'
+            . $avatar_settings . '</div>' . (!DPUNIVERSE_AVATAR_CUSTOM_ENABLED
+            || !function_exists('gd_info') ? ''
+            : '<p style="margin-top: 15px; margin-bottom: 5px">'
+            . dp_text('Upload your own avatar:') . '</p>
+<form id="dpupload" action="" method="POST" enctype="multipart/form-data"
+style="display: block; margin: 0">
+<div style="float: left; height: 28px"><input id="dpuploadimg" type="file"
+name="dpuploadimg" class="dpupload_button"
+onmousedown="return set_browse_avatar_custom()" />&nbsp;<button
+id="buttonUpload" onclick="return upload_avatar_custom()"
+class="dpupload_button">' . dp_text('Upload') . '</button>'
+            . (!$this->avatarCustom ? '' : '&nbsp;<button id="buttonUpload"
+onclick="return remove_avatar_custom()"
+class="dpupload_button">' . dp_text('Delete') . '</button>')
+            . '</div><img id="dpuploading" src="' . DPUNIVERSE_IMAGE_URL
+            . 'loading.gif" style="float: left; position: relative; top: -5px;
+left: 5px; display: none">
+</form><div id="dpupload_msg" style="display: none; margin: 0"></div>')
+. '</window>');
+
+        return TRUE;
+    }
 
     /**
-     * Shows this living object a window with settings
+     * Gets the HTML for a single avatar in the avatar configuration window
+     *
+     * @param   int     $avatarNr     default avatar number, 0 for custom avatar
+     * @return  string  HTML for the given avatar
+     * @access  private
+     * @see     actionAvatar
+     * @since   DutchPIPE 0.4.1
+     */
+    private function _getAvatarSettingsHtml($avatarNr)
+    {
+        $alt = dp_text('Click to select');
+        $img_src = 0 < $avatarNr ? DPUNIVERSE_AVATAR_STD_URL . 'user'
+            . $avatarNr . '.gif' : (!$this->isRegistered
+            ? DPUNIVERSE_AVATAR_CUSTOM_GUEST_URL
+            : DPUNIVERSE_AVATAR_CUSTOM_REG_URL) . $this->avatarCustom;
+        $margin = '20px';
+
+        return '<img src="' . $img_src . '" '
+            . 'border="0" class="dpimage" alt="' . $alt . '" title="' . $alt
+            . '" style="margin-bottom: 12px; margin-left: ' . $margin
+            . '; margin-right: ' . $margin . '" onClick="set_avatar('
+            . $avatarNr . ')"  />';
+    }
+
+    /**
+     * Switches to another avatar when clicking on one using actionAvatar()
+     *
+     * Sets the avatarNr property to the given stock avatar number, or to 0 in
+     * case a custom avatar is used. Updates database for registered users.
+     * Sends messages.
+     *
+     * @see     actionAvatar, uploadAvatarCustom, removeAvatarCustom
+     * @since   DutchPIPE 0.4.1
+     */
+    function setAvatar()
+    {
+        if (!isset($this->_GET['avatar_nr']) || 0 === dp_strlen($avatar_nr
+                = $this->_GET['avatar_nr'])) {
+            $this->tell(dp_text('Error receiving settings.<br />'));
+        }
+
+        $this->avatarNr = $avatar_nr;
+        $this->titleImg = $avatar_nr > 0 ? DPUNIVERSE_AVATAR_STD_URL . 'user'
+            . $avatar_nr . '.gif' : (!$this->isRegistered
+            ? DPUNIVERSE_AVATAR_CUSTOM_GUEST_URL
+            : DPUNIVERSE_AVATAR_CUSTOM_REG_URL) . $this->avatarCustom;
+
+        // TODO: Should get real width/height for non GD users:
+        $this->titleImgWidth = NULL;
+        $this->titleImgHeight = NULL;
+
+        $this->body = '<img src="' . ($avatar_nr > 0 ? DPUNIVERSE_AVATAR_STD_URL
+            . 'user' . $avatar_nr . '_body.gif' : (!$this->isRegistered
+            ? DPUNIVERSE_AVATAR_CUSTOM_GUEST_URL
+            : DPUNIVERSE_AVATAR_CUSTOM_REG_URL) . $this->avatarCustom)
+            . '" border="0" alt="" align="left" style="margin-right: 15px" />'
+            . dp_text('A user.') . '<br />';
+
+        if ($this->isRegistered) {
+            dp_db_exec('UPDATE Users set '
+                . 'userAvatarNr=' . dp_db_quote($avatar_nr, 'integer')
+                . ' WHERE userUsernameLower='
+                . dp_db_quote(dp_strtolower($this->title), 'text'));
+        }
+
+        if (FALSE !== ($body = $this->getEnvironment()->
+                getAppearanceInventory(0, TRUE, NULL, $this->displayMode))) {
+            $this->tell($body);
+        }
+        $this->getEnvironment()->tell(array(
+            'abstract' =>
+                '<changeDpElement id="' . $this->getUniqueId() . '">'
+                . $this->getAppearance(1, FALSE) . '</changeDpElement>',
+            'graphical' =>
+                '<changeDpElement id="' . $this->getUniqueId() . '">'
+                . $this->getAppearance(1, FALSE, $this, 'graphical')
+                . '</changeDpElement>'
+            ), $this);
+    }
+
+    /**
+     * Sets this user as busy browing for a file
+     *
+     * Sets the browseAvatarCustom property to TRUE, or unsets it otherwise.
+     * Called from the JavaScript client when the user clicks on "Browse..." to
+     * look for a file to upload. This causes browsers to halt execution of
+     * scripts while the file dialog is visible. DpCurrentRequest uses this
+     * property to users are not thrown out while browsing for a file.
+     *
+     * @param   boolean $browseAvatarCustom TRUE to start browsing, FALSE to end
+     * @see     actionAvatar, uploadAvatarCustom
+     * @since   DutchPIPE 0.4.1
+     */
+    function setBrowseAvatarCustom($browseAvatarCustom = TRUE)
+    {
+        echo "setBrowseAvatarCustom($browseAvatarCustom) called\n";
+        if (!DPUNIVERSE_AVATAR_CUSTOM_ENABLED || !function_exists('gd_info')) {
+            return;
+        }
+
+        if (TRUE !== $browseAvatarCustom) {
+            if (isset($this->browseAvatarCustom)) {
+                unset($this->browseAvatarCustom);
+            }
+        } else {
+            if (!isset($this->browseAvatarCustom)) {
+                $this->browseAvatarCustom = new_dp_property();
+            }
+            $this->setDpProperty('browseAvatarCustom', $browseAvatarCustom);
+        }
+        echo "browseAvatarCustom: $this->browseAvatarCustom\n";
+    }
+
+    /**
+     * Attempts to upload a file to be used as our avatar image
+     *
+     * @see     actionAvatar, setBrowseAvatarCustom, removeAvatarCustom
+     * @since   DutchPIPE 0.4.1
+     */
+    function uploadAvatarCustom()
+    {
+        if (!DPUNIVERSE_AVATAR_CUSTOM_ENABLED || !function_exists('gd_info')) {
+            return;
+        }
+
+        $prevAvatar = $this->avatarCustom;
+        $msg = $err = FALSE;
+
+        // Check if there are files uploaded
+        if (!isset($this->_FILES['dpuploadimg'])
+                || !empty($this->_FILES['dpuploadimg']['error'])
+                || empty($this->_FILES['dpuploadimg']['tmp_name'])) {
+            $msg = empty($this->_FILES['dpuploadimg']['error'])
+                ?  dp_text('Failed to upload image.')
+                : (empty($this->_FILES['dpuploadimg']['tmp_name'])
+                ? dp_text('No image was given to upload.')
+                : $this->_FILES['dpuploadimg']['error']);
+            $err = TRUE;
+        } elseif ($this->_FILES['dpuploadimg']['size']
+                > DPSERVER_OBJECT_IMAGE_CUSTOM_MAX_SIZE) {
+            $msg = sprintf(dp_text('The image was too large. The maximum file size is %d kilobytes.'),
+                floor(DPSERVER_OBJECT_IMAGE_CUSTOM_MAX_SIZE / 1024));
+            $err = TRUE;
+        } else {
+            $name = $this->_FILES['dpuploadimg']['name'];
+            $pos = dp_strrpos($name, '.');
+            if (FALSE !== $pos && $pos < dp_strlen($name) - 1) {
+                $type = dp_strtolower(dp_substr($name, $pos + 1));
+            }
+
+            // Make a unique filename for the avatar
+            $attempts = 5;
+            while ($attempts--) {
+                $new_fn = make_random_id(36);
+                $new_fn = dp_substr($new_fn, mt_rand(0, dp_strlen($new_fn) - 6),
+                    5) . '.' . $type;
+                $new_path = (!$this->isRegistered
+                    ? DPUNIVERSE_AVATAR_CUSTOM_GUEST_PATH
+                    : DPUNIVERSE_AVATAR_CUSTOM_REG_PATH) . $new_fn;
+                if (!file_exists($new_path)) {
+                    break;
+                }
+                if (!$attempts) {
+                    $msg = dp_text('Failed to upload image.');
+                    $err = TRUE;
+                }
+            }
+
+            $tmp_name = $this->_FILES['dpuploadimg']['tmp_name'];
+
+            if (TRUE !== ($rval = dp_upload_image($this, $tmp_name,
+                    $new_path))) {
+                $msg = $rval;
+                $err = TRUE;
+            } else {
+            	//$msg = "<p style=\"margin-bottom: 10px\">File Name: {$name}, "
+            	//    . " File Size: " . @filesize($tmp_name) . '</p>';
+
+                dp_db_exec('UPDATE Users set '
+                    . 'userAvatarCustom=' . dp_db_quote($new_fn, 'text')
+                    . ',userAvatarNr=' . dp_db_quote(0, 'integer')
+                    . ' WHERE userUsernameLower='
+                    . dp_db_quote(dp_strtolower($this->title), 'text'));
+
+                if ($this->avatarCustom) {
+                    unlink((!$this->isRegistered
+                        ? DPUNIVERSE_AVATAR_CUSTOM_GUEST_PATH
+                        : DPUNIVERSE_AVATAR_CUSTOM_REG_PATH)
+                        . $this->avatarCustom);
+                }
+
+                $this->avatarCustom = $new_fn;
+                $this->avatarNr = 0;
+                $this->titleImg = (!$this->isRegistered
+                    ? DPUNIVERSE_AVATAR_CUSTOM_GUEST_URL
+                    : DPUNIVERSE_AVATAR_CUSTOM_REG_URL) . $new_fn;
+                $this->body = '<img src="' . (!$this->isRegistered
+                    ? DPUNIVERSE_AVATAR_CUSTOM_GUEST_URL
+                    : DPUNIVERSE_AVATAR_CUSTOM_REG_URL) . $new_fn
+                    . '" border="0" alt="" align="left" '
+                    . 'style="margin-right: 15px" />'
+                    . dp_text('A user.') . '<br />';
+            }
+        }
+
+        if (FALSE !== $msg) {
+            if (TRUE === $err) {
+                $msg = sprintf(
+                    dp_text('Error: %s<br />'),
+                    $msg);
+            }
+            $msg = '<br clear="all" />' . $msg;
+        }
+
+        /* In uploadAvatarCustomMessages messagea are sent to the user in XML
+         * format. These are retreived in the target iframe the AJAX form posts
+         * to. Internet Explorer 6 can't handle XML documents, and a small delay
+         * is needed so the messages are retreived by dpclient-js.php using AJAX
+         * instead, where Internet Explorer 6 can handle the XML.
+         *
+         */
+
+        if (isset($this->_GET['ie6']) && 'yes' === $this->_GET['ie6']) {
+            $this->setTimeout('_uploadAvatarCustomMessages', 1, $msg, $err);
+        } else {
+            $this->_uploadAvatarCustomMessages($msg, $err);
+        }
+    }
+
+    /**
+     * Finishes uploading, removes loading indicator, sends messages
+     *
+     * @param   mixed   $msg  message string, FALSE for no message (the default)
+     * @param   boolean $err  TRUE for upload error, else FALSE (the default)
+     * @access  private
+     * @see     actionAvatar, setBrowseAvatarCustom, uploadAvatarCustom,
+     *          removeAvatarCustom
+     * @since   DutchPIPE 0.4.1
+     */
+    function _uploadAvatarCustomMessages($msg = FALSE, $err = FALSE)
+    {
+        $this->tell('<script>jQuery("#dpuploading").hide();</script>');
+        if (!$err) {
+            if (FALSE === ($body = $this->getEnvironment()->
+                    getAppearanceInventory(0, TRUE, $this,
+                    $this->displayMode))) {
+                $body = '';
+            }
+            $this->tell($body);
+            $this->getEnvironment()->tell(array('abstract' =>
+                '<changeDpElement id="'
+                . $this->getUniqueId() . '">'
+                . $this->getAppearance(1, FALSE) . '</changeDpElement>',
+                'graphical' => '<changeDpElement id="'
+                . $this->getUniqueId() . '">'
+                . $this->getAppearance(1, FALSE, $this, 'graphical')
+                . '</changeDpElement>'), $this);
+            $this->performAction(('say' === $this->inputMode ? '/' : '')
+                . dp_text('avatar'));
+        }
+        if ($msg && dp_strlen($msg)) {
+            $this->tell('<div id="dpupload_msg">' . $msg . '</div>');
+        }
+    }
+
+    /**
+     * Removes the custom avatar
+     *
+     * @access  private
+     * @see     actionAvatar, uploadAvatarCustom
+     * @since   DutchPIPE 0.4.1
+     */
+    function removeAvatarCustom()
+    {
+        $avatar_nr = $this->avatarNr = 1;
+        $this->avatarCustom = FALSE;
+        $this->titleImg = DPUNIVERSE_AVATAR_STD_URL . 'user' . $avatar_nr
+            . '.gif';
+
+        $this->titleImgWidth = $this->titleImgHeight = NULL;
+
+        $this->body = '<img src="' . DPUNIVERSE_AVATAR_STD_URL . 'user'
+            . $avatar_nr . '_body.gif" border="0" alt="" align="left" '
+            . 'style="margin-right: 15px" />' . dp_text('A user.') . '<br />';
+
+        if ($this->isRegistered) {
+            dp_db_exec('UPDATE Users set '
+                . 'userAvatarNr=' . dp_db_quote($avatar_nr, 'integer')
+                . ',userAvatarCustom = NULL'
+                . ' WHERE userUsernameLower='
+                . dp_db_quote(dp_strtolower($this->title), 'text'));
+        }
+
+        if (FALSE !== ($body = $this->getEnvironment()->
+                getAppearanceInventory(0, TRUE, NULL, $this->displayMode))) {
+            $this->tell($body);
+        }
+        $this->getEnvironment()->tell(array(
+            'abstract' => '<changeDpElement id="' . $this->getUniqueId() . '">'
+                . $this->getAppearance(1, FALSE) . '</changeDpElement>',
+            'graphical' => '<changeDpElement id="'
+                . $this->getUniqueId() . '">'
+                . $this->getAppearance(1, FALSE, $this, 'graphical')
+                . '</changeDpElement>'
+            ), $this);
+        $this->performAction(('say' === $this->inputMode ? '/' : '')
+            . dp_text('avatar'));
+    }
+
+    /**
+     * Shows this user a window with settings
      *
      * @param   string  $verb       the action, "settings"
      * @param   string  $noun       empty string
      * @return  boolean TRUE for action completed, FALSE otherwise
-     * @see     setSettings()
+     * @see     setSettings
      */
     function actionSettings($verb, $noun)
     {
         $this->tell('<script>
-function send_settings()
+function send_settings(avatar_nr)
 {
-    var avatar_nr = 1;
-    for (i=1;_gel("avatar_nr"+i) != undefined;i++) {
-        if (_gel("avatar_nr"+i).checked) {
-            avatar_nr = i;
-            break;
-        }
-    }
-
     jQuery.ajax({
         url: "' . DPSERVER_CLIENT_URL . '",
         data: "location='
             . $this->getEnvironment()->location
             . '&rand="+Math.round(Math.random()*9999)
-            + "&call_object="+escape("' . $this->getUniqueId() . '")
+            + "&call_object="+encodeURIComponent("' . $this->getUniqueId() . '")
             + "&method=setSettings"
-            + "&avatar_nr="+avatar_nr
             + "&display_mode="+(_gel("display_mode1").checked
                 ? _gel("display_mode1").value : _gel("display_mode2").value)
             + "&people_entering="+(_gel("people_entering").checked ? "1" : "0")
@@ -713,27 +1150,14 @@ function send_settings()
     return false;
 }
 </script>');
-        $nr_of_avatars = $this->_getNrOfAvatars();
-        $cur_avatar_nr = (int)$this->avatarNr;
-        for ($avatar_settings = '', $i = 1; $i <= $nr_of_avatars; $i++) {
-            $avatar_settings .= '<input type="radio" id="avatar_nr' . $i
-                . '" name="avatar_nr" value="' . $i . '"'
-                . ($cur_avatar_nr !== $i ? '' : ' checked="checked"')
-                . ' onClick="send_settings()" style="cursor: pointer" />' . $i
-                . "&#160; ";
-        }
-
-        $this->tell('<window>' . dp_text('Choose your avatar:') . '<br />'
-. $avatar_settings . '<br /><br />'
+        $this->tell('<window>'
 . dp_text('People and items on the page are displayed in:') . '<br />
 <input type="radio" id="display_mode1" name="display_mode" value="graphical"' . ($this->displayMode == 'graphical' ? ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dp_text('Graphical mode') . '<br />
 <input type="radio" id="display_mode2" name="display_mode" value="abstract"' . ($this->displayMode == 'abstract' ? ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dp_text('Abstract mode') . '<br /><br />'
 . dp_text('Alert me of the following events:') . '<br />
 <input type="checkbox" id="people_entering" name="people_entering" value="1"' . (isset($this->mAlertEvents['people_entering']) ? ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dp_text('People entering this site') . '<br />
 <input type="checkbox" id="people_leaving" name="people_leaving" value="1"' . (isset($this->mAlertEvents['people_leaving']) ? ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dp_text('People leaving this site') . '<br />
-<input type="checkbox" id="bots_entering" name="bots_entering" value="1"' . (isset($this->mAlertEvents['bots_entering']) ?  ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dp_text('Search engines indexing pages') . '<br />'
-            . ('http://dutchpipe.org' !== DPSERVER_HOST_URL ? '' : '<br />'
-. '<div id="box"><a href="http://www.messdudes.com/" target="_blank"><b>Mess Dudes</b></a> has kindly allowed DutchPIPE to use a number of avatars.</div>') . '
+<input type="checkbox" id="bots_entering" name="bots_entering" value="1"' . (isset($this->mAlertEvents['bots_entering']) ?  ' checked="checked"' : '') . ' onClick="send_settings()" style="cursor: pointer" />' . dp_text('Search engines indexing pages') . '<br />
 </window>');
 
         return TRUE;
@@ -744,26 +1168,17 @@ function send_settings()
      *
      * Called from the Javascript that goes with the menu that pops up after the
      * settings action has been performed. Applies avatar and dispay mode
-     * settings, based on the DpUser::_GET variable in this living object.
+     * settings, based on the DpUser::_GET variable in this user.
      *
      * @see     actionSettings
      */
     function setSettings()
     {
-        if (!isset($this->_GET['avatar_nr'])
-                || 0 === dp_strlen($avatar_nr = $this->_GET['avatar_nr'])
-                || !isset($this->_GET['display_mode'])
+        if (!isset($this->_GET['display_mode'])
                 || 0 === dp_strlen($display_mode
                 = $this->_GET['display_mode'])) {
             $this->tell(dp_text('Error receiving settings.<br />'));
         }
-
-        $this->avatarNr = $avatar_nr;
-        $this->setTitleImg(DPUNIVERSE_AVATAR_URL . 'user' . $avatar_nr
-            . '.gif');
-        $this->setBody('<img src="' . DPUNIVERSE_AVATAR_URL . 'user'
-            . $avatar_nr . '_body.gif" border="0" alt="" align="left" '
-            . 'style="margin-right: 15px" />' . dp_text('A user.') . '<br />');
 
         $this->displayMode = $display_mode;
 
@@ -792,31 +1207,25 @@ function send_settings()
         }
 
         if ($this->isRegistered) {
-            dp_db_exec("UPDATE Users set "
-                . "userAvatarNr='" . addslashes($avatar_nr)
-                . "',userDisplayMode='" . addslashes($display_mode)
-                . "',userEventPeopleEntering='"
-                . (!isset($this->mAlertEvents['people_entering']) ? '0' : '1')
-                . "',userEventPeopleLeaving='"
-                . (!isset($this->mAlertEvents['people_leaving']) ? '0' : '1')
-                . "',userEventBotsEntering='"
-                . (!isset($this->mAlertEvents['bots_entering']) ? '0' : '1')
-                . "' WHERE userUsernameLower='"
-                . addslashes(dp_strtolower($this->getTitle())) . "'");
+            dp_db_exec('UPDATE Users set '
+                . 'userDisplayMode=' . dp_db_quote($display_mode, 'text')
+                . ',userEventPeopleEntering='
+                . dp_db_quote((!isset($this->mAlertEvents['people_entering'])
+                ? '0' : '1'), 'text')
+                . ',userEventPeopleLeaving='
+                . dp_db_quote((!isset($this->mAlertEvents['people_leaving'])
+                ? '0' : '1'), 'text')
+                . ',userEventBotsEntering='
+                . dp_db_quote((!isset($this->mAlertEvents['bots_entering'])
+                ? '0' : '1'), 'text')
+                . ' WHERE userUsernameLower='
+                . dp_db_quote(dp_strtolower($this->title), 'text'));
         }
 
         if (FALSE !== ($body = $this->getEnvironment()->
                 getAppearanceInventory(0, TRUE, NULL, $display_mode))) {
             $this->tell($body);
         }
-        $this->getEnvironment()->tell(array('abstract' =>
-            '<changeDpElement id="'
-            . $this->getUniqueId() . '">'
-            . $this->getAppearance(1, FALSE) . '</changeDpElement>',
-            'graphical' => '<changeDpElement id="'
-            . $this->getUniqueId() . '">'
-            . $this->getAppearance(1, FALSE, $this, 'graphical')
-            . '</changeDpElement>'), $this);
     }
 
     /**
@@ -935,7 +1344,7 @@ function send_settings()
     }
 
     /**
-     * Makes this administrator force another living object to perform an action
+     * Makes this administrator force another user to perform an action
      *
      * @param   string  $verb       the action, "force"
      * @param   string  $noun       who and what to force
@@ -1000,7 +1409,7 @@ function send_settings()
      */
     function actionMoveOperant($verb, &$menuobj)
     {
-        $title = dp_strtolower($menuobj->getTitle());
+        $title = dp_strtolower($menuobj->title);
 
         return (FALSE === dp_strpos($title, ' ') ? $title : '"' . $title . '"')
             . ' ';
@@ -1156,7 +1565,7 @@ function send_settings()
                     Users
                 WHERE
                     userUsernameLower='
-                    . dp_db_quote(dp_strtolower($this->getTitle()), 'text'));
+                    . dp_db_quote(dp_strtolower($this->title), 'text'));
 
             if (empty($result) || !($row = dp_db_fetch_row($result))) {
                 dp_db_free($result);
@@ -1186,7 +1595,7 @@ function send_settings()
                 . dp_db_quote($loc, 'text') . ',userHomeSublocation='
                 . (is_null($subloc) || !dp_strlen($subloc) ? 'NULL'
                 : dp_db_quote($subloc, 'text')) . ' WHERE userUsernameLower='
-                . dp_db_quote(dp_strtolower($this->getTitle()), 'text'));
+                . dp_db_quote(dp_strtolower($this->title), 'text'));
             $this->tell(dp_text('Your home location has been set to the current page.<br />'));
             return TRUE;
         }
@@ -1231,7 +1640,7 @@ function send_settings()
                 dp_db_exec('UPDATE Users SET '
                     . 'userInputPersistent=' . dp_db_quote($ip, 'text')
                     . ' WHERE userUsernameLower='
-                    . dp_db_quote(dp_strtolower($this->getTitle()), 'text'));
+                    . dp_db_quote(dp_strtolower($this->title), 'text'));
             }
             return TRUE;
         }
@@ -1240,7 +1649,7 @@ function send_settings()
             dp_db_exec('UPDATE Users set userInputMode='
                 . dp_db_quote($this->inputMode, 'text')
                 . ' WHERE userUsernameLower='
-                . dp_db_quote(dp_strtolower($this->getTitle()), 'text'));
+                . dp_db_quote(dp_strtolower($this->title), 'text'));
         }
         $this->tell('cmd' === $this->inputMode
             ? dp_text('The input field is now in command mode. Enter <tt>help</tt> for more information.<br />')
@@ -1286,7 +1695,7 @@ class="dpcomm" /> <input type="submit" value=" &gt; " /></form>
     }
 
     /**
-     * Makes this user object shout something to everyone on the site
+     * Makes this user shout something to everyone on the site
      *
      * @param   string  $verb       the action, "shout"
      * @param   string  $noun       what to shout, could be empty
@@ -1314,7 +1723,7 @@ class="dpcomm" /> <input type="submit" value=" &gt; " /></form>
     }
 
     /**
-     * Makes this living object communicate a custom message to its environment
+     * Makes this user communicate a custom message to its environment
      *
      * @param   string  $verb       the action, "emote"
      * @param   string  $noun       string to "emote"
@@ -1340,7 +1749,5 @@ class="dpemote" /> <input type="submit" value=" &gt; " /></form>
 
         return DpLiving::actionEmote($verb, $noun);
     }
-
-
 }
 ?>

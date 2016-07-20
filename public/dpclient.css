@@ -14,9 +14,9 @@ body, td, th, input { font-family: arial,verdana,'Bitstream Vera Sans',helvetica
 #titlebarright a:hover { color: #fff; font-weight: normal }
 #titlebarright a:visited { color: #fff; font-weight: normal }
 #titlebarright a:active { color: #fff; font-weight: normal }
-.dpobject { background-color: #ffe0e0; width: 190px; padding: 10px; margin-top: 10px; margin-right: 10px; margin-bottom: 0px; float: left }
+.dpobject { cursor: pointer; background-color: #ffe0e0; width: 190px; padding: 10px; margin-top: 10px; margin-right: 10px; margin-bottom: 0px; float: left }
 .dpobject2 { background-color: #e0ffe0; width: 72px; padding: 5px; margin-top: 10px; margin-right: 10px; float: left }
-.title_img, .title_img_me { position: relative; text-align: center; width: 100px; height: 126px; font-size: 10px; font-family: verdana,arial,helvetica; margin-top: 1px; margin-right: 10px; margin-bottom: 0px; float: left }
+.title_img, .title_img_me { position: relative; text-align: center; font-size: 10px; font-family: verdana,arial,helvetica; margin-top: 1px; margin-right: 10px; margin-bottom: 0px; float: left }
 .title_img_me { font-weight: bold }
 .imgtxt { font-size: 10px; font-family: verdana,arial,helvetica }
 #navigation { }
@@ -115,7 +115,8 @@ a.col2:link, a.col2:visited { color: #666666; text-decoration: none }
 .dpwindow_shout { left: 100px; top: 115px; width: 450px; background-color: #00ccff }
 .dpwindow_emote { left: 60px; top: 135px; width: 450px; background-color: #ff9900 }
 .dpwindow_oblist { left: 20px; top: 20px }
-.dpinactive { opacity: 0.60; -moz-opacity: 0.60; filter: alpha(opacity=60) }
+.dpinactive { opacity: 0.55; -moz-opacity: 0.55; filter: alpha(opacity=55) }
 .dpinactive_txt { color: #6666A3 }
 .dpcomm { width: 375px }
 .dpemote { width: 320px }
+.dpupload_button { font-family: arial,verdana,'Bitstream Vera Sans',helvetica,sans-serif; font-size: 11px; height: 20px; color: #000066 }

@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: note.php 278 2007-08-19 22:52:25Z ls $
+ * @version    Subversion: $Id: note.php 308 2007-09-02 19:18:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -47,10 +47,12 @@ final class Note extends DpObject
         $this->titleDefinite = dp_text('the small note');
         $this->titleIndefinite = dp_text('a small note');
         $this->titleImg = DPUNIVERSE_IMAGE_URL . 'smallnote.gif';
+        $this->titleImgWidth = 35;
+        $this->titleImgHeight = 46;
         $this->addId(explode('#',
             dp_text('note#paper note#small note#small paper note#small, paper note#a small note')));
         $this->body = '<img src="' . DPUNIVERSE_IMAGE_URL
-            . 'smallnote_body.gif" width="35" height="46" border="0" alt="" '
+            . 'smallnote.gif" width="35" height="46" border="0" alt="" '
             . 'align="left" style="margin-right: 15px" /><br />'
             . dp_text('This is a small paper note. You can read it.<br />');
 

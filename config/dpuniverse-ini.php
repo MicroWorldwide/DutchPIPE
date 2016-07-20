@@ -18,7 +18,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: dpuniverse-ini.php 280 2007-08-20 20:38:21Z ls $
+ * @version    Subversion: $Id: dpuniverse-ini.php 308 2007-09-02 19:18:58Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        dpuniverse.php, dpserver-ini.php
  */
@@ -301,22 +301,70 @@ define('DPUNIVERSE_IMAGE_PATH', DPUNIVERSE_WWW_PATH . 'images/');
 define('DPUNIVERSE_IMAGE_URL', DPUNIVERSE_WWW_URL . 'images/');
 
 /**
- * Path to the publicly reachable web avatar images directory
+ * Path to the publicly reachable standard avatar images directory
  *
  * Leave this untouched if the DutchPIPE directory structure wasn't changed.
  *
- * @see        DPUNIVERSE_AVATAR_URL
+ * @see        DPUNIVERSE_AVATAR_STD_URL
  */
-define('DPUNIVERSE_AVATAR_PATH', DPUNIVERSE_IMAGE_PATH . 'avatar');
+define('DPUNIVERSE_AVATAR_STD_PATH', DPUNIVERSE_IMAGE_PATH . 'ava_std/');
 
 /**
- * URL to the publicly reachable web avatar images directory
+ * URL to the publicly reachable standard avatar images directory
  *
  * Leave this untouched if the DutchPIPE directory structure wasn't changed.
  *
- * @see        DPUNIVERSE_AVATAR_PATH
+ * @see        DPUNIVERSE_AVATAR_STD_PATH
  */
-define('DPUNIVERSE_AVATAR_URL', DPUNIVERSE_IMAGE_URL . 'avatar/');
+define('DPUNIVERSE_AVATAR_STD_URL', DPUNIVERSE_IMAGE_URL . 'ava_std/');
+
+/**
+ * Are users allowed to upload their own avatar?
+ *
+ * TRUE to enable, FALSE to disable. The GD library must be enabled on your PHP
+ * installation. This constant is ignored when GD is not enabled.
+ */
+define('DPUNIVERSE_AVATAR_CUSTOM_ENABLED', TRUE);
+
+/**
+ * Path to the publicly reachable custom avatar directory of guests
+ *
+ * Leave this untouched if the DutchPIPE directory structure wasn't changed.
+ *
+ * @see        DPUNIVERSE_AVATAR_CUSTOM_GUEST_URL
+ */
+define('DPUNIVERSE_AVATAR_CUSTOM_GUEST_PATH', DPUNIVERSE_IMAGE_PATH
+    . 'ava_cus_gst/');
+
+/**
+ * URL to the publicly reachable custom avatar directory of guests
+ *
+ * Leave this untouched if the DutchPIPE directory structure wasn't changed.
+ *
+ * @see        DPUNIVERSE_AVATAR_CUSTOM_GUEST_PATH
+ */
+define('DPUNIVERSE_AVATAR_CUSTOM_GUEST_URL', DPUNIVERSE_IMAGE_URL
+    . 'ava_cus_gst/');
+
+/**
+ * Path to the publicly reachable custom avatar directory of registered users
+ *
+ * Leave this untouched if the DutchPIPE directory structure wasn't changed.
+ *
+ * @see        DPUNIVERSE_AVATAR_CUSTOM_REG_URL
+ */
+define('DPUNIVERSE_AVATAR_CUSTOM_REG_PATH', DPUNIVERSE_IMAGE_PATH
+    . 'ava_cus_reg/');
+
+/**
+ * URL to the publicly reachable custom avatar directory of registered users
+ *
+ * Leave this untouched if the DutchPIPE directory structure wasn't changed.
+ *
+ * @see        DPUNIVERSE_AVATAR_CUSTOM_REG_PATH
+ */
+define('DPUNIVERSE_AVATAR_CUSTOM_REG_URL', DPUNIVERSE_IMAGE_URL
+    . 'ava_cus_reg/');
 
 /**
  * Path to the directory with CAPTCHA images

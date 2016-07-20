@@ -14,7 +14,7 @@
  * @author     Lennert Stock <ls@dutchpipe.org>
  * @copyright  2006, 2007 Lennert Stock
  * @license    http://dutchpipe.org/license/1_0.txt  DutchPIPE License
- * @version    Subversion: $Id: DpLiving.php 278 2007-08-19 22:52:25Z ls $
+ * @version    Subversion: $Id: DpLiving.php 311 2007-09-03 12:48:09Z ls $
  * @link       http://dutchpipe.org/manual/package/DutchPIPE
  * @see        DpObject
  */
@@ -295,28 +295,6 @@ class DpLiving extends DpObject
     function getSessionAge()
     {
         return get_age2string(time() - $this->creationTime);
-    }
-
-    /**
-     * Gets the available number of avatars images
-     *
-     * Searches the DPUNIVERSE_AVATAR_PATH directory for files ending with
-     * "_body.gif".
-     *
-     * @access  private
-     * @return  int     the number of available avatar images
-     */
-    static function _getNrOfAvatars()
-    {
-        $entries = 0;
-        $d = dir(DPUNIVERSE_AVATAR_PATH);
-            while (false !== ($entry = $d->read())) {
-            if ($entry !== '.' && $entry !== '..' && dp_strlen($entry) > 13
-                    && dp_substr($entry, -9) == '_body.gif') {
-                $entries++;
-            }
-        }
-        return $entries;
     }
 
     /**
